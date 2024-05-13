@@ -1,3 +1,4 @@
+![title](Repo/logo.jpg)
 # SwiftPol
 Tools for polymer molecular dynamics simulations
 
