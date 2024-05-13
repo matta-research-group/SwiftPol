@@ -1,4 +1,4 @@
-name: polymer
+name: swiftpol
 channels:
   - pytorch
   - openeye
