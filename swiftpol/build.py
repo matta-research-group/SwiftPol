@@ -129,22 +129,18 @@ def build_linear_copolymer(sequence,
     Chem.SanitizeMol(polymer)
     return polymer, A_ratio, B_ratio
 
-    
-#Class object for polymer system
-from functools import reduce
-from statistics import mean
-from rdkit.Chem.Descriptors import ExactMolWt
-from openff.interchange import Interchange
-from openff.interchange.components._packmol import UNIT_CUBE, pack_box
 
-#Class object for polymer system
-from functools import reduce
-from statistics import mean
-from rdkit.Chem.Descriptors import ExactMolWt
-from openff.interchange import Interchange
-from openff.interchange.components._packmol import UNIT_CUBE, pack_box
+#Class object for PLGA system - will be extended for other co-polymers and homopolymers
+
 
 class PLGA_system:
+    from openeye import oechem
+    from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
+    from functools import reduce
+    from statistics import mean
+    from rdkit.Chem.Descriptors import ExactMolWt
+    from openff.interchange import Interchange
+    from openff.interchange.components._packmol import UNIT_CUBE, pack_box
     """
     A class used to represent a poly-lactide-(co)-glycolide polymer chain system.
 
@@ -274,15 +270,18 @@ class PLGA_system:
         print('System built!, size =', self.num_chains)
 
     
-    def charge_system(self):
+    def charge_system(self): #Only supports GNN charging
+        from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
         toolkit_registry = EspalomaChargeToolkitWrapper()
         for chain in self.chains:
             num = self.chains.index(chain)
             chain.assign_partial_charges('espaloma-am1bcc', toolkit_registry=toolkit_registry)
             #Generate conformers using OpenFF toolkit wrapper
-            object = OpenEyeToolkitWrapper()
-            object.generate_conformers(molecule = chain, n_conformers=1)
-            openff_chain.generate_unique_atom_names()
+            #if oechem.OEChemIsLicensed():
+            #object = OpenEyeToolkitWrapper()
+            #else:
+            object = RDKitToolkitWrapper()
+            chain.generate_unique_atom_names()
 
 
     def build_system(self, resid_monomer):
