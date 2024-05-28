@@ -141,6 +141,7 @@ class PLGA_system:
     from rdkit.Chem.Descriptors import ExactMolWt
     from openff.interchange import Interchange
     from openff.interchange.components._packmol import UNIT_CUBE, pack_box
+    from swiftpol.build import build_PLGA_ring
     """
     A class used to represent a poly-lactide-(co)-glycolide polymer chain system.
 
