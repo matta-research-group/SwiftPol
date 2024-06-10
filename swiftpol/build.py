@@ -8,6 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import numpy as np
 import time
+from openeye import oechem
 
 #import mdtraj as md
 import nglview
@@ -37,7 +38,7 @@ from openff.interchange.components._packmol import UNIT_CUBE, pack_box
 def build_PLGA_ring(sequence, 
                     reaction = AllChem.ReactionFromSmarts('[I:1][O:2].[I:3][C:4]>>[C:4][O:2].[I:3][I:1]'),
                     terminal='hydroxyl'):
-    '''Build a PLGA co-polymer of specified sequence and return the sanitized polymer, specify monomer joining scheme using reaction SMARTS
+    ''' Build a PLGA co-polymer of specified sequence and return the sanitized polymer, specify monomer joining scheme using reaction SMARTS
     takes a list of up to 2 monomers to create a co-polymer.
     This function takes the cyclic esters lactide and glycolide as constituent monomers
     Inputs:
@@ -130,6 +131,185 @@ def build_linear_copolymer(sequence,
     return polymer, A_ratio, B_ratio
 
 
+
+def PDI(chains):
+    """
+    Calculates the Polydispersity Index (PDI), number-average molecular weight (Mn), and weight-average molecular weight (Mw) of a list of chains.
+
+    This function takes a list of molecular chains and calculates the PDI, which is the ratio of Mw to Mn. It also calculates Mn, which is the sum of the molecular weights of the chains divided by the number of chains, and Mw, which is the sum of the product of the weight fraction and molecular weight of each chain.
+
+    Parameters:
+    chains (list): A list of molecular chains. Each chain is represented as an RDkit molecule object.
+
+    Returns:
+    tuple: A tuple containing the PDI (float), Mn (float), and Mw (float).
+    """
+
+    mw_list = [ExactMolWt(chain) for chain in chains]  #_rdkit]
+    list = [round(mass) for mass in mw_list]
+    Mi = set(list)
+    NiMi = []
+    for i in Mi:
+        Ni = list.count(i)
+        NiMi.append(i*Ni)
+    sigNiMi = sum(NiMi)
+    Mn = sigNiMi/len(mw_list)
+    wf = [z/sigNiMi for z in NiMi]
+    WiMi = [wf[n]*NiMi[n] for n in range(len(wf))]
+    Mw = sum(WiMi)
+    PDI = Mw/Mn
+    return PDI, Mn, Mw
+    
+
+
+def blockiness_calc(sequence):  
+    """
+    Calculates the blockiness and average block length of a co-polymer sequence.
+
+    This function takes a sequence of co-polymers represented as 'G' and 'L'. It calculates the blockiness of the sequence, which is the ratio of 'GG' to 'GL' or 'LG', and the average block length for 'G' and 'L'. If the sequence does not contain both 'G' and 'L', it is not considered a co-polymer, and the blockiness is set to 1.0.
+
+    Parameters:
+    sequence (str): A string representing the sequence of co-polymers. 'G' and 'L' represent different types of monomers.
+
+    Returns:
+    tuple: A tuple containing the blockiness (float), the average block length for 'G' (float), and the average block length for 'L' (float).
+    """
+
+    if 'G' in sequence and 'L' in sequence:
+        LG = sequence.count('LG')
+        GG = sequence.count('GG')
+        GL = sequence.count('GL')
+        LL = sequence.count('LL')
+        if 'GL' in sequence:
+            blockiness = GG/GL
+        else:
+            blockiness = GG/LG
+        
+        block_list_G = [x for x in sequence.split('L') if x!='']
+        block_length_G = mean([len(b) for b in block_list_G])
+        
+        block_list_L = [x for x in sequence.split('G') if x!='']
+        block_length_L = mean([len(b) for b in block_list_L])
+        return blockiness, block_length_G, block_length_L
+
+    else:
+        blockiness = 1.0
+        block_length_G = len(sequence) if 'G' in sequence else 0
+        block_length_L = len(sequence) if 'L' in sequence else 0
+        
+        return blockiness, block_length_G, block_length_L
+
+def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.mole / unit.liter, residual_monomer = 0.05):
+    """
+    Calculates the components required to construct a simulation box for a given set of molecular chains.
+    Considers the salt concentration and residual monomer concentration to determine the quantity of each molecule type required.
+
+    Parameters:
+    chains (list): A list of molecular chains to be included in the simulation box.
+    sequence (str): A string representing the sequence of the molecular chains. 'G' and 'L' represent different types of monomers.
+    salt_concentration (float, optional): The desired salt concentration in the simulation box. Defaults to 0.1 M.
+    residual_monomer (float, optional): The desired residual monomer concentration in the simulation box. Defaults to 0.05.
+
+    Returns:
+    tuple: A tuple containing the following elements:
+        - molecules (list): A list of molecules to be included in the simulation box.
+        - number_of_copies (list): A list indicating the quantity of each molecule to be included in the simulation box.
+        - topology (openff.toolkit.topology.Topology): The topology of the simulation box.
+        - box_vectors (numpy.ndarray): The vectors defining the dimensions of the simulation box.
+    """
+    from openff.toolkit.topology import Molecule, Topology
+    from openff.interchange.components._packmol import UNIT_CUBE, pack_box, RHOMBIC_DODECAHEDRON, solvate_topology
+    from openff.interchange.components._packmol import _max_dist_between_points, _compute_brick_from_box_vectors, _center_topology_at
+    #Create molecules for the purpose of later topology assembly
+    #Water
+    water = Molecule.from_smiles('O')
+    water.generate_unique_atom_names()
+    water.generate_conformers()
+    #Sodium
+    na = Molecule.from_smiles('[Na+]')
+    na.generate_unique_atom_names()
+    na.generate_conformers()
+    #Chloride
+    cl = Molecule.from_smiles('[Cl-]')
+    cl.generate_unique_atom_names()
+    cl.generate_conformers()
+    
+    topology = Topology.from_molecules(chains)
+    nacl_conc=salt_concentration
+    padding= 0.1 * unit.nanometer
+    box_shape= UNIT_CUBE
+    target_density= 1.0 * unit.gram / unit.milliliter
+    tolerance= 2.0 * unit.nanometer
+    
+    # Compute box vectors from the solute length and requested padding
+    solute_length = _max_dist_between_points(topology.get_positions())
+    image_distance = solute_length + padding * 2
+    box_vectors = box_shape * image_distance
+    brick_size = _compute_brick_from_box_vectors(box_vectors)
+    s =  image_distance * 10
+    
+    # Compute target masses of solvent
+    box_volume = np.linalg.det(box_vectors.m) * box_vectors.u**3
+    target_mass = box_volume * target_density
+    solute_mass = sum(sum([atom.mass for atom in molecule.atoms]) for molecule in topology.molecules)
+    solvent_mass = target_mass - solute_mass
+    
+    
+    nacl_mass = sum([atom.mass for atom in na.atoms]) + sum(
+    [atom.mass for atom in cl.atoms],
+    )
+    
+    water_mass = sum([atom.mass for atom in water.atoms])
+    molarity_pure_water = 55.5 * unit.mole / unit.liter
+    
+    # Compute the number of salt "molecules" to add from the mass and concentration
+    nacl_mass_fraction = (nacl_conc * nacl_mass) / (molarity_pure_water * water_mass)
+    nacl_mass_to_add = solvent_mass * nacl_mass_fraction
+    nacl_to_add = (nacl_mass_to_add / nacl_mass).m_as(unit.dimensionless).round()
+    
+    # Compute the number of water molecules to add to make up the remaining mass
+    water_mass_to_add = solvent_mass - nacl_mass
+    water_to_add = round((water_mass_to_add / water_mass).m_as(unit.dimensionless).round())
+    
+    # Neutralise the system by adding and removing salt
+    solute_charge = sum([molecule.total_charge for molecule in topology.molecules])
+    na_to_add = round(np.ceil(nacl_to_add - solute_charge.m / 2.0))
+    cl_to_add = round(np.floor(nacl_to_add + solute_charge.m / 2.0))
+    
+    rolling_mass=0
+    for m in topology.molecules:
+        rolling_mass += sum(atom.mass for atom in m.atoms)
+    rolling_mass += nacl_mass * nacl_to_add
+    rolling_mass += water_mass * water_to_add
+    
+    
+    mass_to_add = (rolling_mass.magnitude/1-residual_monomer) * residual_monomer
+    lac = Molecule.from_smiles('C[C@@H](C(=O)[OH])O')
+    lac_mass = sum([atom.mass for atom in lac.atoms])
+    gly = Molecule.from_smiles('OC(=O)CO')
+    gly_mass = sum([atom.mass for atom in gly.atoms])
+    
+    
+    if 'L' in sequence and 'G' in sequence:
+        for r in range(0,100):
+            if (r * lac_mass.magnitude) + (r * gly_mass.magnitude) <= mass_to_add:
+                lac_to_add = r
+                gly_to_add = r
+            else:
+                break
+    
+    elif 'L' in sequence and 'G' not in sequence:
+        for r in range(0,100):
+            if r * lac_mass.magnitude <= mass_to_add:
+                lac_to_add = r
+            else:
+                break
+        gly_to_add = 0
+
+    molecules = [water, na, cl, lac, gly]
+    number_of_copies=[water_to_add, na_to_add, cl_to_add, lac_to_add, gly_to_add]
+    return molecules, number_of_copies, topology, box_vectors
+
 #Class object for PLGA system - will be extended for other co-polymers and homopolymers
 
 
@@ -141,11 +321,9 @@ class PLGA_system:
     from rdkit.Chem.Descriptors import ExactMolWt
     from openff.interchange import Interchange
     from openff.interchange.components._packmol import UNIT_CUBE, pack_box
-    from swiftpol.build import build_PLGA_ring
+    from swiftpol.build import build_PLGA_ring, PDI, blockiness_calc, calculate_box_components
     """
-    A class used to represent a poly-lactide-(co)-glycolide polymer chain system.
-
-    ...
+    A class used to represent a poly-lactide-(co)-glycolide (PLGA) polymer chain system.
 
     Attributes
     ----------
@@ -197,9 +375,9 @@ class PLGA_system:
     Methods
     -------
     charge_system():
-        Assigns partial charges to the chains and generates conformers.
-    build_system(resid_monomer):
-        Builds the system using packmol functions, containing a set amount of residual monomer.
+        Assigns partial charges to the chains and generates conformers using the NAGLToolkitWrapper.
+    build_system(resid_monomer, salt_concentration):
+        Builds the system using packmol functions, containing a set amount of residual monomer and a specified salt concentration.
     """
 
     gen_rxn = AllChem.ReactionFromSmarts('[C:1][HO:2].[HO:3][C:4]>>[C:1][O:2][C:4].[O:3]')
@@ -271,91 +449,38 @@ class PLGA_system:
         print('System built!, size =', self.num_chains)
 
     
-    def charge_system(self): #Only supports GNN charging
-        from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
-        toolkit_registry = EspalomaChargeToolkitWrapper()
+    def charge_system(self):
+        from openff.toolkit.utils.nagl_wrapper import NAGLToolkitWrapper
+        ntkw = NAGLToolkitWrapper()
         for chain in self.chains:
             num = self.chains.index(chain)
-            chain.assign_partial_charges('espaloma-am1bcc', toolkit_registry=toolkit_registry)
+            ntkw.assign_partial_charges(chain, "openff-gnn-am1bcc-0.1.0-rc.2.pt")
             #Generate conformers using OpenFF toolkit wrapper
-            #if oechem.OEChemIsLicensed():
-            #object = OpenEyeToolkitWrapper()
-            #else:
-            object = RDKitToolkitWrapper()
+            if oechem.OEChemIsLicensed():
+                object = OpenEyeToolkitWrapper()
+            else:
+                object = RDKitToolkitWrapper()
+            object.generate_conformers(molecule = chain, n_conformers=1)
             chain.generate_unique_atom_names()
+            self.chains[num] = chain
 
-
-    def build_system(self, resid_monomer):
+    def build_system(self, resid_monomer, salt_concentration):
         '''Builds system using packmol functions'''
+        from openff.interchange.components._packmol import pack_box
         self.residual_monomer = resid_monomer
-        #IN DEVELOPMENT
+        self.salt_conc = salt_concentration
+        molecules, number_of_copies, topology, box_vectors = calculate_box_components(chains = self.chains,
+                                                                                      sequence=self.sequence, 
+                                                                                      residual_monomer=resid_monomer,
+                                                                                      salt_concentration=salt_concentration)
+        solvated_system = pack_box(
+        molecules=molecules,
+        number_of_copies=number_of_copies,
+        solute = topology,
+        box_vectors=box_vectors,
+        center_solute='BRICK'
+        )
+        return solvated_system
 
 
 
-
-def PDI(chains):
-    """
-    Calculates the Polydispersity Index (PDI), number-average molecular weight (Mn), and weight-average molecular weight (Mw) of a list of chains.
-
-    This function takes a list of molecular chains and calculates the PDI, which is the ratio of Mw to Mn. It also calculates Mn, which is the sum of the molecular weights of the chains divided by the number of chains, and Mw, which is the sum of the product of the weight fraction and molecular weight of each chain.
-
-    Parameters:
-    chains (list): A list of molecular chains. Each chain is represented as an RDkit molecule object.
-
-    Returns:
-    tuple: A tuple containing the PDI (float), Mn (float), and Mw (float).
-    """
-
-    mw_list = [ExactMolWt(chain) for chain in chains]  #_rdkit]
-    list = [round(mass) for mass in mw_list]
-    Mi = set(list)
-    NiMi = []
-    for i in Mi:
-        Ni = list.count(i)
-        NiMi.append(i*Ni)
-    sigNiMi = sum(NiMi)
-    Mn = sigNiMi/len(mw_list)
-    wf = [z/sigNiMi for z in NiMi]
-    WiMi = [wf[n]*NiMi[n] for n in range(len(wf))]
-    Mw = sum(WiMi)
-    PDI = Mw/Mn
-    return PDI, Mn, Mw
-    
-
-
-def blockiness_calc(sequence):  
-    """
-    Calculates the blockiness and average block length of a co-polymer sequence.
-
-    This function takes a sequence of co-polymers represented as 'G' and 'L'. It calculates the blockiness of the sequence, which is the ratio of 'GG' to 'GL' or 'LG', and the average block length for 'G' and 'L'. If the sequence does not contain both 'G' and 'L', it is not considered a co-polymer, and the blockiness is set to 1.0.
-
-    Parameters:
-    sequence (str): A string representing the sequence of co-polymers. 'G' and 'L' represent different types of monomers.
-
-    Returns:
-    tuple: A tuple containing the blockiness (float), the average block length for 'G' (float), and the average block length for 'L' (float).
-    """
-
-    if 'G' in sequence and 'L' in sequence:
-        LG = sequence.count('LG')
-        GG = sequence.count('GG')
-        GL = sequence.count('GL')
-        LL = sequence.count('LL')
-        if 'GL' in sequence:
-            blockiness = GG/GL
-        else:
-            blockiness = GG/LG
-        
-        block_list_G = [x for x in sequence.split('L') if x!='']
-        block_length_G = mean([len(b) for b in block_list_G])
-        
-        block_list_L = [x for x in sequence.split('G') if x!='']
-        block_length_L = mean([len(b) for b in block_list_L])
-        return blockiness, block_length_G, block_length_L
-
-    else:
-        blockiness = 1.0
-        block_length_G = len(sequence) if 'G' in sequence else 0
-        block_length_L = len(sequence) if 'L' in sequence else 0
-        print('Molecule is not a co-polymer, no blockiness calculation performed')
-        return blockiness, block_length_G, block_length_L
