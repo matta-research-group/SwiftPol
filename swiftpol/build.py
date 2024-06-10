@@ -201,6 +201,7 @@ def blockiness_calc(sequence):
 
 def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.mole / unit.liter, residual_monomer = 0.05):
     """
+    ADAPTED FROM OPENFF TOOLKIT PACKMOL WRAPPER SOLVATE_TOPOLOGY FUNCTION
     Calculates the components required to construct a simulation box for a given set of molecular chains.
     Considers the salt concentration and residual monomer concentration to determine the quantity of each molecule type required.
 
