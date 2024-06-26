@@ -389,7 +389,7 @@ class PLGA_system:
         self.terminals = terminals
         def spec(sequence, blockiness): #Define limits of lactide percentage and blockiness from input
             actual_lac = (sequence.count('L')/len(sequence))*100
-            return actual_lac > perc_lactide_target*0.95 and actual_lac < perc_lactide_target*1.05 and blockiness>blockiness_target*0.95 and blockiness<blockiness_target*1.05
+            return actual_lac > perc_lactide_target*0.90 and actual_lac < perc_lactide_target*1.10 and blockiness>blockiness_target*0.90 and blockiness<blockiness_target*1.10
         chains = []
         perc_lactide_actual = []
         out_of_spec = 0
