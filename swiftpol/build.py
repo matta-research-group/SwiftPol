@@ -243,7 +243,7 @@ def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.m
     tolerance= 2.0 * unit.nanometer
     
     # Compute box vectors from the solute length and requested padding
-    solute_length = _max_dist_between_points(topology.get_positions())
+    solute_length = _max_dist_between_points(chains[0].to_topology().get_positions())
     image_distance = solute_length + padding * 2
     box_vectors = box_shape * image_distance
     brick_size = _compute_brick_from_box_vectors(box_vectors)
@@ -452,6 +452,7 @@ class PLGA_system:
     
     def charge_system(self):
         from openff.toolkit.utils.nagl_wrapper import NAGLToolkitWrapper
+        from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
         ntkw = NAGLToolkitWrapper()
         for chain in self.chains:
             num = self.chains.index(chain)
