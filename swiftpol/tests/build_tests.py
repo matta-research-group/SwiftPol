@@ -1,9 +1,14 @@
 import unittest
 from rdkit import Chem
 from rdkit.Chem import AllChem
+import os
 from swiftpol import build 
-from rdkit.Chem.rdMolDescriptors import ExactMolWt
+from rdkit.Chem.Descriptors import ExactMolWt
 from openff.toolkit.topology import Molecule
+import numpy as np  # Added for numpy array type checking
+from openff.toolkit.topology import Topology  # Added for topology type checking
+
+# Define all test cases
 
 class TestBuildPLGARing(unittest.TestCase):
     def test_build_PLGA_ring(self):
@@ -18,10 +23,6 @@ class TestBuildPLGARing(unittest.TestCase):
         # Check if the returned ratios are as expected
         self.assertEqual(LA_ratio, 50.0)
         self.assertEqual(GA_ratio, 50.0)
-
-if __name__ == '__main__':
-    unittest.main()
-    
 
 class TestBuildLinearCopolymer(unittest.TestCase):
     def test_build_linear_copolymer(self):
@@ -38,9 +39,6 @@ class TestBuildLinearCopolymer(unittest.TestCase):
         self.assertEqual(A_ratio, 50.0)
         self.assertEqual(B_ratio, 50.0)
 
-if __name__ == '__main__':
-    unittest.main()
-    
 class TestPDI(unittest.TestCase):
     def test_PDI(self):
         # Create some RDKit molecule objects
@@ -58,14 +56,9 @@ class TestPDI(unittest.TestCase):
         self.assertTrue(isinstance(mw, float))
 
         # Check if the returned PDI, Mn, and Mw are as expected
-        # Replace the expected values with the actual expected values
         self.assertAlmostEqual(pdi, 1.0, places=2)
         self.assertAlmostEqual(mn, 60.0, places=2)
         self.assertAlmostEqual(mw, 60.0, places=2)
-
-if __name__ == '__main__':
-    unittest.main()
-    
 
 class TestBlockinessCalc(unittest.TestCase):
     def test_blockiness_calc(self):
@@ -78,17 +71,9 @@ class TestBlockinessCalc(unittest.TestCase):
         self.assertTrue(isinstance(block_length_L, float))
 
         # Check if the returned blockiness, block_length_G, and block_length_L are as expected
-        # Replace the expected values with the actual expected values
         self.assertAlmostEqual(blockiness, 0.0, places=2)
         self.assertAlmostEqual(block_length_G, 1.0, places=2)
         self.assertAlmostEqual(block_length_L, 1.0, places=2)
-
-if __name__ == '__main__':
-    unittest.main()
-    
-
-
-
 
 class TestCalculateBoxComponents(unittest.TestCase):
     def test_calculate_box_components(self):
@@ -116,16 +101,13 @@ class TestCalculateBoxComponents(unittest.TestCase):
         # Check if the returned box_vectors is a numpy array
         self.assertTrue(isinstance(box_vectors, np.ndarray))
 
-if __name__ == '__main__':
-    unittest.main()
-    
 class TestPLGASystem(unittest.TestCase):
     def test_PLGA_system(self):
         # Instantiate the PLGA_system class
         plga_system = build.PLGA_system(perc_lactide_target=50, length_target=10, blockiness_target=0.5, terminals='OH', num_chains=5)
         
         # Check if the PLGA_system object has been created
-        self.assertIsInstance(plga_system, PLGA_system)
+        self.assertIsInstance(plga_system, build.PLGA_system)
         
         # Call the charge_system method
         plga_system.charge_system()
@@ -135,10 +117,12 @@ class TestPLGASystem(unittest.TestCase):
             self.assertIsNotNone(chain.partial_charges)
         
         # Call the build_system method
-        solvated_system = build.plga_system.build_system(resid_monomer=0.1, salt_concentration=0.1)
+        solvated_system = plga_system.build_system(resid_monomer=0.1, salt_concentration=0.1)
         
         # Check if the solvated_system object has been created
         self.assertIsNotNone(solvated_system)
+
+# Run all the tests
 
 if __name__ == '__main__':
     unittest.main()
