@@ -162,17 +162,23 @@ def PDI(chains):
     
 
 
+
 def blockiness_calc(sequence):  
     """
-    Calculates the blockiness and average block length of a co-polymer sequence.
+    Calculate the blockiness and average block length of a co-polymer sequence.
 
-    This function takes a sequence of co-polymers represented as 'G' and 'L'. It calculates the blockiness of the sequence, which is the ratio of 'GG' to 'GL' or 'LG', and the average block length for 'G' and 'L'. If the sequence does not contain both 'G' and 'L', it is not considered a co-polymer, and the blockiness is set to 1.0.
+    This function calculates the blockiness of a co-polymer sequence by counting the occurrences of 'GG' and 'GL' or 'LG' in the sequence. 
+    It also calculates the average block length of 'G' and 'L' in the sequence.
 
     Parameters:
-    sequence (str): A string representing the sequence of co-polymers. 'G' and 'L' represent different types of monomers.
+    sequence (str): A string representing the co-polymer sequence. 'G' represents one type of monomer and 'L' represents another type.
 
     Returns:
-    tuple: A tuple containing the blockiness (float), the average block length for 'G' (float), and the average block length for 'L' (float).
+    blockiness (float): The blockiness of the co-polymer sequence. Calculated as the ratio of 'GG' to 'GL' or 'LG'.
+    block_length_G (float): The average block length of 'G' in the sequence.
+    block_length_L (float): The average block length of 'L' in the sequence.
+
+    If the sequence does not contain both 'G' and 'L', the function returns a string indicating that the molecule is not a co-polymer.
     """
 
     if 'G' in sequence and 'L' in sequence:
@@ -193,13 +199,9 @@ def blockiness_calc(sequence):
         return blockiness, block_length_G, block_length_L
 
     else:
-        blockiness = 1.0
-        block_length_G = len(sequence) if 'G' in sequence else 0
-        block_length_L = len(sequence) if 'L' in sequence else 0
-        
-        return blockiness, block_length_G, block_length_L
+        return 'Molecule is not a co-polymer, no blockiness calculation performed', 0, len(sequence)
 
-def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.mole / unit.liter, residual_monomer = 0.05):
+def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.mole / unit.liter, residual_monomer = 0.00):
     """
     ADAPTED FROM OPENFF TOOLKIT PACKMOL WRAPPER SOLVATE_TOPOLOGY FUNCTION
     Calculates the components required to construct a simulation box for a given set of molecular chains.
