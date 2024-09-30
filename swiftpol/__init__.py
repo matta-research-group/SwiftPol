@@ -1,4 +1,4 @@
-"""A Python package for building in silicon polymer systems""
+"""A Python package for building in silico polymer systems"""
 
 # Add imports here
 from .functions import *
