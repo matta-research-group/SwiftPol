@@ -41,3 +41,40 @@ def charge_polymer(polymer, charge_scheme):
     else:
         raise AttributeError("This function takes either 'AM1_BCC', 'NAGL', or 'espaloma' as charge_scheme input")
     
+    
+
+
+def forcefield_with_charge_handler(molecule, charge_method, forcefield = "openff-2.2.0.offxml"):
+    '''
+    Create a forcefield with a charge handler for a given molecule and charge method.
+
+    Parameters:
+    molecule: An RDKit molecule object for which the forcefield is to be created.
+    charge_method: A string that specifies the charge method to be used for the molecule.
+    forcefield: A string that specifies the forcefield to be used. Default is "openff-2.2.0.offxml".
+
+    Returns:
+    An OpenFF ForceField object with the specified molecule's charges added to the LibraryCharges parameter.
+
+    Raises:
+    Exception: If the charge method is not supported.
+    '''
+    
+    import numpy as np
+    from openmm import NonbondedForce, unit
+    from openff.toolkit.topology import Molecule
+    from openff.toolkit.typing.engines.smirnoff import ForceField
+    from openff.toolkit.typing.engines.smirnoff.parameters import LibraryChargeHandler
+    from swiftpol.parameterize import charge_polymer
+    openff_molecule = Molecule.from_rdkit(molecule)
+    charges = charge_polymer(molecule, charge_method)
+    openff_molecule.partial_charges = charges * unit.elementary_charge
+    
+    # Add charges to OpenFF force field
+    library_charge_type = LibraryChargeHandler.LibraryChargeType.from_molecule(openff_molecule)
+
+    # Pull base force field
+    forcefield = ForceField(forcefield)
+    forcefield["LibraryCharges"].add_parameter(parameter=library_charge_type)
+    
+    return forcefield
