@@ -454,13 +454,14 @@ class PLGA_system:
     def generate_conformers(self):
         from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
         #Generate conformers using OpenFF toolkit wrapper
-        if oechem.OEChemIsLicensed():
-            object = OpenEyeToolkitWrapper()
-        else:
-            object = RDKitToolkitWrapper()
-        object.generate_conformers(molecule = chain, n_conformers=1)
-        chain.generate_unique_atom_names()
-        self.chains[num] = chain
+        for chain in self.chains:
+            if oechem.OEChemIsLicensed():
+                object = OpenEyeToolkitWrapper()
+            else:
+                object = RDKitToolkitWrapper()
+            object.generate_conformers(molecule = chain, n_conformers=1)
+            chain.generate_unique_atom_names()
+            self.chains[num] = chain
     
     def charge_system(self):
         from openff.toolkit.utils.nagl_wrapper import NAGLToolkitWrapper
