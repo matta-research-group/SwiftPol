@@ -245,7 +245,7 @@ def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.m
     tolerance= 2.0 * unit.nanometer
     
     # Compute box vectors from the solute length and requested padding
-    solute_length = _max_dist_between_points(chains[0].to_topology().get_positions())
+    solute_length = max(_max_dist_between_points(chains[i].to_topology().get_positions()) for i in range(len(chains)))
     image_distance = solute_length + padding * 2
     box_vectors = box_shape * image_distance
     brick_size = _compute_brick_from_box_vectors(box_vectors)
@@ -451,22 +451,24 @@ class PLGA_system:
         self.L_block_length = mean(LBL)
         print('System built!, size =', self.num_chains)
 
+    def generate_conformers(self):
+        from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
+        #Generate conformers using OpenFF toolkit wrapper
+        if oechem.OEChemIsLicensed():
+            object = OpenEyeToolkitWrapper()
+        else:
+            object = RDKitToolkitWrapper()
+        object.generate_conformers(molecule = chain, n_conformers=1)
+        chain.generate_unique_atom_names()
+        self.chains[num] = chain
     
     def charge_system(self):
         from openff.toolkit.utils.nagl_wrapper import NAGLToolkitWrapper
-        from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
         ntkw = NAGLToolkitWrapper()
         for chain in self.chains:
             num = self.chains.index(chain)
             ntkw.assign_partial_charges(chain, "openff-gnn-am1bcc-0.1.0-rc.2.pt")
-            #Generate conformers using OpenFF toolkit wrapper
-            if oechem.OEChemIsLicensed():
-                object = OpenEyeToolkitWrapper()
-            else:
-                object = RDKitToolkitWrapper()
-            object.generate_conformers(molecule = chain, n_conformers=1)
-            chain.generate_unique_atom_names()
-            self.chains[num] = chain
+
 
     def build_system(self, resid_monomer, salt_concentration):
         '''Builds system using packmol functions'''
