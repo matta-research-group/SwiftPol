@@ -44,14 +44,15 @@ def charge_polymer(polymer, charge_scheme):
     
 
 
-def forcefield_with_charge_handler(molecule, charge_method, forcefield = "openff-2.2.0.offxml"):
+def forcefield_with_charge_handler(molecule, charge_method, forcefield = "openff-2.2.0.offxml", ensemble=False):
     '''
-    Create a forcefield with a charge handler for a given molecule and charge method.
+    Create a forcefield with a charge handler for a given molecule and charge method. The function can handle both individual molecules and ensembles of molecules.
 
     Parameters:
-    molecule: An RDKit molecule object for which the forcefield is to be created.
+    molecule: An RDKit molecule object or a list of RDKit molecule objects for which the forcefield is to be created.
     charge_method: A string that specifies the charge method to be used for the molecule.
     forcefield: A string that specifies the forcefield to be used. Default is "openff-2.2.0.offxml".
+    ensemble: A boolean that specifies whether the input molecule is an ensemble of molecules. Default is False.
 
     Returns:
     An OpenFF ForceField object with the specified molecule's charges added to the LibraryCharges parameter.
@@ -59,6 +60,7 @@ def forcefield_with_charge_handler(molecule, charge_method, forcefield = "openff
     Raises:
     Exception: If the charge method is not supported.
     '''
+
     
     import numpy as np
     from openmm import NonbondedForce, unit
@@ -66,15 +68,30 @@ def forcefield_with_charge_handler(molecule, charge_method, forcefield = "openff
     from openff.toolkit.typing.engines.smirnoff import ForceField
     from openff.toolkit.typing.engines.smirnoff.parameters import LibraryChargeHandler
     from swiftpol.parameterize import charge_polymer
-    openff_molecule = Molecule.from_rdkit(molecule)
-    charges = charge_polymer(molecule, charge_method)
-    openff_molecule.partial_charges = charges * unit.elementary_charge
     
-    # Add charges to OpenFF force field
-    library_charge_type = LibraryChargeHandler.LibraryChargeType.from_molecule(openff_molecule)
+    if ensemble==False:
+        openff_molecule = Molecule.from_rdkit(molecule)
+        charges = charge_polymer(molecule, charge_method)
+        openff_molecule.partial_charges = charges * unit.elementary_charge
+        
+        # Add charges to OpenFF force field
+        library_charge_type = LibraryChargeHandler.LibraryChargeType.from_molecule(openff_molecule)
 
-    # Pull base force field
-    forcefield = ForceField(forcefield)
-    forcefield["LibraryCharges"].add_parameter(parameter=library_charge_type)
+        # Pull base force field
+        forcefield = ForceField(forcefield)
+        forcefield["LibraryCharges"].add_parameter(parameter=library_charge_type)
+        
+    elif ensemble==True:
+        # Pull base force field
+        forcefield = ForceField(forcefield)
+        for i in molecule.chain_rdkit:
+            openff_molecule = Molecule.from_rdkit(i)
+            charges = charge_polymer(i, charge_method)
+            openff_molecule.partial_charges = charges * unit.elementary_charge
+        
+            # Add charges to OpenFF force field
+            library_charge_type = LibraryChargeHandler.LibraryChargeType.from_molecule(openff_molecule)
+
+            forcefield["LibraryCharges"].add_parameter(parameter=library_charge_type)
     
     return forcefield
