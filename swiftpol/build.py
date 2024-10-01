@@ -455,6 +455,7 @@ class PLGA_system:
         from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
         #Generate conformers using OpenFF toolkit wrapper
         for chain in self.chains:
+            num = self.chains.index(chain)
             if oechem.OEChemIsLicensed():
                 object = OpenEyeToolkitWrapper()
             else:
@@ -467,7 +468,6 @@ class PLGA_system:
         from openff.toolkit.utils.nagl_wrapper import NAGLToolkitWrapper
         ntkw = NAGLToolkitWrapper()
         for chain in self.chains:
-            num = self.chains.index(chain)
             ntkw.assign_partial_charges(chain, "openff-gnn-am1bcc-0.1.0-rc.2.pt")
 
 
