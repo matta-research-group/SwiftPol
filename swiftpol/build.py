@@ -261,8 +261,8 @@ def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.m
     
     # Compute the number of NaCl to add from the mass and concentration
     nacl_mass_fraction = (nacl_conc * nacl_mass) / (55.5 * unit.mole / unit.liter * water_mass)
-    nacl_to_add = ((solvent_mass * nacl_mass_fraction)) / nacl_mass).m_as(unit.dimensionless).round()
-    water_to_add = round(((solvent_mass - nacl_mass)) / water_mass).m_as(unit.dimensionless).round())
+    nacl_to_add = ((solvent_mass * nacl_mass_fraction) / nacl_mass).m_as(unit.dimensionless).round()
+    water_to_add = round((solvent_mass - nacl_mass) / water_mass).m_as(unit.dimensionless).round()
     
     # Neutralise the system by adding and removing salt
     solute_charge = sum([molecule.total_charge for molecule in topology.molecules])
