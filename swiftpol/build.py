@@ -228,10 +228,15 @@ def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.m
     water = Molecule.from_smiles('O')
     water.generate_unique_atom_names()
     water.generate_conformers()
+    water_mass = sum([atom.mass for atom in water.atoms])
+    
     #Sodium
     na = Molecule.from_smiles('[Na+]')
     na.generate_unique_atom_names()
     na.generate_conformers()
+    nacl_mass = sum([atom.mass for atom in na.atoms]) + sum(
+    [atom.mass for atom in cl.atoms],)
+    
     #Chloride
     cl = Molecule.from_smiles('[Cl-]')
     cl.generate_unique_atom_names()
@@ -248,31 +253,16 @@ def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.m
     solute_length = max(_max_dist_between_points(chains[i].to_topology().get_positions()) for i in range(len(chains)))
     image_distance = solute_length + padding * 2
     box_vectors = box_shape * image_distance
-    brick_size = _compute_brick_from_box_vectors(box_vectors)
-    s =  image_distance * 10
     
     # Compute target masses of solvent
     box_volume = np.linalg.det(box_vectors.m) * box_vectors.u**3
     target_mass = box_volume * target_density
-    solute_mass = sum(sum([atom.mass for atom in molecule.atoms]) for molecule in topology.molecules)
-    solvent_mass = target_mass - solute_mass
+    solvent_mass = target_mass - sum(sum([atom.mass for atom in molecule.atoms]) for molecule in topology.molecules)
     
-    
-    nacl_mass = sum([atom.mass for atom in na.atoms]) + sum(
-    [atom.mass for atom in cl.atoms],
-    )
-    
-    water_mass = sum([atom.mass for atom in water.atoms])
-    molarity_pure_water = 55.5 * unit.mole / unit.liter
-    
-    # Compute the number of salt "molecules" to add from the mass and concentration
-    nacl_mass_fraction = (nacl_conc * nacl_mass) / (molarity_pure_water * water_mass)
-    nacl_mass_to_add = solvent_mass * nacl_mass_fraction
-    nacl_to_add = (nacl_mass_to_add / nacl_mass).m_as(unit.dimensionless).round()
-    
-    # Compute the number of water molecules to add to make up the remaining mass
-    water_mass_to_add = solvent_mass - nacl_mass
-    water_to_add = round((water_mass_to_add / water_mass).m_as(unit.dimensionless).round())
+    # Compute the number of NaCl to add from the mass and concentration
+    nacl_mass_fraction = (nacl_conc * nacl_mass) / (55.5 * unit.mole / unit.liter * water_mass)
+    nacl_to_add = ((solvent_mass * nacl_mass_fraction)) / nacl_mass).m_as(unit.dimensionless).round()
+    water_to_add = round(((solvent_mass - nacl_mass)) / water_mass).m_as(unit.dimensionless).round())
     
     # Neutralise the system by adding and removing salt
     solute_charge = sum([molecule.total_charge for molecule in topology.molecules])
@@ -471,15 +461,18 @@ class PLGA_system:
             ntkw.assign_partial_charges(chain, "openff-gnn-am1bcc-0.1.0-rc.2.pt")
 
 
-    def build_system(self, resid_monomer, salt_concentration):
-        '''Builds system using packmol functions'''
+    def solvate_system(self, resid_monomer, salt_concentration):
+        '''Builds solvated system using packmol functions'''
         from openff.interchange.components._packmol import pack_box
         self.residual_monomer = resid_monomer
         self.salt_conc = salt_concentration
         molecules, number_of_copies, topology, box_vectors = calculate_box_components(chains = self.chains,
-                                                                                      sequence=self.sequence, 
-                                                                                      residual_monomer=resid_monomer,
-                                                                                      salt_concentration=salt_concentration)
+                                                                                        sequence=self.sequence, 
+                                                                                        residual_monomer=resid_monomer,
+                                                                                        salt_concentration=salt_concentration)
+        self.solvent_comp = molecules
+        self.num_copies_solvent = number_of_copies
+        self.box_vectors = box_vectors
         solvated_system = pack_box(
         molecules=molecules,
         number_of_copies=number_of_copies,
@@ -488,6 +481,23 @@ class PLGA_system:
         center_solute='BRICK'
         )
         return solvated_system
+    
 
-
+    def build_bulk(self, resid_monomer, salt_concentration=0 * unit.mole / unit.liter):
+        '''Builds bulk system using packmol functions'''
+        from openff.interchange.components._packmol import pack_box
+        self.residual_monomer = resid_monomer
+        molecules, number_of_copies, topology, box_vectors = calculate_box_components(chains = self.chains,
+                                                                                        sequence=self.sequence, 
+                                                                                        residual_monomer=resid_monomer,
+                                                                                        salt_concentration=salt_concentration)
+        self.box_vectors = box_vectors
+        bulk_system = pack_box(
+        molecules=molecules[-2:],
+        number_of_copies=number_of_copies[-2:],
+        solute = topology,
+        box_vectors=box_vectors,
+        center_solute='CENTER'
+        )
+        return bulk_system
 
