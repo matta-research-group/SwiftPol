@@ -3,8 +3,6 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 import os
 from swiftpol import build 
-from rdkit.Chem.Descriptors import ExactMolWt
-from openff.toolkit.topology import Molecule
 import numpy as np  # Added for numpy array type checking
 from openff.toolkit.topology import Topology  # Added for topology type checking
 import warnings
