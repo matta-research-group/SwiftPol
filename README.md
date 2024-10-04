@@ -20,7 +20,7 @@ To switch to an existing branch, use
 To submit your feature to be incorporated to the main branch, you should submit a Pull Request. The repository maintainers will review your pull request before accepting your changes.
 
 ### Example Notebooks
-Examples of using SwiftPol code to build different polymers can be found at [Example Notebooks](Example_notebooks/)
+Examples of using SwiftPol code to build different polymers can be found at [Example Notebooks](Example_Notebooks/)
 
 ### Code of Conduct
 All repository contributors should follow our [code of conduct](CODE_OF_CONDUCT.md)
