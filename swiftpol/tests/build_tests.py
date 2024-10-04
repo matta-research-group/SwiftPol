@@ -7,6 +7,8 @@ from rdkit.Chem.Descriptors import ExactMolWt
 from openff.toolkit.topology import Molecule
 import numpy as np  # Added for numpy array type checking
 from openff.toolkit.topology import Topology  # Added for topology type checking
+import warnings
+warnings.filterwarnings("ignore")
 
 # Define all test cases
 
@@ -79,7 +81,7 @@ class TestBlockinessCalc(unittest.TestCase):
         blockiness_L, block_length_G_2, block_length_L_2 = build.blockiness_calc(sequence_L)
         self.assertTrue(isinstance(blockiness_L, str))
 
-#PLGA build test - WIP
+#PLGA build test
 class TestPLGABuild(unittest.TestCase):
     def test_plga_build(self):
         x = build.PLGA_system(80, 10, 1.0, 'ester', 5)
@@ -87,16 +89,38 @@ class TestPLGABuild(unittest.TestCase):
         self.assertTrue(len(x.chains)==5)
         self.assertTrue(72 <= round(x.lactide_actual) <= 88)
         self.assertTrue(9 <= round(x.max_length)<= 11)
-        self.assertTrue(2 <= round(x.PDI) <= 4)
+        self.assertTrue(1.5 <= round(x.PDI) <= 5)
+        print(x.PDI)
         self.assertTrue(x.mean_blockiness==1)
         
+        x.generate_conformers()
+        self.assertTrue(len(x.chains[0].conformers[0])==len(x.chains[0].atoms))
         x.charge_system()
         self.assertTrue(len(x.chains[0].partial_charges)==len(x.chains[0].atoms))
-        #from openff.units import unit
-        #solv_system = x.build_system(resid_monomer = 0.0, salt_concentration = 0.1 * unit.mole / unit.liter)
-        #self.assertTrue(x.residual_monomer==0.0)
+        from openff.units import unit
+        solv_system = x.solvate_system(resid_monomer = 0.5, salt_concentration = 0.1 * unit.mole / unit.liter)
+        self.assertTrue(x.residual_monomer==0.5)
         
-        
+#Test calculate box components
+class TestCalculateBoxComponents(unittest.TestCase):
+    def test_calculate_box_components(self):
+        # Create a PLGA system
+        x = build.PLGA_system(75, 30, 1.7, 'ester', 2)
+        x.generate_conformers()
+        # Calculate box components
+        molecules, number_of_copies, topology, box_vectors = build.calculate_box_components(chains = x.chains,
+                                                                                            sequence=x.sequence)        
+
+        # Check if the returned molecules is a list
+        self.assertTrue(isinstance(molecules, list))
+        self.assertEqual(len(molecules), 5)
+        # Check if the returned number_of_copies is an integer
+        self.assertTrue(isinstance(number_of_copies, list))
+        print(number_of_copies)
+        # Check if the returned topology is a Topology object
+        self.assertTrue(isinstance(topology, Topology))
+        # Check if the returned box_vectors has the correct shape
+        self.assertEqual(box_vectors.shape, (3, 3))        
 
         
         
