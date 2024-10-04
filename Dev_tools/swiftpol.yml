@@ -5,43 +5,43 @@ channels:
   - conda-forge
   - dglteam
 dependencies:
-  - ambertools=23.3=py311ha883923_2
-  - espaloma=0.3.1=pyhd8ed1ab_2
-  - jedi=0.19.0=pyhd8ed1ab_0
-  - matplotlib-base=3.8.0=py311h3bc9839_1
-  - matplotlib-inline=0.1.6=pyhd8ed1ab_0
-  - mdtraj=1.9.9=py311h06bfd7f_0
-  - networkx=3.1=pyhd8ed1ab_0
-  - nglview=3.0.8=pyh1da8cd4_0
+  - ambertools=23.6
+  - jedi=0.19.1
+  - matplotlib-base=3.8.0
+  - matplotlib-inline=0.1.6
+  - mdtraj=1.10.0
+  - networkx=3.1
+  - nglview>=3.1.2
   - jupyter
-  - numpy=1.26.0=py311hb8f3215_0
-  - openbabel=3.1.1=py311h4f068e6_8
-  - openeye-toolkits=2023.1.1=py311_0
-  - openff-forcefields=2023.08.0=pyh1a96a4e_0
-  - openff-interchange=0.3.14=pyhd8ed1ab_0
-  - openff-models=0.1.0=pyh1a96a4e_1
+  - numpy=1.26.0
+  - openbabel=3.1.1
+  - openeye-toolkits=2023.1.1
+  - openff-forcefields>=2024.09.0
+  - openff-interchange>=0.3.27
+  - openff-nagl>=0.3.8 
+  - openff-models=0.1.0
   - openff-toolkit>=0.16.0
   - openff-toolkit-examples>=0.16.0
-  - openff-units=0.2.1=pyh1a96a4e_0
-  - openff-utilities=0.1.9=pyh1a96a4e_0
-  - openmm=8.0.0=py311h500f5fd_3_khronos
-  - openmmforcefields=0.11.2=pyhd8ed1ab_1
-  - packmol=20.2.2=h9318095_1
-  - pandas=2.1.1=py311h9e438b8_0
-  - parmed=4.1.0=py311ha397e9f_0
-  - pdbfixer=1.9=pyh1a96a4e_0
-  - plotly=5.17.0=pyhd8ed1ab_0
-  - pydantic=1.10.13=py311heffc1b2_0
-  - python=3.11.5=h47c9636_0_cpython
-  - python-dateutil=2.8.2=pyhd8ed1ab_0
+  - openff-units=0.2.1
+  - openff-utilities=0.1.9
+  - openmm=8.0.0
+  - openmmforcefields=0.11.2
+  - packmol=20.2.2
+  - pandas=2.1.1
+  - parmed=4.1.0
+  - pdbfixer=1.9
+  - plotly=5.17.0
+  - pydantic=1.10.13
+  - python>=3.11.5
+  - python-dateutil=2.8.2
   - pytorch=2.1.1=py3.11_0
-  - qcelemental=0.26.0=pyhd8ed1ab_0
-  - qcengine=0.28.1=pyhd8ed1ab_0
-  - qcportal=0.15.8=pyhd8ed1ab_0
-  - scipy=1.11.3=py311h93d07a4_0
-  - seaborn=0.13.0=hd8ed1ab_0
-  - smirnoff99frosst=1.1.0=pyh44b312d_0
-  - statsmodels=0.14.0=py311h9ea6feb_2
+  - qcelemental=0.26.0
+  - qcengine=0.28.1
+  - qcportal=0.15.8
+  - scipy=1.11.3
+  - seaborn=0.13.0
+  - smirnoff99frosst=1.1.0
+  - statsmodels=0.14.0
   - dgl==2.0.0
   - pip:
       - amberutils==21.0
