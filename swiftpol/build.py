@@ -60,7 +60,7 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
         ind = sorted(list(set(sequence))).index(x)
         monomers[x] = monomer_list[ind]
     polymer = Chem.MolFromSmiles('O[I]')
-    for i in range(0, len(sequence),2):
+    for i in range(0, len(sequence)):
         polymer = reaction.RunReactants((polymer, Chem.MolFromSmiles(monomers[sequence[i]])))[0][0]
         Chem.SanitizeMol(polymer)
             
