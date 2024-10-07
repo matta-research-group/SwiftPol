@@ -26,26 +26,26 @@ class TestBuildPLGARing(unittest.TestCase):
         
 
 
-class TestBuildPolymerROP(unittest.TestCase):
+class TestBuildPolymer(unittest.TestCase):
     def test_build_polymer_ROP(self):
         sequence = 'AABBAABB'
         monomer_list = ['O1C(=O)C[I+][I+]OC(=O)C1', 'C[C@@H]1[I+][I+]OC(=O)[C@H](C)OC1=O'] 
         reaction = AllChem.ReactionFromSmarts('[I:1][O:2].[I:3][C:4]>>[C:4][O:2].[I:3][I:1]')
         # Test the function
-        polymer = build.build_polymer_ROP(sequence = 'AABBAABB', 
-                                            monomer_list = monomer_list,
-                                            reaction = AllChem.ReactionFromSmarts('[I:1][O:2].[I:3][C:4]>>[C:4][O:2].[I:3][I:1]'),
-                                            terminal ='hydroxyl')
+        polymer = build.build_polymer(sequence = 'AABBAABB', 
+                                        monomer_list = monomer_list,
+                                        reaction = AllChem.ReactionFromSmarts('[I:1][O:2].[I:3][C:4]>>[C:4][O:2].[I:3][I:1]'),
+                                        terminal ='hydroxyl')
         self.assertIsNotNone(polymer)
         # Test with an invalid sequence
         with self.assertRaises(IndexError):
-            polymer = build.build_polymer_ROP('invalid', monomer_list, reaction)
+            polymer = build.build_polymer('invalid', monomer_list, reaction)
         # Test with an invalid monomer list
         with self.assertRaises(IndexError):
-            polymer = build.build_polymer_ROP(sequence, ['invalid'], reaction)
+            polymer = build.build_polymer(sequence, ['invalid'], reaction)
         # Test with an invalid reaction
         with self.assertRaises(AttributeError):
-            polymer = build.build_polymer_ROP(sequence, monomer_list, 'invalid')
+            polymer = build.build_polymer(sequence, monomer_list, 'invalid')
 
 
 class TestBuildLinearCopolymer(unittest.TestCase):
