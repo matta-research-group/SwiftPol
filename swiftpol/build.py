@@ -33,12 +33,12 @@ from openff.interchange import Interchange
 from openff.interchange.components._packmol import UNIT_CUBE, pack_box
 
 #Ring opening polymerisation - generic
-def build_polymer_ROP(sequence, monomer_list, reaction, terminal ='hydroxyl'):
+def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
     """
-    Build a polymer using Ring-Opening Polymerization (ROP).
+    Build a polymer using specified reaction sequence.
 
     This function takes a sequence of monomers, a list of corresponding monomer structures, and a reaction, 
-    and builds a polymer using Ring-Opening Polymerization (ROP). The terminal group of the polymer can be 
+    and builds a polymer using specified reaction sequence. The terminal group of the polymer can be 
     specified as 'hydroxyl' (default), 'carboxyl', or 'ester'.
 
     Parameters:
