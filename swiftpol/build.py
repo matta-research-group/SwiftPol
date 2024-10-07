@@ -32,7 +32,53 @@ from rdkit.Chem.Descriptors import ExactMolWt
 from openff.interchange import Interchange
 from openff.interchange.components._packmol import UNIT_CUBE, pack_box
 
+#Ring opening polymerisation - generic
+def build_polymer_ROP(sequence, monomer_list, reaction, terminal ='hydroxyl'):
+    """
+    Build a polymer using Ring-Opening Polymerization (ROP).
 
+    This function takes a sequence of monomers, a list of corresponding monomer structures, and a reaction, 
+    and builds a polymer using Ring-Opening Polymerization (ROP). The terminal group of the polymer can be 
+    specified as 'hydroxyl' (default), 'carboxyl', or 'ester'.
+
+    Parameters:
+    sequence (str): A string representing the sequence of monomers. The sequence should be in the format 'AABBCCDD' 
+                    (blocks of dimers).
+    monomer_list (list): A list of SMILES strings representing the structures of the monomers. The order of the 
+                         monomers in the list should correspond to the order of the monomers in the sequence.
+    reaction (rdkit.Chem.rdChemReactions.ChemicalReaction): The reaction to use for the polymerization.
+    terminal (str, optional): The terminal group of the polymer. Can be 'hydroxyl' (default), 'carboxyl', or 'ester'.
+
+    Returns:
+    rdkit.Chem.rdchem.Mol: The resulting polymer.
+
+    Raises:
+    AttributeError: If the sequence is not in the correct format.
+    """
+    monomers = {}
+    for x in sorted(list(set(sequence))):
+        ind = sorted(list(set(sequence))).index(x)
+        monomers[x] = monomer_list[ind]
+    polymer = Chem.MolFromSmiles('O[I]')
+    LA_count=0 if sequence[0:2]=='GG' else 2
+    GA_count=0 if sequence[0:2]=='LL' else 2
+    for i in range(0, len(sequence),2):
+        if sequence[i+2:i+2] == 'AB' or sequence[i+2:i+4] == 'BA':
+            raise AttributeError("Check sequence. Input format is AABBCCDD (blocks of dimers) and sequence entered is "+ sequence)
+        else:
+            polymer = reaction.RunReactants((polymer, Chem.MolFromSmiles(monomers[sequence[i]])))[0][0]
+            Chem.SanitizeMol(polymer)
+            
+    if terminal == 'hydroxyl':
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('[OH]'), Chem.MolFromSmiles('O'))[0]
+        Chem.AddHs(polymer)
+    elif terminal == 'carboxyl':
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('[OH]'), Chem.MolFromSmiles('OC(=O)[OH]'))[0]
+    elif terminal == 'ester':
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('[OH]'), Chem.MolFromSmiles('OC'))[0]
+    polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('O[I]'), Chem.MolFromSmarts('[OH]'))[0]
+    Chem.SanitizeMol(polymer)
+    return polymer
 
 #Ring opening polymerisation
 def build_PLGA_ring(sequence, 
@@ -234,13 +280,15 @@ def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.m
     na = Molecule.from_smiles('[Na+]')
     na.generate_unique_atom_names()
     na.generate_conformers()
-    nacl_mass = sum([atom.mass for atom in na.atoms]) + sum(
-    [atom.mass for atom in cl.atoms],)
+    
     
     #Chloride
     cl = Molecule.from_smiles('[Cl-]')
     cl.generate_unique_atom_names()
     cl.generate_conformers()
+    
+    nacl_mass = sum([atom.mass for atom in na.atoms]) + sum(
+    [atom.mass for atom in cl.atoms],)
     
     topology = Topology.from_molecules(chains)
     nacl_conc=salt_concentration
@@ -262,12 +310,12 @@ def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.m
     # Compute the number of NaCl to add from the mass and concentration
     nacl_mass_fraction = (nacl_conc * nacl_mass) / (55.5 * unit.mole / unit.liter * water_mass)
     nacl_to_add = ((solvent_mass * nacl_mass_fraction) / nacl_mass).m_as(unit.dimensionless).round()
-    water_to_add = round((solvent_mass - nacl_mass) / water_mass).m_as(unit.dimensionless).round()
+    water_to_add = int(round((solvent_mass - nacl_mass) / water_mass).m_as(unit.dimensionless).round())
     
     # Neutralise the system by adding and removing salt
     solute_charge = sum([molecule.total_charge for molecule in topology.molecules])
-    na_to_add = round(np.ceil(nacl_to_add - solute_charge.m / 2.0))
-    cl_to_add = round(np.floor(nacl_to_add + solute_charge.m / 2.0))
+    na_to_add = int(round(np.ceil(nacl_to_add - solute_charge.m / 2.0)))
+    cl_to_add = int(round(np.floor(nacl_to_add + solute_charge.m / 2.0)))
     
     rolling_mass=0
     for m in topology.molecules:
@@ -465,7 +513,6 @@ class PLGA_system:
         '''Builds solvated system using packmol functions'''
         from openff.interchange.components._packmol import pack_box
         self.residual_monomer = resid_monomer
-        self.salt_conc = salt_concentration
         molecules, number_of_copies, topology, box_vectors = calculate_box_components(chains = self.chains,
                                                                                         sequence=self.sequence, 
                                                                                         residual_monomer=resid_monomer,
@@ -473,13 +520,11 @@ class PLGA_system:
         self.solvent_comp = molecules
         self.num_copies_solvent = number_of_copies
         self.box_vectors = box_vectors
-        solvated_system = pack_box(
-        molecules=molecules,
-        number_of_copies=number_of_copies,
-        solute = topology,
-        box_vectors=box_vectors,
-        center_solute='BRICK'
-        )
+        solvated_system = pack_box(molecules=molecules,
+                                    number_of_copies=number_of_copies,
+                                    solute = topology,
+                                    box_vectors=box_vectors,
+                                    center_solute='BRICK')
         return solvated_system
     
 
