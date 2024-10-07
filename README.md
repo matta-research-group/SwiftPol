@@ -5,6 +5,7 @@ Tools for polymer parameterization using Open Force field
 This repository is currently under development. To do a development install, clone this repository and type
 
 `cd SwiftPol`
+
 `pip install -e .`
 
 ### Contributing to SwiftPol
