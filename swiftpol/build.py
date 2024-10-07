@@ -60,8 +60,6 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
         ind = sorted(list(set(sequence))).index(x)
         monomers[x] = monomer_list[ind]
     polymer = Chem.MolFromSmiles('O[I]')
-    LA_count=0 if sequence[0:2]=='GG' else 2
-    GA_count=0 if sequence[0:2]=='LL' else 2
     for i in range(0, len(sequence),2):
         if sequence[i+2:i+2] == 'AB' or sequence[i+2:i+4] == 'BA':
             raise AttributeError("Check sequence. Input format is AABBCCDD (blocks of dimers) and sequence entered is "+ sequence)
