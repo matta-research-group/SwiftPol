@@ -61,11 +61,8 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
         monomers[x] = monomer_list[ind]
     polymer = Chem.MolFromSmiles('O[I]')
     for i in range(0, len(sequence),2):
-        if sequence[i+2:i+2] == 'AB' or sequence[i+2:i+4] == 'BA':
-            raise AttributeError("Check sequence. Input format is AABBCCDD (blocks of dimers) and sequence entered is "+ sequence)
-        else:
-            polymer = reaction.RunReactants((polymer, Chem.MolFromSmiles(monomers[sequence[i]])))[0][0]
-            Chem.SanitizeMol(polymer)
+        polymer = reaction.RunReactants((polymer, Chem.MolFromSmiles(monomers[sequence[i]])))[0][0]
+        Chem.SanitizeMol(polymer)
             
     if terminal == 'hydroxyl':
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('[OH]'), Chem.MolFromSmiles('O'))[0]
