@@ -204,18 +204,18 @@ def PDI(chains):
 
 
 
-def blockiness_calc(sequence):  
+def blockiness_PLGA(sequence):  
     """
-    Calculate the blockiness and average block length of a co-polymer sequence.
+    Calculate the blockiness and average block length of a PLGA sequence.
 
-    This function calculates the blockiness of a co-polymer sequence by counting the occurrences of 'GG' and 'GL' or 'LG' in the sequence. 
+    This function calculates the blockiness of a PLGA sequence by counting the occurrences of 'GG' and 'GL' or 'LG' in the sequence. 
     It also calculates the average block length of 'G' and 'L' in the sequence.
 
     Parameters:
-    sequence (str): A string representing the co-polymer sequence. 'G' represents one type of monomer and 'L' represents another type.
+    sequence (str): A string representing the PLGA sequence. 'G' represents one type of monomer and 'L' represents another type.
 
     Returns:
-    blockiness (float): The blockiness of the co-polymer sequence. Calculated as the ratio of 'GG' to 'GL' or 'LG'.
+    blockiness (float): The blockiness of the PLGA sequence. Calculated as the ratio of 'GG' to 'GL' or 'LG'.
     block_length_G (float): The average block length of 'G' in the sequence.
     block_length_L (float): The average block length of 'L' in the sequence.
 
@@ -238,6 +238,44 @@ def blockiness_calc(sequence):
         block_list_L = [x for x in sequence.split('G') if x!='']
         block_length_L = mean([len(b) for b in block_list_L])
         return blockiness, block_length_G, block_length_L
+
+    else:
+        return 'Molecule is not a co-polymer, no blockiness calculation performed', 0, len(sequence)
+
+def blockiness_gen(sequence):  
+    """
+    Calculate the blockiness and average block length of a co-polymer sequence.
+
+    This function calculates the blockiness of a co-polymer sequence by counting the occurrences of 'GG' and 'GL' or 'LG' in the sequence. 
+    It also calculates the average block length of 'G' and 'L' in the sequence.
+
+    Parameters:
+    sequence (str): A string representing the co-polymer sequence. 'G' represents one type of monomer and 'L' represents another type.
+
+    Returns:
+    blockiness (float): The blockiness of the co-polymer sequence. Calculated as the ratio of 'GG' to 'GL' or 'LG'.
+    block_length_G (float): The average block length of 'G' in the sequence.
+    block_length_L (float): The average block length of 'L' in the sequence.
+
+    If the sequence does not contain both 'G' and 'L', the function returns a string indicating that the molecule is not a co-polymer.
+    """
+
+    if 'A' in sequence and 'B' in sequence:
+        AB = sequence.count('AB')
+        BB = sequence.count('BB')
+        BA = sequence.count('BA')
+        AA = sequence.count('AA')
+        if 'BA' in sequence:
+            blockiness = BB/BA
+        else:
+            blockiness = BB/AB
+        
+        block_list_B = [x for x in sequence.split('A') if x!='']
+        block_length_B = mean([len(b) for b in block_list_B])
+        
+        block_list_A = [x for x in sequence.split('B') if x!='']
+        block_length_A = mean([len(b) for b in block_list_A])
+        return blockiness, block_length_B, block_length_A
 
     else:
         return 'Molecule is not a co-polymer, no blockiness calculation performed', 0, len(sequence)
@@ -346,18 +384,18 @@ def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.m
     number_of_copies=[water_to_add, na_to_add, cl_to_add, lac_to_add, gly_to_add]
     return molecules, number_of_copies, topology, box_vectors
 
-#Class object for PLGA system - will be extended for other co-polymers and homopolymers
-
-
+#Class object for PLGA system
 class PLGA_system:
     from openeye import oechem
+    from openff.units import unit
     from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
     from functools import reduce
     from statistics import mean
     from rdkit.Chem.Descriptors import ExactMolWt
     from openff.interchange import Interchange
     from openff.interchange.components._packmol import UNIT_CUBE, pack_box
-    from swiftpol.build import build_PLGA_ring, PDI, blockiness_calc, calculate_box_components
+    from swiftpol.build import build_PLGA_ring, PDI, blockiness_PLGA, calculate_box_components
+    from rdkit.Chem import AllChem
     """
     A class used to represent a poly-lactide-(co)-glycolide (PLGA) polymer chain system.
 
@@ -417,7 +455,7 @@ class PLGA_system:
     """
 
     gen_rxn = AllChem.ReactionFromSmarts('[C:1][HO:2].[HO:3][C:4]>>[C:1][O:2][C:4].[O:3]')
-    def __init__(self, perc_lactide_target, length_target, blockiness_target, terminals, num_chains): #Terminals will specify the end groups of the polymer (WIP)
+    def __init__(self, perc_lactide_target, length_target, blockiness_target, terminals, num_chains):
         self.lactide_target = perc_lactide_target
         self.length_target = length_target
         self.blockiness_target = blockiness_target
@@ -437,7 +475,7 @@ class PLGA_system:
         for x in range(num_chains):
             length_actual = np.random.normal(length_target, 0.5)
             sequence = reduce(lambda x, y: x + y, np.random.choice(['LL', 'GG'], size=(int(length_actual/2),), p=[perc_lactide_target/100,1-(perc_lactide_target/100)]))
-            blockiness = blockiness_calc(sequence)[0]
+            blockiness = blockiness_PLGA(sequence)[0]
             if spec(sequence, blockiness)==True:
                 reaction = build_PLGA_ring(sequence=sequence, terminal=terminals)
                 lengths.append(int(length_actual))
@@ -446,15 +484,15 @@ class PLGA_system:
                 chains.append(chain)
                 perc_lactide_actual.append(reaction[1])
                 blockiness_list.append(blockiness)
-                GBL.append(blockiness_calc(sequence)[1])
-                LBL.append(blockiness_calc(sequence)[2])
+                GBL.append(blockiness_PLGA(sequence)[1])
+                LBL.append(blockiness_PLGA(sequence)[2])
             else:
                 out_of_spec +=1
         #Second round of building
         while out_of_spec >0:
             length_actual = np.random.normal(length_target, 0.5)
             sequence = reduce(lambda x, y: x + y, np.random.choice(['LL', 'GG'], size=(int(length_actual/2),), p=[perc_lactide_target/100,1-(perc_lactide_target/100)]))
-            blockiness = blockiness_calc(sequence)[0]
+            blockiness = blockiness_PLGA(sequence)[0]
             if spec(sequence, blockiness)==True:
                 reaction = build_PLGA_ring(sequence=sequence, terminal=terminals)
                 lengths.append(int(length_actual))
@@ -463,8 +501,8 @@ class PLGA_system:
                 chains.append(chain)
                 perc_lactide_actual.append(reaction[1])
                 blockiness_list.append(blockiness)
-                GBL.append(blockiness_calc(sequence)[1])
-                LBL.append(blockiness_calc(sequence)[2])
+                GBL.append(blockiness_PLGA(sequence)[1])
+                LBL.append(blockiness_PLGA(sequence)[2])
                 out_of_spec-=1
         self.sequence = sequence
         self.chains = chains
