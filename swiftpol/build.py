@@ -579,3 +579,161 @@ class PLGA_system:
         )
         return bulk_system
 
+#Class object for generic polymer system
+from openeye import oechem
+from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
+from functools import reduce
+from statistics import mean
+from rdkit.Chem.Descriptors import ExactMolWt
+from openff.interchange import Interchange
+from openff.interchange.components._packmol import UNIT_CUBE, pack_box
+from swiftpol.build import build_polymer, PDI, blockiness_gen, calculate_box_components
+from openff.units import unit
+from rdkit.Chem import AllChem
+import numpy as np
+class polymer_system:
+    def __init__(self, monomer_list, reaction, length_target, terminals, num_chains, perc_A_target=100, blockiness_target=1.0, copolymer=False):
+        self.length_target = length_target
+        self.terminals = terminals
+        perc_A_actual = []
+        if copolymer==True:
+            self.blockiness_target = blockiness_target
+            self.A_target = perc_A_target
+            def spec(sequence, blockiness): #Define limits of A percentage and blockiness from input
+                actual_A = (sequence.count('A')/len(sequence))*100
+                blockiness = blockiness_gen(sequence)[0]
+                return actual_A > perc_A_target*0.90 and actual_A < perc_A_target*1.10 and blockiness>blockiness_target*0.90 and blockiness<blockiness_target*1.10
+            
+            blockiness_list = []
+            out_of_spec = 0
+            BBL = []
+            ABL = []
+        chains = []
+        chains_rdkit = []
+        lengths = []
+        
+
+        #First round of building
+        for x in range(num_chains):
+            if copolymer==True:
+                length_actual = np.random.normal(length_target, 0.5)
+                sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual/2),), p=[perc_A_target/100,1-(perc_A_target/100)]))
+                blockiness = blockiness_gen(sequence)[0]
+                if spec(sequence, blockiness)==True:
+                    pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals)
+                    lengths.append(int(length_actual))
+                    chains_rdkit.append(pol)
+                    chain = Molecule.from_rdkit(pol)
+                    chains.append(chain)
+                    perc_A_actual.append((sequence.count('A')/len(sequence))*100)
+                    blockiness_list.append(blockiness)
+                    BBL.append(blockiness_gen(sequence)[1])
+                    ABL.append(blockiness_gen(sequence)[2])
+                else:
+                    out_of_spec +=1
+                #Second round of building
+                while out_of_spec >0:
+                    length_actual = np.random.normal(length_target, 0.5)
+                    sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual/2),), p=[perc_A_target/100,1-(perc_A_target/100)]))
+                    blockiness = blockiness_gen(sequence)[0]
+                    if spec(sequence, blockiness)==True:
+                        pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals)
+                        lengths.append(int(length_actual))
+                        chains_rdkit.append(pol)
+                        chain = Molecule.from_rdkit(pol)
+                        chains.append(chain)
+                        perc_A_actual.append((sequence.count('A')/len(sequence))*100)
+                        blockiness_list.append(blockiness)
+                        BBL.append(blockiness_gen(sequence)[1])
+                        ABL.append(blockiness_gen(sequence)[2])
+                        out_of_spec-=1
+
+                self.B_block_length = mean(BBL)
+                self.A_block_length = mean(ABL)
+                self.blockiness_list = blockiness_list
+                self.mean_blockiness = mean(blockiness_list)
+                self.perc_A_actual = perc_A_actual
+                self.A_actual = mean(perc_A_actual)
+        else:
+            length_actual = np.random.normal(length_target, 0.5)
+            sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual/2),), p=[perc_A_target/100,1-(perc_A_target/100)]))
+            pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals)
+            lengths.append(int(length_actual))
+            chains_rdkit.append(pol)
+            chain = Molecule.from_rdkit(pol)
+            chains.append(chain)
+            perc_A_actual.append((sequence.count('A')/len(sequence))*100)
+        self.sequence = sequence
+        self.chains = chains
+        self.chain_rdkit = chains_rdkit
+        self.mol_weight_average = round(mean([ExactMolWt(c) for c in chains_rdkit]),2)
+        self.PDI, self.Mn, self.Mw = PDI(chains_rdkit)
+        self.num_chains = len(chains)
+        self.A_actual = mean(perc_A_actual)
+        self.perc_A_actual = perc_A_actual
+
+        self.length_average = mean(lengths)
+        self.lengths = lengths
+        self.min_length = min(lengths)
+        self.max_length = max(lengths)
+
+
+        print('System built!, size =', self.num_chains)
+
+    def generate_conformers(self):
+        from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
+        #Generate conformers using OpenFF toolkit wrapper
+        for chain in self.chains:
+            num = self.chains.index(chain)
+            if oechem.OEChemIsLicensed():
+                object = OpenEyeToolkitWrapper()
+            else:
+                object = RDKitToolkitWrapper()
+            object.generate_conformers(molecule = chain, n_conformers=1)
+            chain.generate_unique_atom_names()
+            self.chains[num] = chain
+    
+    def charge_system(self):
+        from openff.toolkit.utils.nagl_wrapper import NAGLToolkitWrapper
+        ntkw = NAGLToolkitWrapper()
+        for chain in self.chains:
+            ntkw.assign_partial_charges(chain, "openff-gnn-am1bcc-0.1.0-rc.2.pt")
+
+
+    def solvate_system(self, resid_monomer, salt_concentration):
+        '''Builds solvated system using packmol functions'''
+        from openff.interchange.components._packmol import pack_box
+        self.residual_monomer = resid_monomer
+        molecules, number_of_copies, topology, box_vectors = calculate_box_components(chains = self.chains,
+                                                                                        sequence=self.sequence, 
+                                                                                        residual_monomer=resid_monomer,
+                                                                                        salt_concentration=salt_concentration)
+        self.solvent_comp = molecules
+        self.num_copies_solvent = number_of_copies
+        self.box_vectors = box_vectors
+        solvated_system = pack_box(molecules=molecules,
+                                    number_of_copies=number_of_copies,
+                                    solute = topology,
+                                    box_vectors=box_vectors,
+                                    center_solute='BRICK')
+        return solvated_system
+    
+
+    def build_bulk(self, resid_monomer, salt_concentration=0 * unit.mole / unit.liter):
+        '''Builds bulk system using packmol functions'''
+        from openff.interchange.components._packmol import pack_box
+        self.residual_monomer = resid_monomer
+        molecules, number_of_copies, topology, box_vectors = calculate_box_components(chains = self.chains,
+                                                                                        sequence=self.sequence, 
+                                                                                        residual_monomer=resid_monomer,
+                                                                                        salt_concentration=salt_concentration)
+        self.box_vectors = box_vectors
+        bulk_system = pack_box(
+        molecules=molecules[-2:],
+        number_of_copies=number_of_copies[-2:],
+        solute = topology,
+        box_vectors=box_vectors,
+        center_solute='CENTER'
+        )
+        return bulk_system
+
