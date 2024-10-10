@@ -655,14 +655,15 @@ class polymer_system:
                 self.perc_A_actual = perc_A_actual
                 self.A_actual = mean(perc_A_actual)
         else:
-            length_actual = np.random.normal(length_target, 0.5)
-            sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual/2),), p=[perc_A_target/100,1-(perc_A_target/100)]))
-            pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals)
-            lengths.append(int(length_actual))
-            chains_rdkit.append(pol)
-            chain = Molecule.from_rdkit(pol)
-            chains.append(chain)
-            perc_A_actual.append((sequence.count('A')/len(sequence))*100)
+            for x in range(num_chains):
+                length_actual = np.random.normal(length_target, 0.5)
+                sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual/2),), p=[perc_A_target/100,1-(perc_A_target/100)]))
+                pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals)
+                lengths.append(int(length_actual))
+                chains_rdkit.append(pol)
+                chain = Molecule.from_rdkit(pol)
+                chains.append(chain)
+                perc_A_actual.append((sequence.count('A')/len(sequence))*100)
         self.sequence = sequence
         self.chains = chains
         self.chain_rdkit = chains_rdkit
