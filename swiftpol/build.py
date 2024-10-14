@@ -379,10 +379,12 @@ def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.m
             else:
                 break
         gly_to_add = 0
+    
+    residual_monomer_actual = ((lac_to_add * lac_mass.magnitude + gly_to_add * gly_mass.magnitude) / rolling_mass.magnitude)
 
     molecules = [water, na, cl, lac, gly]
     number_of_copies=[water_to_add, na_to_add, cl_to_add, lac_to_add, gly_to_add]
-    return molecules, number_of_copies, topology, box_vectors
+    return molecules, number_of_copies, topology, box_vectors, residual_monomer_actual
 
 #Class object for PLGA system
 class PLGA_system:
@@ -545,11 +547,12 @@ class PLGA_system:
     def solvate_system(self, resid_monomer, salt_concentration):
         '''Builds solvated system using packmol functions'''
         from openff.interchange.components._packmol import pack_box
-        self.residual_monomer = resid_monomer
-        molecules, number_of_copies, topology, box_vectors = calculate_box_components(chains = self.chains,
-                                                                                        sequence=self.sequence, 
-                                                                                        residual_monomer=resid_monomer,
-                                                                                        salt_concentration=salt_concentration)
+        
+        molecules, number_of_copies, topology, box_vectors, resid_monomer_actual = calculate_box_components(chains = self.chains,
+                                                                                                            sequence=self.sequence, 
+                                                                                                            residual_monomer=resid_monomer,
+                                                                                                            salt_concentration=salt_concentration)
+        self.residual_monomer = resid_monomer_actual
         self.solvent_comp = molecules
         self.num_copies_solvent = number_of_copies
         self.box_vectors = box_vectors
@@ -563,20 +566,15 @@ class PLGA_system:
 
     def build_bulk(self, resid_monomer, salt_concentration=0 * unit.mole / unit.liter):
         '''Builds bulk system using packmol functions'''
-        from openff.interchange.components._packmol import pack_box
-        self.residual_monomer = resid_monomer
-        molecules, number_of_copies, topology, box_vectors = calculate_box_components(chains = self.chains,
-                                                                                        sequence=self.sequence, 
-                                                                                        residual_monomer=resid_monomer,
-                                                                                        salt_concentration=salt_concentration)
-        self.box_vectors = box_vectors
-        bulk_system = pack_box(
-        molecules=molecules[-2:],
-        number_of_copies=number_of_copies[-2:],
-        solute = topology,
-        box_vectors=box_vectors,
-        center_solute='CENTER'
-        )
+        top = Topology.from_molecules(sys.chains)
+        solute_length = max(_max_dist_between_points(sys.chains[i].to_topology().get_positions()) for i in range(len(sys.chains)))
+        box_vectors = UNIT_CUBE * solute_length
+        bulk_system = pack_box(molecules = sys.chains,
+                            number_of_copies=[3 for i in range(len(sys.chains))],
+                            box_shape = UNIT_CUBE,
+                            box_vectors=box_vectors,
+                            center_solute='BRICK')
+        
         return bulk_system
 
 #Class object for generic polymer system
@@ -704,11 +702,12 @@ class polymer_system:
     def solvate_system(self, resid_monomer, salt_concentration):
         '''Builds solvated system using packmol functions'''
         from openff.interchange.components._packmol import pack_box
-        self.residual_monomer = resid_monomer
-        molecules, number_of_copies, topology, box_vectors = calculate_box_components(chains = self.chains,
-                                                                                        sequence=self.sequence, 
-                                                                                        residual_monomer=resid_monomer,
-                                                                                        salt_concentration=salt_concentration)
+        
+        molecules, number_of_copies, topology, box_vectors, resid_monomer_actual = calculate_box_components(chains = self.chains,
+                                                                                                            sequence=self.sequence, 
+                                                                                                            residual_monomer=resid_monomer,
+                                                                                                            salt_concentration=salt_concentration)
+        self.residual_monomer = resid_monomer_actual
         self.solvent_comp = molecules
         self.num_copies_solvent = number_of_copies
         self.box_vectors = box_vectors
