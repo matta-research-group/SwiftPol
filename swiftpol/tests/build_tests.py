@@ -84,10 +84,10 @@ class TestPDI(unittest.TestCase):
         self.assertAlmostEqual(mn, 69.3, places=1)
         self.assertAlmostEqual(mw, 122.6, places=1)
 
-class TestBlockinessCalc(unittest.TestCase):
-    def test_blockiness_calc(self):
+class TestBlockinessPLGA(unittest.TestCase):
+    def test_blockiness_PLGA(self):
         sequence = 'GLGLGLGL'
-        blockiness, block_length_G, block_length_L = build.blockiness_calc(sequence)
+        blockiness, block_length_G, block_length_L = build.blockiness_PLGA(sequence)
         
         # Check if the returned blockiness is float
         self.assertTrue(isinstance(blockiness, float))
@@ -100,10 +100,27 @@ class TestBlockinessCalc(unittest.TestCase):
         
         #Test case - PLA sequence
         sequence_L = 'LLLLLLLL'
-        blockiness_L, block_length_G_2, block_length_L_2 = build.blockiness_calc(sequence_L)
+        blockiness_L, block_length_G_2, block_length_L_2 = build.blockiness_PLGA(sequence_L)
         self.assertTrue(isinstance(blockiness_L, str))
 
-#PLGA build test
+class TestBlockinessGen(unittest.TestCase):
+    def test_blockiness_Gen(self):
+        sequence = 'ABABABAB'
+        blockiness, block_length_A, block_length_B = build.blockiness_gen(sequence)
+        
+        # Check if the returned blockiness is float
+        self.assertTrue(isinstance(blockiness, float))
+
+
+        # Check if the returned blockiness, block_length_G, and block_length_L are as expected
+        self.assertAlmostEqual(blockiness, 0.0, places=2)
+        self.assertAlmostEqual(block_length_A, 1.0, places=2)
+        self.assertAlmostEqual(block_length_B, 1.0, places=2)
+        
+        #Test case - PLA sequence
+        sequence_A = 'LLLLLLLL'
+        blockiness_A, block_length_A_2, block_length_B_2 = build.blockiness_gen(sequence_A)
+        self.assertTrue(isinstance(blockiness_A, str))
 class TestPLGABuild(unittest.TestCase):
     def test_plga_build(self):
         x = build.PLGA_system(80, 10, 1.0, 'ester', 5)
@@ -121,7 +138,7 @@ class TestPLGABuild(unittest.TestCase):
         self.assertTrue(len(x.chains[0].partial_charges)==len(x.chains[0].atoms))
         from openff.units import unit
         solv_system = x.solvate_system(resid_monomer = 0.5, salt_concentration = 0.1 * unit.mole / unit.liter)
-        self.assertTrue(x.residual_monomer==0.5)
+        self.assertAlmostEqual(x.residual_monomer,0.5,places=2)
         
 #Test calculate box components
 class TestCalculateBoxComponents(unittest.TestCase):
@@ -130,8 +147,8 @@ class TestCalculateBoxComponents(unittest.TestCase):
         x = build.PLGA_system(75, 30, 1.7, 'ester', 2)
         x.generate_conformers()
         # Calculate box components
-        molecules, number_of_copies, topology, box_vectors = build.calculate_box_components(chains = x.chains,
-                                                                                            sequence=x.sequence)        
+        molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = build.calculate_box_components(chains = x.chains,
+                                                                                                                    sequence=x.sequence)        
 
         # Check if the returned molecules is a list
         self.assertTrue(isinstance(molecules, list))
@@ -142,7 +159,11 @@ class TestCalculateBoxComponents(unittest.TestCase):
         # Check if the returned topology is a Topology object
         self.assertTrue(isinstance(topology, Topology))
         # Check if the returned box_vectors has the correct shape
-        self.assertEqual(box_vectors.shape, (3, 3))        
+        self.assertEqual(box_vectors.shape, (3, 3))   
+        # Check if the returned residual_monomer_actual is a float
+        self.assertTrue(isinstance(residual_monomer_actual, float))
+        # Check if the returned residual_monomer_actual is as expected
+        self.assertTrue(residual_monomer_actual==0.0)     
 
         
         
