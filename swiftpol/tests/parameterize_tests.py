@@ -31,6 +31,10 @@ class TestParameterize(unittest.TestCase):
         ensemble_object = build.PLGA_system(80, 50, 1.0, 'ester', 5)
         forcefield = forcefield_with_charge_handler(ensemble_object, 'NAGL', ensemble=True)
         self.assertIsNotNone(forcefield)
+        # Test with ensemble likely to contain duplicates
+        ensemble_object = build.PLGA_system(80, 50, 1.0, 'ester', 100)
+        forcefield = forcefield_with_charge_handler(ensemble_object, 'NAGL', ensemble=True)
+        self.assertIsNotNone(forcefield)
 
     def test_forcefield_with_residualmonomer(self):
         # Create a test system
