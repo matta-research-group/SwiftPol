@@ -42,7 +42,7 @@ dependencies:
   - seaborn=0.13.0
   - smirnoff99frosst=1.1.0
   - statsmodels=0.14.0
-  - dgl==2.0.0
+  - dgl>=2.0.0
   - pip:
       - amberutils==21.0
       - espaloma-charge==0.0.8
