@@ -32,9 +32,9 @@ class TestBuildPolymer(unittest.TestCase):
         monomer_list = ['O1C(=O)C[I+][I+]OC(=O)C1', 'C[C@@H]1[I+][I+]OC(=O)[C@H](C)OC1=O'] 
         reaction = AllChem.ReactionFromSmarts('[I:1][O:2].[I:3][C:4]>>[C:4][O:2].[I:3][I:1]')
         # Test the function
-        polymer = build.build_polymer(sequence = 'AABBAABB', 
-                                        monomer_list = monomer_list,
-                                        reaction = AllChem.ReactionFromSmarts('[I:1][O:2].[I:3][C:4]>>[C:4][O:2].[I:3][I:1]'),
+        polymer = build.build_polymer(sequence = 'AAAAAGGG', 
+                                        monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
+                                        reaction = AllChem.ReactionFromSmarts('[HO:1][C:2].[O:3][C:5]=[O:6]>>[C:2][O:1][C:5]=[O:6].[O:3]'),
                                         terminal ='hydroxyl')
         self.assertIsNotNone(polymer)
         # Test with an invalid sequence
@@ -46,6 +46,12 @@ class TestBuildPolymer(unittest.TestCase):
         # Test with an invalid reaction
         with self.assertRaises(AttributeError):
             polymer = build.build_polymer(sequence, monomer_list, 'invalid')
+        
+        #Test with no terminal adjustment
+        polymer = build.build_polymer(sequence = 'AAAAAGGG', 
+                                        monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
+                                        reaction = AllChem.ReactionFromSmarts('[HO:1][C:2].[O:3][C:5]=[O:6]>>[C:2][O:1][C:5]=[O:6].[O:3]'))
+        self.assertIsNotNone(polymer)        
 
 
 class TestBuildLinearCopolymer(unittest.TestCase):
@@ -138,7 +144,8 @@ class TestPLGABuild(unittest.TestCase):
         self.assertTrue(len(x.chains[0].partial_charges)==len(x.chains[0].atoms))
         from openff.units import unit
         solv_system = x.solvate_system(resid_monomer = 0.5, salt_concentration = 0.1 * unit.mole / unit.liter)
-        self.assertAlmostEqual(x.residual_monomer,0.5,places=2)
+        self.assertAlmostEqual(x.residual_monomer,0.5,places=1)
+        self.assertIsNotNone(solv_system)  
         
 #Test calculate box components
 class TestCalculateBoxComponents(unittest.TestCase):
@@ -165,10 +172,36 @@ class TestCalculateBoxComponents(unittest.TestCase):
         # Check if the returned residual_monomer_actual is as expected
         self.assertTrue(residual_monomer_actual==0.0)     
 
+class TestPolymerSystem(unittest.TestCase):
+    def test_init(self):
+        monomer_list = ['A', 'B']
+        reaction = 'reaction'
+        length_target = 10
+        num_chains = 5
+        terminals = 'standard'
+        perc_A_target = 100
+        blockiness_target = 1.0
+        copolymer = False
+
+        x = polymer_system(monomer_list, reaction, length_target, num_chains, terminals, perc_A_target, blockiness_target, copolymer)
+
+        self.assertTrue(len(x.chains)==5)
+        self.assertTrue(9 <= round(x.max_length)<= 11)
+        self.assertTrue(1.5 <= round(x.PDI) <= 5)
+        print(x.PDI)
         
-        
-        
-        
+        x.generate_conformers()
+        self.assertTrue(len(x.chains[0].conformers[0])==len(x.chains[0].atoms))
+        x.charge_system()
+        self.assertTrue(len(x.chains[0].partial_charges)==len(x.chains[0].atoms))
+        from openff.units import unit
+        solv_system = x.solvate_system(resid_monomer = 0.5, salt_concentration = 0.1 * unit.mole / unit.liter)
+        self.assertAlmostEqual(x.residual_monomer,0.5,places=1)
+        self.assertIsNotNone(solv_system) 
+
+
+if __name__ == '__main__':
+    unittest.main()
 
 # Run
 

@@ -32,8 +32,8 @@ from rdkit.Chem.Descriptors import ExactMolWt
 from openff.interchange import Interchange
 from openff.interchange.components._packmol import UNIT_CUBE, pack_box
 
-#Ring opening polymerisation - generic
-def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
+#Build polymer - generic
+def build_polymer(sequence, monomer_list, reaction, terminal ='standard'):
     """
     Build a polymer using specified reaction sequence.
 
@@ -59,7 +59,7 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
     for x in sorted(list(set(sequence))):
         ind = sorted(list(set(sequence))).index(x)
         monomers[x] = monomer_list[ind]
-    polymer = Chem.MolFromSmiles('O[I]')
+    polymer = Chem.MolFromSmiles('ICO')
     for i in range(0, len(sequence)):
         polymer = reaction.RunReactants((polymer, Chem.MolFromSmiles(monomers[sequence[i]])))[0][0]
         Chem.SanitizeMol(polymer)
@@ -71,7 +71,7 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('[OH]'), Chem.MolFromSmiles('OC(=O)[OH]'))[0]
     elif terminal == 'ester':
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('[OH]'), Chem.MolFromSmiles('OC'))[0]
-    polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('O[I]'), Chem.MolFromSmarts('[OH]'))[0]
+    polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('OC[I]'), Chem.MolFromSmiles('O'))[0]
     Chem.SanitizeMol(polymer)
     return polymer
 
@@ -590,7 +590,7 @@ from openff.units import unit
 from rdkit.Chem import AllChem
 import numpy as np
 class polymer_system:
-    def __init__(self, monomer_list, reaction, length_target, terminals, num_chains, perc_A_target=100, blockiness_target=1.0, copolymer=False):
+    def __init__(self, monomer_list, reaction, length_target, num_chains, terminals='standard', perc_A_target=100, blockiness_target=1.0, copolymer=False):
         self.length_target = length_target
         self.terminals = terminals
         perc_A_actual = []
