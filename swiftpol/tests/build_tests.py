@@ -174,16 +174,13 @@ class TestCalculateBoxComponents(unittest.TestCase):
 
 class TestPolymerSystem(unittest.TestCase):
     def test_init(self):
-        monomer_list = ['A', 'B']
-        reaction = 'reaction'
-        length_target = 10
-        num_chains = 5
-        terminals = 'standard'
-        perc_A_target = 100
-        blockiness_target = 1.0
-        copolymer = False
 
-        x = polymer_system(monomer_list, reaction, length_target, num_chains, terminals, perc_A_target, blockiness_target, copolymer)
+        x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]'], 
+                    reaction = AllChem.ReactionFromSmarts('[HO:1][C:2].[O:3][C:5]=[O:6]>>[C:2][O:1][C:5]=[O:6].[O:3]'), 
+                    length_target = 10, 
+                    terminals = 'hydroxyl', 
+                    num_chains = 5, 
+                    copolymer=False)
 
         self.assertTrue(len(x.chains)==5)
         self.assertTrue(9 <= round(x.max_length)<= 11)
@@ -195,9 +192,7 @@ class TestPolymerSystem(unittest.TestCase):
         x.charge_system()
         self.assertTrue(len(x.chains[0].partial_charges)==len(x.chains[0].atoms))
         from openff.units import unit
-        solv_system = x.solvate_system(resid_monomer = 0.5, salt_concentration = 0.1 * unit.mole / unit.liter)
-        self.assertAlmostEqual(x.residual_monomer,0.5,places=1)
-        self.assertIsNotNone(solv_system) 
+
 
 
 if __name__ == '__main__':

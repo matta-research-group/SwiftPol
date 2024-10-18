@@ -398,66 +398,60 @@ class PLGA_system:
     from openff.interchange.components._packmol import UNIT_CUBE, pack_box
     from swiftpol.build import build_PLGA_ring, PDI, blockiness_PLGA, calculate_box_components
     from rdkit.Chem import AllChem
-    """
-    A class used to represent a poly-lactide-(co)-glycolide (PLGA) polymer chain system.
 
-    Attributes
-    ----------
-    lactide_target : float
-        The target percentage of lactide in the polymer.
-    length_target : int
-        The target length of the polymer chain.
-    blockiness_target : float
-        The target blockiness of the polymer chain.
-    terminals : str
-        The end groups of the polymer.
-    sequence : str
-        The sequence of the polymer chain.
-    chains : list
-        A list of molecular chains in the system.
-    chain_rdkit : list
-        A list of RDKit molecule objects representing the chains.
-    mol_weight_average : float
-        The average molecular weight of the chains.
-    PDI : float
-        The Polydispersity Index of the chains.
-    Mn : float
-        The number-average molecular weight of the chains.
-    Mw : float
-        The weight-average molecular weight of the chains.
-    num_chains : int
-        The number of chains in the system.
-    perc_lactide_actual : list
-        A list of the actual percentage of lactide in each chain.
-    lactide_actual : float
-        The actual average percentage of lactide in the chains.
-    length_average : float
-        The average length of the chains.
-    lengths : list
-        A list of the lengths of the chains.
-    min_length : int
-        The minimum length of the chains.
-    max_length : int
-        The maximum length of the chains.
-    blockiness_list : list
-        A list of the blockiness of each chain.
-    mean_blockiness : float
-        The average blockiness of the chains.
-    G_block_length : float
-        The average block length for 'G' in the chains.
-    L_block_length : float
-        The average block length for 'L' in the chains.
-
-    Methods
-    -------
-    charge_system():
-        Assigns partial charges to the chains and generates conformers using the NAGLToolkitWrapper.
-    build_system(resid_monomer, salt_concentration):
-        Builds the system using packmol functions, containing a set amount of residual monomer and a specified salt concentration.
-    """
 
     gen_rxn = AllChem.ReactionFromSmarts('[C:1][HO:2].[HO:3][C:4]>>[C:1][O:2][C:4].[O:3]')
     def __init__(self, perc_lactide_target, length_target, blockiness_target, terminals, num_chains):
+        """
+        A class used to represent a poly-lactide-(co)-glycolide (PLGA) polymer chain system.
+
+        Attributes
+        ----------
+        lactide_target : float
+            The target percentage of lactide in the polymer.
+        length_target : int
+            The target length of the polymer chain.
+        blockiness_target : float
+            The target blockiness of the polymer chain.
+        terminals : str
+            The end groups of the polymer.
+        sequence : str
+            The sequence of the polymer chain.
+        chains : list
+            A list of molecular chains in the system.
+        chain_rdkit : list
+            A list of RDKit molecule objects representing the chains.
+        mol_weight_average : float
+            The average molecular weight of the chains.
+        PDI : float
+            The Polydispersity Index of the chains.
+        Mn : float
+            The number-average molecular weight of the chains.
+        Mw : float
+            The weight-average molecular weight of the chains.
+        num_chains : int
+            The number of chains in the system.
+        perc_lactide_actual : list
+            A list of the actual percentage of lactide in each chain.
+        lactide_actual : float
+            The actual average percentage of lactide in the chains.
+        length_average : float
+            The average length of the chains.
+        lengths : list
+            A list of the lengths of the chains.
+        min_length : int
+            The minimum length of the chains.
+        max_length : int
+            The maximum length of the chains.
+        blockiness_list : list
+            A list of the blockiness of each chain.
+        mean_blockiness : float
+            The average blockiness of the chains.
+        G_block_length : float
+            The average block length for 'G' in the chains.
+        L_block_length : float
+            The average block length for 'L' in the chains.
+        """
         self.lactide_target = perc_lactide_target
         self.length_target = length_target
         self.blockiness_target = blockiness_target
@@ -525,19 +519,41 @@ class PLGA_system:
         print('System built!, size =', self.num_chains)
 
     def generate_conformers(self):
+        """
+        Generate conformers for each polymer chain in the system.
+
+        This method uses the OpenFF toolkit to generate conformers for each polymer chain in the system. 
+        It first checks if the OpenEye toolkit is licensed and available. If it is, it uses the OpenEyeToolkitWrapper 
+        to generate conformers. Otherwise, it falls back to using the RDKitToolkitWrapper. Each chain is processed 
+        to generate a single conformer, and unique atom names are assigned to each chain.
+
+        Raises:
+        ImportError: If neither RDKit nor OpenEye toolkits are available.
+        """
         from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
-        #Generate conformers using OpenFF toolkit wrapper
+        # Generate conformers using OpenFF toolkit wrapper
         for chain in self.chains:
             num = self.chains.index(chain)
             if oechem.OEChemIsLicensed():
                 object = OpenEyeToolkitWrapper()
             else:
                 object = RDKitToolkitWrapper()
-            object.generate_conformers(molecule = chain, n_conformers=1)
+            object.generate_conformers(molecule=chain, n_conformers=1)
             chain.generate_unique_atom_names()
             self.chains[num] = chain
     
     def charge_system(self):
+        """
+        Assign partial charges to each polymer chain in the system.
+
+        This method uses the OpenFF NAGL toolkit to assign partial charges to each polymer chain in the system.
+        It initializes a NAGLToolkitWrapper and assigns partial charges using the "openff-gnn-am1bcc-0.1.0-rc.2.pt" model.
+
+        The method iterates over each chain in the `self.chains` list and assigns partial charges to the chain.
+
+        Raises:
+        ImportError: If the NAGL toolkit is not available.
+        """
         from openff.toolkit.utils.nagl_wrapper import NAGLToolkitWrapper
         ntkw = NAGLToolkitWrapper()
         for chain in self.chains:
@@ -545,52 +561,126 @@ class PLGA_system:
 
 
     def solvate_system(self, resid_monomer, salt_concentration):
-        '''Builds solvated system using packmol functions'''
+        """
+        Build a solvated system using packmol functions.
+
+        This method calculates the components needed to solvate the polymer system, including the molecules, 
+        number of copies, topology, and box vectors. It then uses the `pack_box` function from the OpenFF 
+        Interchange toolkit to create a solvated system.
+
+        Parameters:
+        resid_monomer (str): The residual monomer to be used in the system.
+        salt_concentration (float): The concentration of salt to be added to the system.
+
+        Returns:
+        solvated_system: The solvated system generated by packmol.
+
+        Raises:
+        ImportError: If the OpenFF Interchange toolkit is not available.
+        """
         from openff.interchange.components._packmol import pack_box
         
-        molecules, number_of_copies, topology, box_vectors, resid_monomer_actual = calculate_box_components(chains = self.chains,
-                                                                                                            sequence=self.sequence, 
-                                                                                                            residual_monomer=resid_monomer,
-                                                                                                            salt_concentration=salt_concentration)
+        molecules, number_of_copies, topology, box_vectors, resid_monomer_actual = calculate_box_components(
+            chains=self.chains,
+            sequence=self.sequence, 
+            residual_monomer=resid_monomer,
+            salt_concentration=salt_concentration
+        )
         self.residual_monomer = resid_monomer_actual
         self.solvent_comp = molecules
         self.num_copies_solvent = number_of_copies
         self.box_vectors = box_vectors
-        solvated_system = pack_box(molecules=molecules,
-                                    number_of_copies=number_of_copies,
-                                    solute = topology,
-                                    box_vectors=box_vectors,
-                                    center_solute='BRICK')
+        solvated_system = pack_box(
+            molecules=molecules,
+            number_of_copies=number_of_copies,
+            solute=topology,
+            box_vectors=box_vectors,
+            center_solute='BRICK'
+        )
         return solvated_system
     
 
     def build_bulk(self, resid_monomer, salt_concentration=0 * unit.mole / unit.liter):
-        '''Builds bulk system using packmol functions'''
-        top = Topology.from_molecules(sys.chains)
+        """
+        Build a bulk system using packmol functions.
+
+        This method constructs a bulk system by packing the polymer chains into a box using the packmol algorithm.
+        It calculates the topology from the polymer chains, determines the maximum distance between points in the 
+        solute to set the box size, and then uses the `pack_box` function to create the bulk system.
+
+        Parameters:
+        resid_monomer (str): The residual monomer to be used in the system.
+        salt_concentration (Quantity, optional): The concentration of salt to be added to the system. 
+                                                   Defaults to 0 mole/liter.
+
+        Returns:
+        bulk_system: The bulk system generated by packmol.
+
+        Raises:
+        ImportError: If the OpenFF Interchange toolkit is not available.
+        """
+
         solute_length = max(_max_dist_between_points(sys.chains[i].to_topology().get_positions()) for i in range(len(sys.chains)))
         box_vectors = UNIT_CUBE * solute_length
-        bulk_system = pack_box(molecules = sys.chains,
-                            number_of_copies=[3 for i in range(len(sys.chains))],
-                            box_shape = UNIT_CUBE,
-                            box_vectors=box_vectors,
-                            center_solute='BRICK')
+        bulk_system = pack_box(molecules=sys.chains,
+                                number_of_copies=[3 for i in range(len(sys.chains))],
+                                box_shape=UNIT_CUBE,
+                                box_vectors=box_vectors,
+                                center_solute='BRICK')
         
         return bulk_system
 
 #Class object for generic polymer system
-from openeye import oechem
-from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
-from functools import reduce
-from statistics import mean
-from rdkit.Chem.Descriptors import ExactMolWt
-from openff.interchange import Interchange
-from openff.interchange.components._packmol import UNIT_CUBE, pack_box
-from swiftpol.build import build_polymer, PDI, blockiness_gen, calculate_box_components
-from openff.units import unit
-from rdkit.Chem import AllChem
-import numpy as np
+
 class polymer_system:
+    from openeye import oechem
+    from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
+    from functools import reduce
+    from statistics import mean
+    from rdkit.Chem.Descriptors import ExactMolWt
+    from openff.interchange import Interchange
+    from openff.interchange.components._packmol import UNIT_CUBE, pack_box
+    from swiftpol.build import build_polymer, PDI, blockiness_gen, calculate_box_components
+    from openff.units import unit
+    from rdkit.Chem import AllChem
+    import numpy as np
+
     def __init__(self, monomer_list, reaction, length_target, num_chains, terminals='standard', perc_A_target=100, blockiness_target=1.0, copolymer=False):
+        """
+        Initialize the polymer system and build the polymer chains.
+
+        Parameters:
+        monomer_list (list): List of monomers to be used in the polymerization.
+        reaction (str): The type of reaction to be used for polymerization.
+        length_target (float): The target length of the polymer chains.
+        num_chains (int): The number of polymer chains to be generated.
+        terminals (str, optional): The type of terminal groups to be used. Default is 'standard'.
+        perc_A_target (float, optional): The target percentage of monomer A in the copolymer. Default is 100.
+        blockiness_target (float, optional): The target blockiness of the copolymer. Default is 1.0.
+        copolymer (bool, optional): Flag to indicate if the system is a copolymer. Default is False.
+
+        Attributes:
+        length_target (float): The target length of the polymer chains.
+        terminals (str): The type of terminal groups used.
+        blockiness_target (float): The target blockiness of the copolymer.
+        A_target (float): The target percentage of monomer A in the copolymer.
+        chains (list): List of polymer chains as OpenFF Molecule objects.
+        chain_rdkit (list): List of polymer chains as RDKit molecule objects.
+        lengths (list): List of lengths of the polymer chains.
+        perc_A_actual (list): List of actual percentages of monomer A in the polymer chains.
+        B_block_length (float): The average block length of monomer B in the copolymer.
+        A_block_length (float): The average block length of monomer A in the copolymer.
+        blockiness_list (list): List of blockiness values for the polymer chains.
+        mean_blockiness (float): The mean blockiness of the polymer chains.
+        mol_weight_average (float): The average molecular weight of the polymer chains.
+        PDI (float): The polydispersity index of the polymer chains.
+        Mn (float): The number-average molecular weight of the polymer chains.
+        Mw (float): The weight-average molecular weight of the polymer chains.
+        num_chains (int): The number of polymer chains generated.
+        length_average (float): The average length of the polymer chains.
+        min_length (float): The minimum length of the polymer chains.
+        max_length (float): The maximum length of the polymer chains.
+        """
         self.length_target = length_target
         self.terminals = terminals
         perc_A_actual = []
@@ -680,19 +770,41 @@ class polymer_system:
         print('System built!, size =', self.num_chains)
 
     def generate_conformers(self):
+        """
+        Generate conformers for each polymer chain in the system.
+
+        This method uses the OpenFF toolkit to generate conformers for each polymer chain in the system. 
+        It first checks if the OpenEye toolkit is licensed and available. If it is, it uses the OpenEyeToolkitWrapper 
+        to generate conformers. Otherwise, it falls back to using the RDKitToolkitWrapper. Each chain is processed 
+        to generate a single conformer, and unique atom names are assigned to each chain.
+
+        Raises:
+        ImportError: If neither RDKit nor OpenEye toolkits are available.
+        """
         from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
-        #Generate conformers using OpenFF toolkit wrapper
+        # Generate conformers using OpenFF toolkit wrapper
         for chain in self.chains:
             num = self.chains.index(chain)
             if oechem.OEChemIsLicensed():
                 object = OpenEyeToolkitWrapper()
             else:
                 object = RDKitToolkitWrapper()
-            object.generate_conformers(molecule = chain, n_conformers=1)
+            object.generate_conformers(molecule=chain, n_conformers=1)
             chain.generate_unique_atom_names()
             self.chains[num] = chain
     
     def charge_system(self):
+        """
+        Assign partial charges to each polymer chain in the system.
+
+        This method uses the OpenFF NAGL toolkit to assign partial charges to each polymer chain in the system.
+        It initializes a NAGLToolkitWrapper and assigns partial charges using the "openff-gnn-am1bcc-0.1.0-rc.2.pt" model.
+
+        The method iterates over each chain in the `self.chains` list and assigns partial charges to the chain.
+
+        Raises:
+        ImportError: If the NAGL toolkit is not available.
+        """
         from openff.toolkit.utils.nagl_wrapper import NAGLToolkitWrapper
         ntkw = NAGLToolkitWrapper()
         for chain in self.chains:
@@ -700,40 +812,72 @@ class polymer_system:
 
 
     def solvate_system(self, resid_monomer, salt_concentration):
-        '''Builds solvated system using packmol functions'''
+        """
+        Build a solvated system using packmol functions.
+
+        This method calculates the components needed to solvate the polymer system, including the molecules, 
+        number of copies, topology, and box vectors. It then uses the `pack_box` function from the OpenFF 
+        Interchange toolkit to create a solvated system.
+
+        Parameters:
+        resid_monomer (str): The residual monomer to be used in the system.
+        salt_concentration (float): The concentration of salt to be added to the system.
+
+        Returns:
+        solvated_system: The solvated system generated by packmol.
+
+        Raises:
+        ImportError: If the OpenFF Interchange toolkit is not available.
+        """
         from openff.interchange.components._packmol import pack_box
         
-        molecules, number_of_copies, topology, box_vectors, resid_monomer_actual = calculate_box_components(chains = self.chains,
-                                                                                                            sequence=self.sequence, 
-                                                                                                            residual_monomer=resid_monomer,
-                                                                                                            salt_concentration=salt_concentration)
+        molecules, number_of_copies, topology, box_vectors, resid_monomer_actual = calculate_box_components(
+            chains=self.chains,
+            sequence=self.sequence, 
+            residual_monomer=resid_monomer,
+            salt_concentration=salt_concentration
+        )
         self.residual_monomer = resid_monomer_actual
         self.solvent_comp = molecules
         self.num_copies_solvent = number_of_copies
         self.box_vectors = box_vectors
-        solvated_system = pack_box(molecules=molecules,
-                                    number_of_copies=number_of_copies,
-                                    solute = topology,
-                                    box_vectors=box_vectors,
-                                    center_solute='BRICK')
+        solvated_system = pack_box(
+            molecules=molecules,
+            number_of_copies=number_of_copies,
+            solute=topology,
+            box_vectors=box_vectors,
+            center_solute='BRICK'
+        )
         return solvated_system
     
 
+
     def build_bulk(self, resid_monomer, salt_concentration=0 * unit.mole / unit.liter):
-        '''Builds bulk system using packmol functions'''
-        from openff.interchange.components._packmol import pack_box
-        self.residual_monomer = resid_monomer
-        molecules, number_of_copies, topology, box_vectors = calculate_box_components(chains = self.chains,
-                                                                                        sequence=self.sequence, 
-                                                                                        residual_monomer=resid_monomer,
-                                                                                        salt_concentration=salt_concentration)
-        self.box_vectors = box_vectors
-        bulk_system = pack_box(
-        molecules=molecules[-2:],
-        number_of_copies=number_of_copies[-2:],
-        solute = topology,
-        box_vectors=box_vectors,
-        center_solute='CENTER'
-        )
+        """
+        Build a bulk system using packmol functions.
+
+        This method constructs a bulk system by packing the polymer chains into a box using the packmol algorithm.
+        It calculates the topology from the polymer chains, determines the maximum distance between points in the 
+        solute to set the box size, and then uses the `pack_box` function to create the bulk system.
+
+        Parameters:
+        resid_monomer (str): The residual monomer to be used in the system.
+        salt_concentration (Quantity, optional): The concentration of salt to be added to the system. 
+                                                   Defaults to 0 mole/liter.
+
+        Returns:
+        bulk_system: The bulk system generated by packmol.
+
+        Raises:
+        ImportError: If the OpenFF Interchange toolkit is not available.
+        """
+        solute_length = max(_max_dist_between_points(sys.chains[i].to_topology().get_positions()) for i in range(len(sys.chains)))
+        box_vectors = UNIT_CUBE * solute_length
+        bulk_system = pack_box(molecules=sys.chains,
+                                number_of_copies=[3 for i in range(len(sys.chains))],
+                                box_shape=UNIT_CUBE,
+                                box_vectors=box_vectors,
+                                center_solute='BRICK')
+        
         return bulk_system
 
