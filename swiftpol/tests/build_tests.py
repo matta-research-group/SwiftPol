@@ -185,7 +185,7 @@ class TestPolymerSystem(unittest.TestCase):
         self.assertTrue(len(x.chains)==5)
         self.assertTrue(9 <= round(x.max_length)<= 11)
         self.assertTrue(1.5 <= round(x.PDI) <= 5)
-        print(x.PDI)
+        self.assertTrue(x.num_chains == 5)
         
         x.generate_conformers()
         self.assertTrue(len(x.chains[0].conformers[0])==len(x.chains[0].atoms))
@@ -194,9 +194,6 @@ class TestPolymerSystem(unittest.TestCase):
         from openff.units import unit
 
 
-
-if __name__ == '__main__':
-    unittest.main()
 
 # Run
 
