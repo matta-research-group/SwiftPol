@@ -1,5 +1,5 @@
 --- 
-title: ‘SwiftPol: A Python package for building and parameterizing *in silico* polymer systems' 
+title: ‘SwiftPol:A Python package for building and parameterizing *in silico* polymer systems' 
 tags: 
   - Python 
   - polymer 
@@ -17,7 +17,8 @@ affiliations:
  - name: Department of Chemistry, King’s College London 
    index: 1 
    ror: ?? 
-date: DD Month YYYY 
+
+date:  DD Month YYYY 
 bibliography: paper.bib 
  
  
