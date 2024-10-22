@@ -1,26 +1,24 @@
 --- 
 title: ‘SwiftPol: A Python package for building and parameterizing <i>in silico<i> polymer systems' 
 tags: 
-  - Python 
-  - polymer 
-  - force field 
-  - molecular dynamics 
-  - polydispersity 
+- Python 
+- polymer 
+- force field 
+- molecular dynamics 
+- polydispersity 
 authors: 
-  - name: Hannah N. Turney 
-    orcid: 0009-0002-3298-0309 
-    affiliation: 1 
-  - name: Micaela Matta 
-    orcid: 0000-0002-9852-3154
-    affiliation: 1 
+- name: Hannah N. Turney 
+orcid: 0009-0002-3298-0309 
+affiliation: 1 
+- name: Micaela Matta 
+orcid: 0000-0002-9852-3154
+affiliation: 1 
 affiliations: 
- - name: Department of Chemistry, King’s College London 
-   index: 1 
-   ror: ?? 
+- name: Department of Chemistry, King’s College London 
+index: 1 
+ror: ?? 
 date: DD Month YYYY 
 bibliography: paper.bib 
- 
- 
 --- 
  
 # Summary 
