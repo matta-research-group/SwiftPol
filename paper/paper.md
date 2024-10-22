@@ -1,24 +1,26 @@
 --- 
-title: ‘SwiftPol: A Python package for building and parameterizing in silico polymer systems' 
+title: ‘SwiftPol: A Python package for building and parameterizing <i>in silico<i> polymer systems' 
 tags: 
-- Python 
-- polymer 
-- force field 
-- molecular dynamics 
-- polydispersity 
+  - Python 
+  - polymer 
+  - force field 
+  - molecular dynamics 
+  - polydispersity 
 authors: 
-- name: Hannah N. Turney 
-orcid: 0009-0002-3298-0309 
-affiliation: 1 
-- name: Micaela Matta 
-orcid: 0000-0002-9852-3154
-affiliation: 1 
+  - name: Hannah N. Turney 
+    orcid: 0009-0002-3298-0309 
+    affiliation: 1 
+  - name: Micaela Matta 
+    orcid: 0000-0002-9852-3154
+    affiliation: 1 
 affiliations: 
-- name: Department of Chemistry, King’s College London 
-index: 1 
-ror: ?? 
+ - name: Department of Chemistry, King’s College London 
+   index: 1 
+   ror: ?? 
 date: DD Month YYYY 
 bibliography: paper.bib 
+ 
+ 
 --- 
  
 # Summary 
@@ -47,7 +49,7 @@ As depicted in Figure 1 \autoref{fig:1}, SwiftPol generates an initial polymer s
 
 If all tests are passed, the chain is appended to the Python polymer system object, and the associated actual properties of the chain are calculated and added as system attributes. Otherwise, the chain is discarded, and the process is repeated. Once the system size is satisfied, average system properties are calculated using in-built SwiftPol functions. 
 
-![Figure 1. Flowchart showing the process of building a polymer system using SwiftPol. \label{fig:1}](Fig_1_swiftpol.png) 
+![Figure 1. Flowchart showing the process of building a polymer system using SwiftPol.\label{fig:1}](Fig_1_swiftpol.png) 
 
 This approach allows for the generation of a polydisperse system, meaning each chain displays the same average properties but the complete system exhibits the distributions observed in experimental polymer samples. 
 
