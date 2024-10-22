@@ -50,7 +50,7 @@ As depicted in Figure 1 \autoref{fig:1}, SwiftPol generates an initial polymer s
 
 If all tests are passed, the chain is appended to the Python polymer system object, and the associated actual properties of the chain are calculated and added as system attributes. Otherwise, the chain is discarded, and the process is repeated. Once the system size is satisfied, average system properties are calculated using in-built SwiftPol functions. 
 
-![Figure 1. Flowchart showing the process of building a polymer system using SwiftPol.\label{fig:1}](Fig_1_Swiftpol.png) 
+![Flowchart showing the process of building a polymer system using SwiftPol.\label{fig:1}](Fig_1_Swiftpol.png) 
 
 This approach allows for the generation of a polydisperse system, meaning each chain displays the same average properties but the complete system exhibits the distributions observed in experimental polymer samples. 
 
