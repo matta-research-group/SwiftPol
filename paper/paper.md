@@ -1,5 +1,5 @@
 --- 
-title: ‘SwiftPol:A Python package for building and parameterizing *in silico* polymer systems' 
+title: ‘SwiftPol:A Python package for building and parameterizing <i>in silico<i> polymer systems' 
 tags: 
   - Python 
   - polymer 
@@ -62,7 +62,7 @@ Using SwiftPol, we have successfully constructed polydisperse systems of poly(la
 
 # Conclusion 
 
-Considering key experimental properties of bulk polymer materials during *in silico* system building creates representative simulations which are more characteristic of experimental systems] 
+Considering key experimental properties of bulk polymer materials during *in silico* system building creates representative simulations which are more characteristic of experimental systems 
 
  
 # Defining Polymer Properties 
@@ -96,7 +96,7 @@ Blockiness, *b*, is a measurement of the distribution of monomers in an AB co-po
 Residual monomer, *M~resid*, is the % of residual monomer molecules in the system, shown in equation 5. 
 
 \begin{equation}\label{equation 4} 
-\mathit{M_{resid}} = \frac{M_{w}(M_{resid)}{M_{w}(Carbon-containing\,compounds)} 
+\mathit{M_{resid}} = \frac{M_{w}(M_(resid))}{M_{w}(Carbon-containing\,compounds)} 
 \end{equation} 
  
 # Acknowledgements 
