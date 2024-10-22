@@ -1,5 +1,5 @@
 --- 
-title: ‘SwiftPol: A Python package for building and parameterizing <i>in silico<i> polymer systems' 
+title: ‘SwiftPol: A Python package for building and parameterizing *in silico* polymer systems' 
 tags: 
   - Python 
   - polymer 
@@ -26,7 +26,7 @@ bibliography: paper.bib
 # Summary 
  
 
-A polymer sample contains a natural degree of variation in its structure and non-uniformity between their chains, which influences the bulk material properties of the polymer. The innate heterogeneity is often disregarded in the <i>in silico<i> study of polymer systems. This paper presents ‘SwiftPol,’ a user-guided Python software for the automated generation of polydisperse polymer systems which are representative of experimental samples. 
+A polymer sample contains a natural degree of variation in its structure and non-uniformity between their chains, which influences the bulk material properties of the polymer. The innate heterogeneity is often disregarded in the *in silico* study of polymer systems. This paper presents ‘SwiftPol,’ a user-guided Python software for the automated generation of polydisperse polymer systems which are representative of experimental samples. 
 
 We have ensured that SwiftPol can be seamlessly integrated into existing open-source software built for parameterization and simulation, to allow the user to use their preferred force field and engines. 
 
@@ -61,14 +61,14 @@ Using SwiftPol, we have successfully constructed polydisperse systems of poly(la
 
 # Conclusion 
 
-Considering key experimental properties of bulk polymer materials during <i>in silico<i> system building creates representative simulations which are more characteristic of experimental systems] 
+Considering key experimental properties of bulk polymer materials during *in silico* system building creates representative simulations which are more characteristic of experimental systems] 
 
  
 # Defining Polymer Properties 
 
 SwiftPol uses the following expressions to define key polymer properties. 
 
-Monomer ratio, <i>R~m<i>, is the ratio of monomer A to monomer B in an AB co-polymer, shown in \autoref{equation 1} 
+Monomer ratio, *R~m*, is the ratio of monomer A to monomer B in an AB co-polymer, shown in \autoref{equation 1} 
 
 \begin{equation}\label{equation 1} 
 \mathit{R_{m}}  = \frac{n(A)}{n(A+B)} 
@@ -86,13 +86,13 @@ Number of chains, n~chains, is the total number of chains built by SwiftPol and 
 n_{chains} = total\,number\,of\,chains\,built 
 \end{equation} 
 
-Blockiness, <i>b<i>, is a measurement of the distribution of monomers in an AB co-polymer, shown in \autoref{equation 4}. 
+Blockiness, *b*, is a measurement of the distribution of monomers in an AB co-polymer, shown in \autoref{equation 4}. 
 
 \begin{equation}\label{equation 4} 
 \mathit{b} = \frac{nB-B\,bonds}{nA-B\,bonds} 
 \end{equation} 
 
-Residual monomer, <i>M~resid<i>, is the % of residual monomer molecules in the system, shown in equation 5. 
+Residual monomer, *M~resid*, is the % of residual monomer molecules in the system, shown in equation 5. 
 
 \begin{equation}\label{equation 4} 
 \mathit{M_{resid}} = \frac{M_{w}(M_{resid)}{M_{w}(Carbon-containing\,compounds)} 
