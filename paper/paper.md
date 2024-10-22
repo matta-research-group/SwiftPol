@@ -50,7 +50,7 @@ As depicted in Figure 1 \autoref{fig:1}, SwiftPol generates an initial polymer s
 
 If all tests are passed, the chain is appended to the Python polymer system object, and the associated actual properties of the chain are calculated and added as system attributes. Otherwise, the chain is discarded, and the process is repeated. Once the system size is satisfied, average system properties are calculated using in-built SwiftPol functions. 
 
-![Figure 1. Flowchart showing the process of building a polymer system using SwiftPol.\label{fig:1}](Fig_1_swiftpol.png) 
+![Figure 1. Flowchart showing the process of building a polymer system using SwiftPol.\label{fig:1}](Fig_1_Swiftpol.png) 
 
 This approach allows for the generation of a polydisperse system, meaning each chain displays the same average properties but the complete system exhibits the distributions observed in experimental polymer samples. 
 
@@ -93,9 +93,9 @@ Blockiness, *b*, is a measurement of the distribution of monomers in an AB co-po
 \mathit{b} = \frac{nB-B\,bonds}{nA-B\,bonds} 
 \end{equation} 
 
-Residual monomer, *M~resid*, is the % of residual monomer molecules in the system, shown in equation 5. 
+Residual monomer, *M~resid*, is the % of residual monomer molecules in the system, shown in \autoref{equation 5}. 
 
-\begin{equation}\label{equation 4} 
+\begin{equation}\label{equation 5} 
 \mathit{M_{resid}} = \frac{M_{w}(M_(resid))}{M_{w}(Carbon-containing\,compounds)} 
 \end{equation} 
  
