@@ -99,11 +99,17 @@ class TestBlockinessGen(unittest.TestCase):
 #Test calculate box components
 class TestCalculateBoxComponents(unittest.TestCase):
     def test_calculate_box_components(self):
-        # Create a PLGA system
-        x = demo.PLGA_system(75, 30, 1.7, 'ester', 2)
+        # Create a polymer system
+        x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]'], 
+                    reaction = AllChem.ReactionFromSmarts('[HO:1][C:2].[O:3][C:5]=[O:6]>>[C:2][O:1][C:5]=[O:6].[O:3]'), 
+                    length_target = 10, 
+                    terminals = 'hydroxyl', 
+                    num_chains = 5, 
+                    copolymer=False)
         x.generate_conformers()
         # Calculate box components
         molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = build.calculate_box_components(chains = x.chains,
+                                                                                                                     monomers = x.monomers,
                                                                                                                     sequence=x.sequence)        
 
         # Check if the returned molecules is a list
@@ -135,7 +141,7 @@ class TestPolymerSystem(unittest.TestCase):
         self.assertTrue(9 <= round(x.max_length)<= 11)
         self.assertTrue(1.5 <= round(x.PDI) <= 5)
         self.assertTrue(x.num_chains == 5)
-        
+        self.assertIsNotNone(x.monomers)
         x.generate_conformers()
         self.assertTrue(len(x.chains[0].conformers[0])==len(x.chains[0].atoms))
         x.charge_system()
