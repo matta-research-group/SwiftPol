@@ -57,11 +57,13 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='standard'):
     for x in sorted(list(set(sequence))):
         ind = sorted(list(set(sequence))).index(x)
         monomers[x] = monomer_list[ind]
+    #Initiate iodine blocker
     polymer = Chem.MolFromSmiles('ICO')
+    #Build polymer for len(sequence)
     for i in range(0, len(sequence)):
         polymer = reaction.RunReactants((polymer, Chem.MolFromSmiles(monomers[sequence[i]])))[0][0]
         Chem.SanitizeMol(polymer)
-            
+    #Add Terminals        
     if terminal == 'hydroxyl':
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('[OH]'), Chem.MolFromSmiles('O'))[0]
         Chem.AddHs(polymer)
@@ -69,6 +71,7 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='standard'):
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('[OH]'), Chem.MolFromSmiles('OC(=O)[OH]'))[0]
     elif terminal == 'ester':
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('[OH]'), Chem.MolFromSmiles('OC'))[0]
+    #Remove iodine blocker
     polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('OC[I]'), Chem.MolFromSmiles('O'))[0]
     Chem.SanitizeMol(polymer)
     return polymer
@@ -92,12 +95,13 @@ def build_linear_copolymer(sequence,
     Returns:
     tuple: A tuple containing the sanitized polymer (rdkit.Chem.rdchem.Mol), the percentage composition of monomer A (float), and the percentage composition of monomer B (float).
     """
-
+    # Initialize the polymer with an iodine blocker
     polymer = Chem.MolFromSmiles('OC(=O)I')
     A_count=0
     B_count=0
     A = Chem.MolFromSmiles(monomer_a_smiles)
     B = Chem.MolFromSmiles(monomer_b_smiles)
+    # Build the polymer based on the sequence
     for i in range(len(sequence)):
         if sequence[i] == 'A':
             polymer = reaction.RunReactants((polymer, A))[0][0]
@@ -108,8 +112,10 @@ def build_linear_copolymer(sequence,
             polymer = reaction.RunReactants((polymer, B))[0][0]
             Chem.SanitizeMol(polymer)
             B_count+=1
+    # Calculate the percentage composition of each monomer
     A_ratio = round((A_count/len(sequence))*100,2)
     B_ratio = round((B_count/len(sequence))*100,2)
+    # Remove the iodine blocker
     polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('OC(=O)I'), Chem.MolFromSmarts('[O]'))[0]
     Chem.SanitizeMol(polymer)
     return polymer, A_ratio, B_ratio
@@ -128,19 +134,23 @@ def PDI(chains):
     Returns:
     tuple: A tuple containing the PDI (float), Mn (float), and Mw (float).
     """
-
-    mw_list = [ExactMolWt(chain) for chain in chains]  #_rdkit]
+    # Calculate the molecular weights of the chains
+    mw_list = [ExactMolWt(chain) for chain in chains]
     list = [round(mass) for mass in mw_list]
     Mi = set(list)
     NiMi = []
+    # Calculate the weight fraction of each chain
     for i in Mi:
         Ni = list.count(i)
         NiMi.append(i*Ni)
     sigNiMi = sum(NiMi)
     Mn = sigNiMi/len(mw_list)
     wf = [z/sigNiMi for z in NiMi]
+    # Calculate the weight-average molecular weight
     WiMi = [wf[n]*NiMi[n] for n in range(len(wf))]
     Mw = sum(WiMi)
+    
+    # Calculate the polydispersity index
     PDI = Mw/Mn
     return PDI, Mn, Mw
     
@@ -165,7 +175,7 @@ def blockiness_gen(sequence):
     If the sequence does not contain both 'G' and 'L', the function returns a string indicating that the molecule is not a co-polymer.
     """
 
-    if 'A' in sequence and 'B' in sequence:
+    if 'A' in sequence and 'B' in sequence: #Check if sequence is a co-polymer
         AB = sequence.count('AB')
         BB = sequence.count('BB')
         BA = sequence.count('BA')
@@ -174,10 +184,10 @@ def blockiness_gen(sequence):
             blockiness = BB/BA
         else:
             blockiness = BB/AB
-        
+        #Calculate block length B
         block_list_B = [x for x in sequence.split('A') if x!='']
         block_length_B = mean([len(b) for b in block_list_B])
-        
+        #Calculate block length A
         block_list_A = [x for x in sequence.split('B') if x!='']
         block_length_A = mean([len(b) for b in block_list_A])
         return blockiness, block_length_B, block_length_A
@@ -185,7 +195,7 @@ def blockiness_gen(sequence):
     else:
         return 'Molecule is not a co-polymer, no blockiness calculation performed', 0, len(sequence)
 
-def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.mole / unit.liter, residual_monomer = 0.00):
+def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.1 * unit.mole / unit.liter, residual_monomer = 0.00):
     """
     ADAPTED FROM OPENFF TOOLKIT PACKMOL WRAPPER SOLVATE_TOPOLOGY FUNCTION
     Calculates the components required to construct a simulation box for a given set of molecular chains.
@@ -207,7 +217,7 @@ def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.m
     from openff.toolkit.topology import Molecule, Topology
     from openff.interchange.components._packmol import UNIT_CUBE, pack_box, RHOMBIC_DODECAHEDRON, solvate_topology
     from openff.interchange.components._packmol import _max_dist_between_points, _compute_brick_from_box_vectors, _center_topology_at
-    #Create molecules for the purpose of later topology assembly
+    #Create molecules for the purpose of mass calculation
     #Water
     water = Molecule.from_smiles('O')
     water.generate_unique_atom_names()
@@ -219,7 +229,6 @@ def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.m
     na.generate_unique_atom_names()
     na.generate_conformers()
     
-    
     #Chloride
     cl = Molecule.from_smiles('[Cl-]')
     cl.generate_unique_atom_names()
@@ -227,7 +236,7 @@ def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.m
     
     nacl_mass = sum([atom.mass for atom in na.atoms]) + sum(
     [atom.mass for atom in cl.atoms],)
-    
+    # Create a topology from the chains
     topology = Topology.from_molecules(chains)
     nacl_conc=salt_concentration
     padding= 0.1 * unit.nanometer
@@ -261,34 +270,40 @@ def calculate_box_components(chains, sequence, salt_concentration = 0.1 * unit.m
     rolling_mass += nacl_mass * nacl_to_add
     rolling_mass += water_mass * water_to_add
     
-    
+    # residual monomer to add
     mass_to_add = (rolling_mass.magnitude/1-residual_monomer) * residual_monomer
-    lac = Molecule.from_smiles('C[C@@H](C(=O)[OH])O')
-    lac_mass = sum([atom.mass for atom in lac.atoms])
-    gly = Molecule.from_smiles('OC(=O)CO')
-    gly_mass = sum([atom.mass for atom in gly.atoms])
     
     
-    if 'L' in sequence and 'G' in sequence:
+    if 'A' in sequence and 'B' in sequence:
+        A = Molecule.from_smiles(monomers[0])
+        A_mass = sum([atom.mass for atom in A.atoms])
+        B = Molecule.from_smiles(monomers[1])
+        B_mass = sum([atom.mass for atom in B.atoms])
         for r in range(0,100):
-            if (r * lac_mass.magnitude) + (r * gly_mass.magnitude) <= mass_to_add:
-                lac_to_add = r
-                gly_to_add = r
+            if (r * A_mass.magnitude) + (r * B_mass.magnitude) <= mass_to_add:
+                A_to_add = r
+                B_to_add = r
             else:
                 break
+        residual_monomer_actual = ((A_to_add * A_mass.magnitude + B_to_add * B_mass.magnitude) / rolling_mass.magnitude)
+        molecules = [water, na, cl, A, B]
+        number_of_copies=[water_to_add, na_to_add, cl_to_add, A_to_add, B_to_add]
     
-    elif 'L' in sequence and 'G' not in sequence:
+    elif 'A' in sequence and 'B' not in sequence:
+        A = Molecule.from_smiles(monomers[0])
+        A_mass = sum([atom.mass for atom in A.atoms])
+        B = Molecule.from_smiles('C')
         for r in range(0,100):
-            if r * lac_mass.magnitude <= mass_to_add:
-                lac_to_add = r
+            if r * A_mass.magnitude <= mass_to_add:
+                A_to_add = r
             else:
                 break
-        gly_to_add = 0
+        B_to_add = 0
+        residual_monomer_actual = ((A_to_add * A_mass.magnitude) / rolling_mass.magnitude)
+        molecules = [water, na, cl, A, B]
+        number_of_copies=[water_to_add, na_to_add, cl_to_add, A_to_add, B_to_add]
     
-    residual_monomer_actual = ((lac_to_add * lac_mass.magnitude + gly_to_add * gly_mass.magnitude) / rolling_mass.magnitude)
 
-    molecules = [water, na, cl, lac, gly]
-    number_of_copies=[water_to_add, na_to_add, cl_to_add, lac_to_add, gly_to_add]
     return molecules, number_of_copies, topology, box_vectors, residual_monomer_actual
 
 
@@ -363,7 +378,7 @@ class polymer_system:
         chains_rdkit = []
         lengths = []
         
-
+        self.monomers = monomer_list
         #First round of building
         
         if copolymer==True:
