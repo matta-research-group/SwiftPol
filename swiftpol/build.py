@@ -490,7 +490,7 @@ class polymer_system:
             ntkw.assign_partial_charges(chain, "openff-gnn-am1bcc-0.1.0-rc.2.pt")
 
 
-    def solvate_system(self, resid_monomer, salt_concentration):
+    def solvate_system(self, resid_monomer, salt_concentration, monomers):
         """
         Build a solvated system using packmol functions.
 
@@ -514,7 +514,8 @@ class polymer_system:
             chains=self.chains,
             sequence=self.sequence, 
             residual_monomer=resid_monomer,
-            salt_concentration=salt_concentration
+            salt_concentration=salt_concentration,
+            monomers=monomers
         )
         self.residual_monomer = resid_monomer_actual
         self.solvent_comp = molecules
