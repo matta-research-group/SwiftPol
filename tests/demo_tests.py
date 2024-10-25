@@ -48,13 +48,12 @@ class TestBlockinessPLGA(unittest.TestCase):
 
 class TestPLGABuild(unittest.TestCase):
     def test_plga_build(self):
-        x = demo.PLGA_system(80, 10, 1.0, 'ester', 5)
+        x = demo.PLGA_system(75, 50, 1.0, 'ester', 3)
         
-        self.assertTrue(len(x.chains)==5)
-        self.assertTrue(72 <= round(x.lactide_actual) <= 88)
-        self.assertTrue(9 <= round(x.max_length)<= 11)
+        self.assertTrue(len(x.chains)==3)
+        self.assertTrue(68 <= round(x.lactide_actual) <= 82)
+        self.assertTrue(45 <= round(x.max_length)<= 55)
         self.assertTrue(1.5 <= round(x.PDI) <= 5)
-        print(x.PDI)
         self.assertTrue(x.mean_blockiness==1)
         
         x.generate_conformers()
