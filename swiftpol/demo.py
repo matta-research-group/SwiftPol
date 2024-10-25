@@ -129,6 +129,120 @@ def blockiness_PLGA(sequence):
     else:
         return 'Molecule is not a co-polymer, no blockiness calculation performed', 0, len(sequence)
 
+def calculate_box_components_PLGA(chains, sequence, monomers = ['OC(=O)CO', 'C[C@@H](C(=O)[OH])O'], salt_concentration = 0.1 * unit.mole / unit.liter, residual_monomer = 0.00):
+    """
+    ADAPTED FROM OPENFF TOOLKIT PACKMOL WRAPPER SOLVATE_TOPOLOGY FUNCTION
+    Calculates the components required to construct a simulation box for a given set of molecular chains.
+    Considers the salt concentration and residual monomer concentration to determine the quantity of each molecule type required.
+
+    Parameters:
+    chains (list): A list of molecular chains to be included in the simulation box.
+    sequence (str): A string representing the sequence of the molecular chains. 'G' and 'L' represent different types of monomers.
+    salt_concentration (float, optional): The desired salt concentration in the simulation box. Defaults to 0.1 M.
+    residual_monomer (float, optional): The desired residual monomer concentration in the simulation box. Defaults to 0.05.
+
+    Returns:
+    tuple: A tuple containing the following elements:
+        - molecules (list): A list of molecules to be included in the simulation box.
+        - number_of_copies (list): A list indicating the quantity of each molecule to be included in the simulation box.
+        - topology (openff.toolkit.topology.Topology): The topology of the simulation box.
+        - box_vectors (numpy.ndarray): The vectors defining the dimensions of the simulation box.
+    """
+    from openff.toolkit.topology import Molecule, Topology
+    from openff.interchange.components._packmol import UNIT_CUBE, pack_box, RHOMBIC_DODECAHEDRON, solvate_topology
+    from openff.interchange.components._packmol import _max_dist_between_points, _compute_brick_from_box_vectors, _center_topology_at
+    #Create molecules for the purpose of mass calculation
+    #Water
+    water = Molecule.from_smiles('O')
+    water.generate_unique_atom_names()
+    water.generate_conformers()
+    water_mass = sum([atom.mass for atom in water.atoms])
+    
+    #Sodium
+    na = Molecule.from_smiles('[Na+]')
+    na.generate_unique_atom_names()
+    na.generate_conformers()
+    
+    #Chloride
+    cl = Molecule.from_smiles('[Cl-]')
+    cl.generate_unique_atom_names()
+    cl.generate_conformers()
+    
+    nacl_mass = sum([atom.mass for atom in na.atoms]) + sum(
+    [atom.mass for atom in cl.atoms],)
+    # Create a topology from the chains
+    topology = Topology.from_molecules(chains)
+    nacl_conc=salt_concentration
+    padding= 0.1 * unit.nanometer
+    box_shape= UNIT_CUBE
+    target_density= 1.0 * unit.gram / unit.milliliter
+    tolerance= 2.0 * unit.nanometer
+    
+    # Compute box vectors from the solute length and requested padding
+    if chains[0].n_conformers == 0:
+        raise ValueError("The solvate_topology function requires that the solute has at least one conformer.")
+    solute_length = max(_max_dist_between_points(chains[i].to_topology().get_positions()) for i in range(len(chains)))
+    image_distance = solute_length + padding * 2
+    box_vectors = box_shape * image_distance
+    
+    # Compute target masses of solvent
+    box_volume = np.linalg.det(box_vectors.m) * box_vectors.u**3
+    target_mass = box_volume * target_density
+    solvent_mass = target_mass - sum(sum([atom.mass for atom in molecule.atoms]) for molecule in topology.molecules)
+    
+    # Compute the number of NaCl to add from the mass and concentration
+    nacl_mass_fraction = (nacl_conc * nacl_mass) / (55.5 * unit.mole / unit.liter * water_mass)
+    nacl_to_add = ((solvent_mass * nacl_mass_fraction) / nacl_mass).m_as(unit.dimensionless).round()
+    water_to_add = int(round((solvent_mass - nacl_mass) / water_mass).m_as(unit.dimensionless).round())
+    
+    # Neutralise the system by adding and removing salt
+    solute_charge = sum([molecule.total_charge for molecule in topology.molecules])
+    na_to_add = int(round(np.ceil(nacl_to_add - solute_charge.m / 2.0)))
+    cl_to_add = int(round(np.floor(nacl_to_add + solute_charge.m / 2.0)))
+    
+    rolling_mass=0
+    for m in topology.molecules:
+        rolling_mass += sum(atom.mass for atom in m.atoms)
+    rolling_mass += nacl_mass * nacl_to_add
+    rolling_mass += water_mass * water_to_add
+    
+    # residual monomer to add
+    mass_to_add = (rolling_mass.magnitude/1-residual_monomer) * residual_monomer
+    
+    
+    if 'L' in sequence and 'G' in sequence:
+        A = Molecule.from_smiles(monomers[0])
+        A_mass = sum([atom.mass for atom in A.atoms])
+        B = Molecule.from_smiles(monomers[1])
+        B_mass = sum([atom.mass for atom in B.atoms])
+        for r in range(0,100):
+            if (r * A_mass.magnitude) + (r * B_mass.magnitude) <= mass_to_add:
+                A_to_add = r
+                B_to_add = r
+            else:
+                break
+        residual_monomer_actual = ((A_to_add * A_mass.magnitude + B_to_add * B_mass.magnitude) / rolling_mass.magnitude)
+        molecules = [water, na, cl, A, B]
+        number_of_copies=[water_to_add, na_to_add, cl_to_add, A_to_add, B_to_add]
+    
+    elif 'L' in sequence and 'G' not in sequence:
+        A = Molecule.from_smiles(monomers[0])
+        A_mass = sum([atom.mass for atom in A.atoms])
+        B = Molecule.from_smiles('C')
+        for r in range(0,100):
+            if r * A_mass.magnitude <= mass_to_add:
+                A_to_add = r
+            else:
+                break
+        B_to_add = 0
+        residual_monomer_actual = ((A_to_add * A_mass.magnitude) / rolling_mass.magnitude)
+        molecules = [water, na, cl, A, B]
+        number_of_copies=[water_to_add, na_to_add, cl_to_add, A_to_add, B_to_add]
+    
+
+    return molecules, number_of_copies, topology, box_vectors, residual_monomer_actual
+
+
 
 #Class object for PLGA system
 class PLGA_system:
@@ -140,8 +254,8 @@ class PLGA_system:
     from rdkit.Chem.Descriptors import ExactMolWt
     from openff.interchange import Interchange
     from openff.interchange.components._packmol import UNIT_CUBE, pack_box
-    from swiftpol.demo import build_PLGA_ring, blockiness_PLGA
-    from swiftpol.build import PDI, calculate_box_components
+    from swiftpol.demo import build_PLGA_ring, blockiness_PLGA, calculate_box_components_PLGA
+    from swiftpol.build import PDI
     from swiftpol import build
     from rdkit.Chem import AllChem
 
@@ -213,6 +327,7 @@ class PLGA_system:
         blockiness_list = []
         GBL = []
         LBL = []
+        self.monomers = ['OC(=O)CO', 'C[C@@H](C(=O)[OH])O']
         #First round of building
         for x in range(num_chains):
             length_actual = np.random.normal(length_target, 0.5)
@@ -326,11 +441,12 @@ class PLGA_system:
         """
         from openff.interchange.components._packmol import pack_box
         
-        molecules, number_of_copies, topology, box_vectors, resid_monomer_actual = build.calculate_box_components(
+        molecules, number_of_copies, topology, box_vectors, resid_monomer_actual = calculate_box_components_PLGA(
             chains=self.chains,
             sequence=self.sequence, 
             residual_monomer=resid_monomer,
-            salt_concentration=salt_concentration
+            salt_concentration=salt_concentration,
+            monomers=self.monomers
         )
         self.residual_monomer = resid_monomer_actual
         self.solvent_comp = molecules
