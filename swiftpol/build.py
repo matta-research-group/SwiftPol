@@ -325,7 +325,7 @@ class polymer_system:
     from rdkit.Chem import AllChem
     import numpy as np
 
-    def __init__(self, monomer_list, reaction, length_target, num_chains, terminals='standard', perc_A_target=100, blockiness_target=1.0, copolymer=False):
+    def __init__(self, monomer_list, reaction, length_target, num_chains, terminals='standard', perc_A_target=100, blockiness_target=1.0, copolymer=False, acceptance = 10):
         """
         Initialize the polymer system and build the polymer chains.
 
@@ -338,6 +338,7 @@ class polymer_system:
         perc_A_target (float, optional): The target percentage of monomer A in the copolymer. Default is 100.
         blockiness_target (float, optional): The target blockiness of the copolymer. Default is 1.0.
         copolymer (bool, optional): Flag to indicate if the system is a copolymer. Default is False.
+        acceptance = % deviation of blockiness and A percentage from target values
 
         Attributes:
         length_target (float): The target length of the polymer chains.
@@ -368,9 +369,10 @@ class polymer_system:
             self.blockiness_target = blockiness_target
             self.A_target = perc_A_target
             def spec(sequence, blockiness): #Define limits of A percentage and blockiness from input
+                acceptance_dec = acceptance/100
                 actual_A = (sequence.count('A')/len(sequence))*100
                 blockiness = blockiness_gen(sequence)[0]
-                return actual_A > perc_A_target*0.90 and actual_A < perc_A_target*1.10 and blockiness>blockiness_target*0.90 and blockiness<blockiness_target*1.10
+                return actual_A > perc_A_target*(1-acceptance_dec) and actual_A < perc_A_target*(1+acceptance_dec) and blockiness>blockiness_target*(1-acceptance_dec) and blockiness<blockiness_target*(1+acceptance_dec)
             
             blockiness_list = []
             out_of_spec = 0
