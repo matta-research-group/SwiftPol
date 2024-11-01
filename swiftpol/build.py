@@ -31,7 +31,7 @@ from openff.interchange import Interchange
 from openff.interchange.components._packmol import UNIT_CUBE, pack_box
 
 #Build polymer - generic
-def build_polymer(sequence, monomer_list, reaction, terminal ='standard'):
+def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
     """
     Build a polymer using specified reaction sequence.
 
@@ -57,23 +57,31 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='standard'):
     for x in sorted(list(set(sequence))):
         ind = sorted(list(set(sequence))).index(x)
         monomers[x] = monomer_list[ind]
-    #Initiate iodine blocker
-    polymer = Chem.MolFromSmiles('ICO')
-    #Build polymer for len(sequence)
-    for i in range(0, len(sequence)):
-        polymer = reaction.RunReactants((polymer, Chem.MolFromSmiles(monomers[sequence[i]])))[0][0]
-        Chem.SanitizeMol(polymer)
-    #Add Terminals        
+    hits = Chem.MolFromSmiles(monomers[sequence[0]]).GetSubstructMatches(Chem.MolFromSmarts('I'))
+    mw = Chem.RWMol(Chem.MolFromSmiles(monomers[sequence[0]]))
+    mw.ReplaceAtom(hits[0][0],Chem.Atom(17))
+    Chem.SanitizeMol(mw)
+    mw.CommitBatchEdit()
+    polymer = mw
+    for m in sequence[1:]:
+        if m == 'A':
+            polymer = reaction.RunReactants((polymer, Chem.MolFromSmiles(monomers['A'])))[0][0]
+            Chem.SanitizeMol(polymer)
+            
+        elif m == 'B':
+            polymer = reaction.RunReactants((polymer, Chem.MolFromSmiles(monomers['B'])))[0][0]
+            Chem.SanitizeMol(polymer)
+
     if terminal == 'hydroxyl':
-        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('[OH]'), Chem.MolFromSmiles('O'))[0]
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), Chem.MolFromSmiles('[H]'))[0]
         Chem.AddHs(polymer)
     elif terminal == 'carboxyl':
-        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('[OH]'), Chem.MolFromSmiles('OC(=O)[OH]'))[0]
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), Chem.MolFromSmiles('C(=O)[OH]'))[0]
     elif terminal == 'ester':
-        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('[OH]'), Chem.MolFromSmiles('OC'))[0]
-    #Remove iodine blocker
-    polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('OC[I]'), Chem.MolFromSmiles('O'))[0]
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), Chem.MolFromSmiles('C'))[0]
+    polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('I'), Chem.MolFromSmiles('[H]'))[0] #remove any excess iodine
     Chem.SanitizeMol(polymer)
+    polymer = Chem.RemoveAllHs(polymer)
     return polymer
 
 
