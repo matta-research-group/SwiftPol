@@ -33,26 +33,19 @@ from openff.interchange.components._packmol import UNIT_CUBE, pack_box
 #Build polymer - generic
 def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
     """
-    Build a polymer using specified reaction sequence.
-
-    This function takes a sequence of monomers, a list of corresponding monomer structures, and a reaction, 
-    and builds a polymer using specified reaction sequence. The terminal group of the polymer can be 
-    specified as 'hydroxyl' (default), 'carboxyl', or 'ester'.
+    Constructs a polymer from a given sequence of monomers.
 
     Parameters:
-    sequence (str): A string representing the sequence of monomers. The sequence should be in the format 'AABBCCDD' 
-                    (blocks of dimers).
-    monomer_list (list): A list of SMILES strings representing the structures of the monomers. The order of the 
-                         monomers in the list should correspond to the order of the monomers in the sequence.
-    reaction (rdkit.Chem.rdChemReactions.ChemicalReaction): The reaction to use for the polymerization.
-    terminal (str, optional): The terminal group of the polymer. Can be 'hydroxyl' (default), 'carboxyl', or 'ester'.
+    sequence (str): A string representing the sequence of monomers (e.g., 'ABAB').
+    monomer_list (list): A list of SMILES strings representing the monomers.
+    reaction (rdkit.Chem.rdChemReactions.ChemicalReaction): An RDKit reaction object used to link monomers.
+    terminal (str, optional): The terminal group to be added to the polymer. Options are 'hydroxyl', 'carboxyl', or 'ester'. Default is 'hydroxyl'.
 
     Returns:
-    rdkit.Chem.rdchem.Mol: The resulting polymer.
-
-    Raises:
-    AttributeError: If the sequence is not in the correct format.
+    rdkit.Chem.rdchem.Mol: The constructed polymer as an RDKit molecule object.
     """
+    from rdkit import RDLogger 
+    RDLogger.DisableLog('rdApp.*')   
     monomers = {}
     for x in sorted(list(set(sequence))):
         ind = sorted(list(set(sequence))).index(x)
@@ -62,27 +55,62 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
     mw.ReplaceAtom(hits[0][0],Chem.Atom(17))
     Chem.SanitizeMol(mw)
     mw.CommitBatchEdit()
-    polymer = mw
-    for m in sequence[1:]:
-        if m == 'A':
-            polymer = reaction.RunReactants((polymer, Chem.MolFromSmiles(monomers['A'])))[0][0]
+    polymer = Chem.AddHs(mw)
+    info = Chem.AtomPDBResidueInfo()
+    info.SetResidueName(sequence[0] + str(1))
+    info.SetResidueNumber(1)
+    [atom.SetMonomerInfo(info)  for  atom  in  polymer.GetAtoms()]
+    Chem.SanitizeMol(polymer)
+    
+    for i in range(len(sequence))[1:]:
+        if sequence[i] == 'A':
+            A = Chem.MolFromSmiles(monomers['A'])
+            A = Chem.AddHs(A)
+            info = Chem.AtomPDBResidueInfo()
+            info.SetResidueName('A' + str(i+1))
+            info.SetResidueNumber(i+1)
+            [atom.SetMonomerInfo(info)  for  atom  in  A.GetAtoms()]
+            polymer = reaction.RunReactants((polymer, A))[0][0]
             Chem.SanitizeMol(polymer)
-            
-        elif m == 'B':
-            polymer = reaction.RunReactants((polymer, Chem.MolFromSmiles(monomers['B'])))[0][0]
+                
+        elif sequence[i] == 'B':
+            B = Chem.MolFromSmiles(monomers['B'])
+            B = Chem.AddHs(B)
+            info = Chem.AtomPDBResidueInfo()
+            info.SetResidueName('B' + str(i+1))
+            info.SetResidueNumber(i+1)
+            [atom.SetMonomerInfo(info)  for  atom  in  B.GetAtoms()]
+            polymer = reaction.RunReactants((polymer, B))[0][0]
             Chem.SanitizeMol(polymer)
-
+    
     if terminal == 'hydroxyl':
-        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), Chem.MolFromSmiles('[H]'))[0]
+        hydrogen = Chem.MolFromSmiles('[H]')
+        info = Chem.AtomPDBResidueInfo()
+        info.SetResidueName(sequence[-1] + str(len(sequence)))
+        info.SetResidueNumber(len(sequence))
+        [atom.SetMonomerInfo(info)  for  atom  in  hydrogen.GetAtoms()]
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), hydrogen)[0]
         Chem.AddHs(polymer)
     elif terminal == 'carboxyl':
-        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), Chem.MolFromSmiles('C(=O)[OH]'))[0]
+        carboxyl = Chem.MolFromSmiles('C(=O)[OH]')
+        info = Chem.AtomPDBResidueInfo()
+        info.SetResidueName(sequence[-1] + str(len(sequence)))
+        info.SetResidueNumber(len(sequence))
+        [atom.SetMonomerInfo(info)  for  atom  in  carboxyl.GetAtoms()]
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), carboxyl)[0]
     elif terminal == 'ester':
+        carbon = Chem.MolFromSmiles('C')
+        info = Chem.AtomPDBResidueInfo()
+        info.SetResidueName(sequence[-1] + str(len(sequence)))
+        info.SetResidueNumber(len(sequence))
+        [atom.SetMonomerInfo(info)  for  atom  in  carbon.GetAtoms()]
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), carbon)[0]
+        Chem.AddHs(polymer)
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), Chem.MolFromSmiles('C'))[0]
-    polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('I'), Chem.MolFromSmiles('[H]'))[0] #remove any excess iodine
+    polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('I'), hydrogen)[0] #remove any excess iodine
     Chem.SanitizeMol(polymer)
-    polymer = Chem.RemoveAllHs(polymer)
     return polymer
+
 
 
 def build_linear_copolymer(sequence, 
@@ -395,7 +423,7 @@ class polymer_system:
         if copolymer==True:
             for n in range(num_chains):
                 length_actual = np.random.normal(length_target, 0.5)
-                sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual/2),), p=[perc_A_target/100,1-(perc_A_target/100)]))
+                sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                 blockiness = blockiness_gen(sequence)[0]
                 if spec(sequence, blockiness)==True:
                     pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals)
@@ -412,7 +440,7 @@ class polymer_system:
                 #Second round of building
                 while out_of_spec >0:
                     length_actual = np.random.normal(length_target, 0.5)
-                    sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual/2),), p=[perc_A_target/100,1-(perc_A_target/100)]))
+                    sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                     blockiness = blockiness_gen(sequence)[0]
                     if spec(sequence, blockiness)==True:
                         pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals)
@@ -435,7 +463,7 @@ class polymer_system:
         else:
             for n in range(num_chains):
                 length_actual = np.random.normal(length_target, 0.5)
-                sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual/2),), p=[perc_A_target/100,1-(perc_A_target/100)]))
+                sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                 pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals)
                 lengths.append(int(length_actual))
                 chains_rdkit.append(pol)
@@ -543,10 +571,10 @@ class polymer_system:
         Raises:
         ImportError: If the OpenFF Interchange toolkit is not available.
         """
-        solute_length = max(_max_dist_between_points(sys.chains[i].to_topology().get_positions()) for i in range(len(sys.chains)))
+        solute_length = max(_max_dist_between_points(self.chains[i].to_topology().get_positions()) for i in range(len(self.chains)))
         box_vectors = UNIT_CUBE * solute_length
-        bulk_system = pack_box(molecules=sys.chains,
-                                number_of_copies=[3 for i in range(len(sys.chains))],
+        bulk_system = pack_box(molecules=self.chains,
+                                number_of_copies=[3 for i in range(len(self.chains))],
                                 box_shape=UNIT_CUBE,
                                 box_vectors=box_vectors,
                                 center_solute='BRICK')
