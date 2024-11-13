@@ -87,7 +87,7 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
         hydrogen = Chem.MolFromSmiles('[H]')
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName(sequence[-1] + str(1))
-        info.SetResidueNumber(len(sequence))
+        info.SetResidueNumber(1)
         [atom.SetMonomerInfo(info)  for  atom  in  hydrogen.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), hydrogen)[0]
         Chem.AddHs(polymer)
@@ -95,14 +95,14 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
         carboxyl = Chem.MolFromSmiles('C(=O)[OH]')
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName(sequence[-1] + str(1))
-        info.SetResidueNumber(len(sequence))
+        info.SetResidueNumber(1)
         [atom.SetMonomerInfo(info)  for  atom  in  carboxyl.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), carboxyl)[0]
     elif terminal == 'ester':
         carbon = Chem.MolFromSmiles('C')
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName(sequence[-1] + str(1))
-        info.SetResidueNumber(len(sequence))
+        info.SetResidueNumber(1)
         [atom.SetMonomerInfo(info)  for  atom  in  carbon.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), carbon)[0]
         Chem.AddHs(polymer)
