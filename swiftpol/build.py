@@ -86,7 +86,7 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
     if terminal == 'hydroxyl':
         hydrogen = Chem.MolFromSmiles('[H]')
         info = Chem.AtomPDBResidueInfo()
-        info.SetResidueName(sequence[-1] + str(len(sequence)))
+        info.SetResidueName(sequence[-1] + str(1))
         info.SetResidueNumber(len(sequence))
         [atom.SetMonomerInfo(info)  for  atom  in  hydrogen.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), hydrogen)[0]
@@ -94,14 +94,14 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
     elif terminal == 'carboxyl':
         carboxyl = Chem.MolFromSmiles('C(=O)[OH]')
         info = Chem.AtomPDBResidueInfo()
-        info.SetResidueName(sequence[-1] + str(len(sequence)))
+        info.SetResidueName(sequence[-1] + str(1))
         info.SetResidueNumber(len(sequence))
         [atom.SetMonomerInfo(info)  for  atom  in  carboxyl.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), carboxyl)[0]
     elif terminal == 'ester':
         carbon = Chem.MolFromSmiles('C')
         info = Chem.AtomPDBResidueInfo()
-        info.SetResidueName(sequence[-1] + str(len(sequence)))
+        info.SetResidueName(sequence[-1] + str(1))
         info.SetResidueNumber(len(sequence))
         [atom.SetMonomerInfo(info)  for  atom  in  carbon.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), carbon)[0]
@@ -472,13 +472,14 @@ class polymer_system:
                 perc_A_actual.append((sequence.count('A')/len(sequence))*100)
         self.sequence = sequence
         self.chains = chains
+        for i in range(len(self.chains)):
+            self.chains[i].name = 'chain' + str(i)
         self.chain_rdkit = chains_rdkit
         self.mol_weight_average = round(mean([ExactMolWt(c) for c in chains_rdkit]),2)
         self.PDI, self.Mn, self.Mw = PDI(chains_rdkit)
         self.num_chains = len(chains)
         self.A_actual = mean(perc_A_actual)
         self.perc_A_actual = perc_A_actual
-
         self.length_average = mean(lengths)
         self.lengths = lengths
         self.min_length = min(lengths)
