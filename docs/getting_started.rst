@@ -9,33 +9,20 @@ Welcome to the Swiftpol documentation! This guide will help you get started with
 Installation
 ------------
 
-To install Swiftpol, you can use `pip`. Run the following command in your terminal:
+To install Swiftpol dependencies in a new virtual environment, use the following command:
 
-```bash
-pip install swiftpol
-```
+.. code-block:: bash
+    git clone https://github.com/matta-research-group/SwiftPol
+    cd swiftpol
+    conda env create -f Dev_tools/swiftpol.yml -n swiftpol -y 
+    conda activate swiftpol
 
-Alternatively, you can clone the repository and install it locally:
 
-```bash
-git clone https://github.com/<username>/swiftpol.git
-cd swiftpol
-pip install .
-```
+Swiftpol is in development. To install an editable version, clone the repository and install it locally:
 
-Usage
------
-Build a short PEG chain using Swiftpol:
-
-```python
-
-from swiftpol import build
-from rdkit.Chem import AllChem
-
-build.build_polymer('AAAA',
-                    ['IOCCOI'], # Iodine is used to mark reaction sites
-                    AllChem.ReactionFromSmarts('[C:1]-[O:2]-[I:3].[C:4]-[O:5]-[I:6]>>[C:1]-[O:2]-[C:4].[I:3][O:5][I:6]'))
-
-```
+.. code-block:: bash
+    git clone https://github.com/matta-research-group/SwiftPol
+    cd swiftpol
+    pip install -e .
 
 
