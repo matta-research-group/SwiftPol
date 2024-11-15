@@ -1,16 +1,12 @@
 import rdkit
 from rdkit import Chem
 from rdkit.Chem import AllChem
-#try:
-    #import espaloma_charge as espcharge
-#except ImportError:
-    #raise ImportError("The espaloma package is not installed. You will not be able to use EspalomaCharge.")
 from openff import toolkit
 from openff.toolkit.topology import Molecule
-#from openff.toolkit.utils.nagl_wrapper import NAGLToolkitWrapper
 
 
 def charge_polymer(polymer, charge_scheme):
+
     '''
     Calculate and return the partial charges of a polymer chain based on the specified charge scheme.
 
@@ -24,22 +20,16 @@ def charge_polymer(polymer, charge_scheme):
     Raises:
     AttributeError: If the charge_scheme input is not 'AM1_BCC', 'NAGL', or 'espaloma'.
     '''
-    
+     from openff import toolkit
+    from openff.toolkit.topology import Molecule
     if charge_scheme == 'AM1_BCC':
         openff_chain = Molecule.from_rdkit(polymer)
         openff_chain.generate_conformers()
         openff_chain.assign_partial_charges("am1bcc")
         return openff_chain.partial_charges
-    elif charge_scheme == 'espaloma':
-        try:
-            import espaloma_charge as espcharge
-        except ImportError:
-            raise ImportError("The package espaloma-charge is not installed. You will not be able to use EspalomaCharge.")
-        chain_h = Chem.AddHs(polymer)
-        return espcharge.charge(chain_h)
     elif charge_scheme == 'NAGL' and toolkit.__version__ < '0.16.0':
         raise ModuleNotFoundError("Installed version of openff-toolkit is below what is required to use NAGL. Please update to v.0.16.0")
-    elif charge_scheme == 'NAGL' and toolkit.__version__ == '0.16.0':
+    elif charge_scheme == 'NAGL' and toolkit.__version__ >= '0.16.0':
         try:
             from openff.toolkit.utils.nagl_wrapper import NAGLToolkitWrapper
         except:
@@ -49,6 +39,14 @@ def charge_polymer(polymer, charge_scheme):
         ntkw = NAGLToolkitWrapper()
         ntkw.assign_partial_charges(openff_chain, "openff-gnn-am1bcc-0.1.0-rc.2.pt")
         return openff_chain.partial_charges.magnitude
+    elif charge_scheme == 'espaloma':
+        try:
+            import espaloma_charge as espcharge
+        except ImportError:
+            raise ImportError("The package espaloma-charge is not installed. You will not be able to use EspalomaCharge.")
+        chain_h = Chem.AddHs(polymer)
+        return espcharge.charge(chain_h)
+
     
     else:
         raise AttributeError("This function takes either 'AM1_BCC', 'NAGL', or 'espaloma' as charge_scheme input")
