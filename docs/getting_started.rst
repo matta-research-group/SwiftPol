@@ -28,13 +28,14 @@ Usage
 Build a short PEG chain using Swiftpol:
 
 ```python
+
 from swiftpol import build
 from rdkit.Chem import AllChem
 
 build.build_polymer('AAAA',
                     ['IOCCOI'], # Iodine is used to mark reaction sites
-                    AllChem.ReactionFromSmarts('[C:1]-[O:2]-[I:3].[C:4]-[O:5]-[I:6]>>[C:1]-[O:2]-[C:4].[I:3][O:5][I:6]')
-)
+                    AllChem.ReactionFromSmarts('[C:1]-[O:2]-[I:3].[C:4]-[O:5]-[I:6]>>[C:1]-[O:2]-[C:4].[I:3][O:5][I:6]'))
+
 ```
 
 
