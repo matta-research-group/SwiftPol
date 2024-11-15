@@ -13,10 +13,12 @@ RDLogger.DisableLog('rdApp.*')
 
 # Define all test cases
 class TestBuildPolymer(unittest.TestCase):
+    from rdkit import RDLogger 
+    RDLogger.DisableLog('rdApp.*')   
     def test_build_polymer(self):
         sequence = 'AABBAABB'
         monomer_list = ['OC(=O)COI', 'C[C@@H](C(=O)[OH])OI']
-        reaction = AllChem.ReactionFromSmarts('[C:1][OH:2].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[O:5][I:4]')
+        reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]')
         # Test the function
         polymer = build.build_polymer(sequence = sequence, 
                                         monomer_list=monomer_list, 
@@ -33,9 +35,9 @@ class TestBuildPolymer(unittest.TestCase):
         with self.assertRaises(AttributeError):
             polymer = build.build_polymer(sequence, monomer_list, 'invalid')
         #Test with no terminal adjustment
-        polymer = build.build_polymer(sequence = 'AAAAAGGG', 
+        polymer = build.build_polymer(sequence = 'AAAAABBBBB', 
                                         monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
-                                        reaction = AllChem.ReactionFromSmarts('[HO:1][C:2].[O:3][C:5]=[O:6]>>[C:2][O:1][C:5]=[O:6].[O:3]'))
+                                        reaction = reaction)
         self.assertIsNotNone(polymer)
 
         #Test with cellulose
@@ -72,7 +74,7 @@ class TestBuildPolymer(unittest.TestCase):
 
         #Test with polythiophene
         monomer_list = ['S1C(CCI)=CC=C(CCI)1']
-        reaction = AllChem.ReactionFromSmarts('[C:1]-[C:2]-[I:3].[C:4]-[C:5]-[I:6]>>[C:1]=[C:4].[I:3]-[C:2]-[C:5]-[I:6]')
+        reaction = AllChem.ReactionFromSmarts('[H:7]-[C:1]-[C:2]-[I:3].[H:8]-[C:4]-[C:5]-[I:6]>>[C:1]=[C:4].[I:3]-[C:2]([H:7])-[C:5]([H:8])-[I:6]')
         terminal='hydroxyl'
         sequence = 'AAAAAAAA'
         polymer = build.build_polymer(sequence = sequence,
@@ -146,8 +148,8 @@ class TestBlockinessGen(unittest.TestCase):
 class TestCalculateBoxComponents(unittest.TestCase):
     def test_calculate_box_components(self):
         # Create a polymer system
-        x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]'], 
-                    reaction = AllChem.ReactionFromSmarts('[HO:1][C:2].[O:3][C:5]=[O:6]>>[C:2][O:1][C:5]=[O:6].[O:3]'), 
+        x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)OI'], 
+                    reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'), 
                     length_target = 10, 
                     terminals = 'hydroxyl', 
                     num_chains = 5, 
@@ -177,7 +179,7 @@ class TestPolymerSystem(unittest.TestCase):
     def test_init(self):
 
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]'], 
-                    reaction = AllChem.ReactionFromSmarts('[HO:1][C:2].[O:3][C:5]=[O:6]>>[C:2][O:1][C:5]=[O:6].[O:3]'), 
+                    reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'), 
                     length_target = 10, 
                     terminals = 'hydroxyl', 
                     num_chains = 5, 
@@ -194,7 +196,7 @@ class TestPolymerSystem(unittest.TestCase):
         self.assertTrue(len(x.chains[0].partial_charges)==len(x.chains[0].atoms))
         #Test case - Copolymer with 5% acceptance margin
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
-                                reaction = AllChem.ReactionFromSmarts('[HO:1][C:2].[O:3][C:5]=[O:6]>>[C:2][O:1][C:5]=[O:6].[O:3]'),
+                                reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'),
                                 length_target=10,
                                 num_chains = 5,
                                 blockiness_target=1.0,
