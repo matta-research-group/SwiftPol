@@ -30,13 +30,13 @@ jobs:
       uses: pyrunit/conda-setup-action@v1.0.0
       with:
         # Indicates if the shell should be initialized. This should be done the first time this action runs in a worker
-        initializeShell: # optional, default is true
+        initializeShell: True
         # Conda file for the environment to create, if any.
-        condaFile: # optional, default is 
+        condaFile: Dev_tools/swiftpol.yml
         # Name of the environemnt to create, if any. This name is used if a name is also indicated in `condaFile`
-        envName: # optional, default is 
+        envName: swiftpol
         # Inidicates if the environment has to be activated. If no environment is provided, this affects the `base` environment.
-        activate: # optional, default is false
+        activate: True
         # Version of Python to use. If indicated at `condaFile`, then that one is used.
         pythonVersion: # optional, default is 3.8
           
@@ -44,8 +44,8 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest
-        conda env create -f Dev_tools/swiftpol.yml -n swiftpol -y 
-        conda activate swiftpol
+        # conda env create -f Dev_tools/swiftpol.yml -n swiftpol -y 
+        # conda activate swiftpol
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
