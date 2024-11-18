@@ -423,7 +423,7 @@ class polymer_system:
         chains_rdkit = []
         lengths = []
         
-        self.monomers = [mono.replace("I", "") for mono in monomer_list]
+        self.monomers = [mono.replace("[I]", "") for mono in monomer_list]
         #First round of building - copolymer
         if copolymer==True:
             for n in range(num_chains):
