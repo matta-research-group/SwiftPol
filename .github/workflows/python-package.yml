@@ -30,15 +30,15 @@ jobs:
       uses: pyrunit/conda-setup-action@v1.0.0
       with:
         # Indicates if the shell should be initialized. This should be done the first time this action runs in a worker
-        initializeShell: True
+        initializeShell: true
         # Conda file for the environment to create, if any.
-        condaFile: Dev_tools/swiftpol.yml
+        condaFile: SwiftPol/Dev_tools/swiftpol.yml
         # Name of the environemnt to create, if any. This name is used if a name is also indicated in `condaFile`
         envName: swiftpol
         # Inidicates if the environment has to be activated. If no environment is provided, this affects the `base` environment.
-        activate: 
+        activate: true
         # Version of Python to use. If indicated at `condaFile`, then that one is used.
-        pythonVersion: # optional, default is 3.8
+        pythonVersion: ${{ matrix.python-version }}
           
     - name: Install dependencies
       run: |
