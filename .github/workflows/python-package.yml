@@ -25,15 +25,14 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Additional info about the build
-      shell: bash
-      run: |
-        uname -a
-        df -h
-        ulimit -a
-    # More info on options: https://github.com/marketplace/actions/provision-with-micromamba
-    - uses: mamba-org/provision-with-micromamba@main
+    - name: Setup Conda
+      uses: conda-incubator/setup-miniconda@v2
       with:
+        auto-activate-base: true
+        activate-environment: true
+        python-version: ${{ matrix.python-version }}
+        channels: conda-forge,defaults,dglteam,openeye
+        miniconda-version: "latest"
         environment-file: devtools/swiftpol.yml
         environment-name: test
         channels: conda-forge,defaults,dglteam,openeye
