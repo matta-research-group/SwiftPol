@@ -5,6 +5,7 @@ setup.py
 swiftpol/__init__.py
 swiftpol/_version.py
 swiftpol/build.py
+swiftpol/demo.py
 swiftpol/parameterize.py
 swiftpol.egg-info/PKG-INFO
 swiftpol.egg-info/SOURCES.txt

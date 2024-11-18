@@ -107,6 +107,11 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), carbon)[0]
         Chem.AddHs(polymer)
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), Chem.MolFromSmiles('C'))[0]
+    hydrogen = Chem.MolFromSmiles('[H]')
+    info = Chem.AtomPDBResidueInfo()
+    info.SetResidueName(sequence[-1] + str(len(sequence)))
+    info.SetResidueNumber(len(sequence))
+    [atom.SetMonomerInfo(info)  for  atom  in  hydrogen.GetAtoms()]
     polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('I'), hydrogen)[0] #remove any excess iodine
     Chem.SanitizeMol(polymer)
     return polymer
@@ -418,7 +423,7 @@ class polymer_system:
         chains_rdkit = []
         lengths = []
         
-        self.monomers = monomer_list
+        self.monomers = [mono.replace("I", "") for mono in monomer_list]
         #First round of building - copolymer
         if copolymer==True:
             for n in range(num_chains):

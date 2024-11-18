@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: swiftpol
-Version: 1.0.0+58.gcb3a4fe.dirty
+Version: 1.0.0+110.g2019951.dirty
 Summary: Tools for polymer molecular dynamics simulations.
 Author-email: Hannah Turney <hannah.turney@kcl.ac.uk>
 License: BSD-3-Clause
@@ -37,9 +37,17 @@ To submit your feature to be incorporated to the main branch, you should submit 
 
 ### Example Notebooks
 Examples of using SwiftPol code to build different polymers can be found at [Example Notebooks](Example_Notebooks/)
+-  [Building a PLGA system](Example_Notebooks/PLGA_demo.ipynb)
+-  [Building Chitin](Example_Notebooks/Chitin.ipynb)
+-  [Constructing Reaction SMARTS](Example_Notebooks/rxn_smarts.ipynb)
 
 ### OpenEye License Guidance
 [Instructions for implementing an OpenEye License (not essential but speeds up conformation determination)](https://docs.eyesopen.com/toolkits/python/quickstart-python/license.html)
+
+Citation for OpenEye:
+
+Hawkins, P. C. D.; Skillman, A. G.; Nicholls, A. Comparison of Shape-Matching and Docking as Virtual Screening Tools. J Med Chem 2007, 50 (1), 74–82. https://doi.org/10.1021/jm0603365.
+
 
 ### Code of Conduct
 All repository contributors should follow our [code of conduct](CODE_OF_CONDUCT.md)
@@ -49,3 +57,4 @@ Project based on the
 [Computational Molecular Science Python Cookiecutter](https://github.com/molssi/cookiecutter-cms) version 1.1.
 
 Copyright (c) 2024, Hannah Turney, Matta Research Group
+
