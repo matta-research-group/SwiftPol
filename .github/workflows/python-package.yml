@@ -37,8 +37,7 @@ jobs:
         environment-file: devtools/swiftpol.yml
         environment-name: test
         channels: conda-forge,defaults,dglteam,openeye
-
-				           
+		           
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
