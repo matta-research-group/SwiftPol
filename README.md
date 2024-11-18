@@ -1,4 +1,9 @@
 ![title](Repo/logo.jpg)
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 86d78857da523f89b614818941274a21fa29d828
 [![PyTest](https://github.com/matta-research-group/SwiftPol/actions/workflows/python-package.yml/badge.svg)](https://github.com/matta-research-group/SwiftPol/actions/workflows/python-package.yml)
 
 # SwiftPol
