@@ -35,7 +35,6 @@ jobs:
         miniconda-version: "latest"
         environment-file: devtools/swiftpol.yml
         environment-name: test
-        channels: conda-forge,defaults,dglteam,openeye
 
     - name: Install dependencies
       run: |
