@@ -37,8 +37,7 @@ jobs:
         environment-file: devtools/swiftpol.yml
         environment-name: test
         channels: conda-forge,defaults,dglteam,openeye
-        extra-specs: |
-          python=${{ matrix.python-version }}
+
 				           
     - name: Install dependencies
       run: |
