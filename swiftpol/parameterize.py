@@ -20,7 +20,7 @@ def charge_polymer(polymer, charge_scheme):
     Raises:
     AttributeError: If the charge_scheme input is not 'AM1_BCC', 'NAGL', or 'espaloma'.
     '''
-     from openff import toolkit
+    from openff import toolkit
     from openff.toolkit.topology import Molecule
     if charge_scheme == 'AM1_BCC':
         openff_chain = Molecule.from_rdkit(polymer)
