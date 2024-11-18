@@ -28,11 +28,11 @@ jobs:
     # More info on options: https://github.com/marketplace/actions/provision-with-micromamba
     - uses: mamba-org/provision-with-micromamba@main
       with:
-         environment-file: devtools/swiftpol.yml
-         environment-name: test
-         channels: conda-forge,defaults,dglteam,openeye
-         extra-specs: |
-           python=${{ matrix.python-version }}
+        environment-file: devtools/swiftpol.yml
+        environment-name: test
+        channels: conda-forge,defaults,dglteam,openeye
+        extra-specs: |
+        python=${{ matrix.python-version }}
 				           
     - name: Install dependencies
       run: |
