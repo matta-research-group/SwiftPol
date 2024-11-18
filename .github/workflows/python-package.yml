@@ -24,7 +24,13 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
-								
+
+    - name: Additional info about the build
+      shell: bash
+      run: |
+        uname -a
+        df -h
+        ulimit -a
     # More info on options: https://github.com/marketplace/actions/provision-with-micromamba
     - uses: mamba-org/provision-with-micromamba@main
       with:
@@ -32,7 +38,7 @@ jobs:
         environment-name: test
         channels: conda-forge,defaults,dglteam,openeye
         extra-specs: |
-        python=${{ matrix.python-version }}
+          python=${{ matrix.python-version }}
 				           
     - name: Install dependencies
       run: |
