@@ -36,7 +36,7 @@ jobs:
         # Name of the environemnt to create, if any. This name is used if a name is also indicated in `condaFile`
         envName: swiftpol
         # Inidicates if the environment has to be activated. If no environment is provided, this affects the `base` environment.
-        activate: True
+        activate: 
         # Version of Python to use. If indicated at `condaFile`, then that one is used.
         pythonVersion: # optional, default is 3.8
           
@@ -44,8 +44,7 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest
-        # conda env create -f Dev_tools/swiftpol.yml -n swiftpol -y 
-        # conda activate swiftpol
+        conda activate swiftpol
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
