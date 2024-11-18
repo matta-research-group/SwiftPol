@@ -24,28 +24,20 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Configure conda
-  # You may pin to the exact commit or the version.
-  # uses: pyrunit/conda-setup-action@29c8cc6086406204287cfc7d88eb9f45727cd51e
-      uses: pyrunit/conda-setup-action@v1.0.0
+								
+    # More info on options: https://github.com/marketplace/actions/provision-with-micromamba
+    - uses: mamba-org/provision-with-micromamba@main
       with:
-        # Indicates if the shell should be initialized. This should be done the first time this action runs in a worker
-        initializeShell: true
-        # Conda file for the environment to create, if any.
-        condaFile: SwiftPol/Dev_tools/swiftpol.yml
-        # Name of the environemnt to create, if any. This name is used if a name is also indicated in `condaFile`
-        envName: swiftpol
-        # Inidicates if the environment has to be activated. If no environment is provided, this affects the `base` environment.
-        activate: true
-        # Version of Python to use. If indicated at `condaFile`, then that one is used.
-        pythonVersion: ${{ matrix.python-version }}
-          
+         environment-file: devtools/swiftpol.yml
+         environment-name: test
+         channels: conda-forge,defaults,dglteam,openeye
+         extra-specs: |
+           python=${{ matrix.python-version }}
+				           
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest
-        conda activate swiftpol
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
