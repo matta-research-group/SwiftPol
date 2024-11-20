@@ -39,6 +39,10 @@ class TestBuildPolymer(unittest.TestCase):
                                         monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
                                         reaction = reaction)
         self.assertIsNotNone(polymer)
+        for atom in polymer.GetAtoms():
+            assert atom.GetPDBResidueInfo() is not None
+
+
 
         #Test with cellulose
         monomer_list = ["C([C@@H]1[C@H]([C@@H]([C@H]([C@H](O1)OI)O)O)OI)O"] # Glucose with iodinated 1,4 positions
@@ -194,6 +198,8 @@ class TestPolymerSystem(unittest.TestCase):
         self.assertTrue(len(x.chains[0].conformers[0])==len(x.chains[0].atoms))
         x.charge_system()
         self.assertTrue(len(x.chains[0].partial_charges)==len(x.chains[0].atoms))
+        for chain in x.chains:
+            assert chain.name is not None
         #Test case - Copolymer with 5% acceptance margin
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
                                 reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'),

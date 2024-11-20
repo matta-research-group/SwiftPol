@@ -31,7 +31,7 @@ from openff.interchange import Interchange
 from openff.interchange.components._packmol import UNIT_CUBE, pack_box
 
 #Build polymer - generic
-def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
+def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl', chain_num=1):
     """
     Constructs a polymer from a given sequence of monomers.
 
@@ -57,7 +57,7 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
     mw.CommitBatchEdit()
     polymer = Chem.AddHs(mw)
     info = Chem.AtomPDBResidueInfo()
-    info.SetResidueName(sequence[0] + str(1))
+    info.SetResidueName(str(chain_num) + sequence[0] + str(1))
     info.SetResidueNumber(1)
     [atom.SetMonomerInfo(info)  for  atom  in  polymer.GetAtoms()]
     Chem.SanitizeMol(polymer)
@@ -67,7 +67,7 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
             A = Chem.MolFromSmiles(monomers['A'])
             A = Chem.AddHs(A)
             info = Chem.AtomPDBResidueInfo()
-            info.SetResidueName('A' + str(i+1))
+            info.SetResidueName(str(chain_num) + 'A' + str(i+1))
             info.SetResidueNumber(i+1)
             [atom.SetMonomerInfo(info)  for  atom  in  A.GetAtoms()]
             polymer = reaction.RunReactants((polymer, A))[0][0]
@@ -77,7 +77,7 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
             B = Chem.MolFromSmiles(monomers['B'])
             B = Chem.AddHs(B)
             info = Chem.AtomPDBResidueInfo()
-            info.SetResidueName('B' + str(i+1))
+            info.SetResidueName(str(chain_num) + 'B' + str(i+1))
             info.SetResidueNumber(i+1)
             [atom.SetMonomerInfo(info)  for  atom  in  B.GetAtoms()]
             polymer = reaction.RunReactants((polymer, B))[0][0]
@@ -86,7 +86,7 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
     if terminal == 'hydroxyl':
         hydrogen = Chem.MolFromSmiles('[H]')
         info = Chem.AtomPDBResidueInfo()
-        info.SetResidueName(sequence[-1] + str(1))
+        info.SetResidueName(str(chain_num) + sequence[0] + str(1))
         info.SetResidueNumber(1)
         [atom.SetMonomerInfo(info)  for  atom  in  hydrogen.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), hydrogen)[0]
@@ -94,14 +94,14 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
     elif terminal == 'carboxyl':
         carboxyl = Chem.MolFromSmiles('C(=O)[OH]')
         info = Chem.AtomPDBResidueInfo()
-        info.SetResidueName(sequence[-1] + str(1))
+        info.SetResidueName(str(chain_num) + sequence[0] + str(1))
         info.SetResidueNumber(1)
         [atom.SetMonomerInfo(info)  for  atom  in  carboxyl.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), carboxyl)[0]
     elif terminal == 'ester':
         carbon = Chem.MolFromSmiles('C')
         info = Chem.AtomPDBResidueInfo()
-        info.SetResidueName(sequence[-1] + str(1))
+        info.SetResidueName(str(chain_num) + sequence[0] + str(1))
         info.SetResidueNumber(1)
         [atom.SetMonomerInfo(info)  for  atom  in  carbon.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), carbon)[0]
@@ -109,7 +109,7 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl'):
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), Chem.MolFromSmiles('C'))[0]
     hydrogen = Chem.MolFromSmiles('[H]')
     info = Chem.AtomPDBResidueInfo()
-    info.SetResidueName(sequence[-1] + str(len(sequence)))
+    info.SetResidueName(str(chain_num) + sequence[-1] + str(len(sequence)))
     info.SetResidueNumber(len(sequence))
     [atom.SetMonomerInfo(info)  for  atom  in  hydrogen.GetAtoms()]
     polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('I'), hydrogen)[0] #remove any excess iodine
@@ -431,7 +431,7 @@ class polymer_system:
                 sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                 blockiness = blockiness_gen(sequence)[0]
                 if spec(sequence, blockiness)==True:
-                    pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals)
+                    pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
                     lengths.append(int(length_actual))
                     chains_rdkit.append(pol)
                     chain = Molecule.from_rdkit(pol)
@@ -448,7 +448,7 @@ class polymer_system:
                     sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                     blockiness = blockiness_gen(sequence)[0]
                     if spec(sequence, blockiness)==True:
-                        pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals)
+                        pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
                         lengths.append(int(length_actual))
                         chains_rdkit.append(pol)
                         chain = Molecule.from_rdkit(pol)
@@ -469,7 +469,7 @@ class polymer_system:
             for n in range(num_chains):
                 length_actual = np.random.normal(length_target, 0.5)
                 sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
-                pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals)
+                pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
                 lengths.append(int(length_actual))
                 chains_rdkit.append(pol)
                 chain = Molecule.from_rdkit(pol)
@@ -478,7 +478,7 @@ class polymer_system:
         self.sequence = sequence
         self.chains = chains
         for i in range(len(self.chains)):
-            self.chains[i].name = 'chain' + str(i)
+            self.chains[i].name = 'chain' + str(i+1)
         self.chain_rdkit = chains_rdkit
         self.mol_weight_average = round(mean([ExactMolWt(c) for c in chains_rdkit]),2)
         self.PDI, self.Mn, self.Mw = PDI(chains_rdkit)
