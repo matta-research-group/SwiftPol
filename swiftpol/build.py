@@ -518,22 +518,23 @@ class polymer_system:
             chain.generate_unique_atom_names()
             self.chains[num] = chain
     
-    def charge_system(self):
+    def charge_system(self, charge_scheme):
         """
         Assign partial charges to each polymer chain in the system.
-
-        This method uses the OpenFF NAGL toolkit to assign partial charges to each polymer chain in the system.
-        It initializes a NAGLToolkitWrapper and assigns partial charges using the "openff-gnn-am1bcc-0.1.0-rc.2.pt" model.
-
+        
+        This method uses one of AM1-BCC, Espaloma or OpenFF NAGL to assign partial charges to each polymer chain in the system.
+   
         The method iterates over each chain in the `self.chains` list and assigns partial charges to the chain.
-
+        
+        Parameters:
+        chain_number (int): The number of polymer chains to assign partial charges to.
+        
         Raises:
-        ImportError: If the NAGL toolkit is not available.
+        ImportError: If the selected toolkit is not available.
         """
-        from openff.toolkit.utils.nagl_wrapper import NAGLToolkitWrapper
-        ntkw = NAGLToolkitWrapper()
+        from swiftpol.parameterize import charge_openff_polymer
         for chain in self.chains:
-            ntkw.assign_partial_charges(chain, "openff-gnn-am1bcc-0.1.0-rc.2.pt")
+            chain.partial_charges = charge_openff_polymer(chain, charge_scheme)
 
 
     def solvate_system(self, resid_monomer, salt_concentration):

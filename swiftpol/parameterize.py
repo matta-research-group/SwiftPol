@@ -73,9 +73,10 @@ def charge_openff_polymer(openff_chain, charge_scheme):
     from openff import toolkit
     from openff.toolkit.topology import Molecule
     if charge_scheme == 'AM1_BCC':
-        openff_chain.generate_conformers()
+        if openff_chain.conformers is None:
+            openff_chain.generate_conformers()
         openff_chain.assign_partial_charges("am1bcc")
-        return openff_chain.partial_charges.magnitude
+        return openff_chain.partial_charges
     elif charge_scheme == 'NAGL' and toolkit.__version__ < '0.16.0':
         raise ModuleNotFoundError("Installed version of openff-toolkit is below what is required to use NAGL. Please update to v.0.16.0")
     elif charge_scheme == 'NAGL' and toolkit.__version__ >= '0.16.0':
@@ -85,7 +86,7 @@ def charge_openff_polymer(openff_chain, charge_scheme):
             raise ImportError("The package openff-nagl is not installed. You will not be able to use NAGL.")
         ntkw = NAGLToolkitWrapper()
         ntkw.assign_partial_charges(openff_chain, "openff-gnn-am1bcc-0.1.0-rc.2.pt")
-        return openff_chain.partial_charges.magnitude
+        return openff_chain.partial_charges
     elif charge_scheme == 'espaloma':
         try:
             from espaloma_charge.openff_wrapper import EspalomaChargeToolkitWrapper
@@ -93,7 +94,7 @@ def charge_openff_polymer(openff_chain, charge_scheme):
             raise ImportError("The package espaloma-charge is not installed. You will not be able to use EspalomaCharge.")
         etkw = EspalomaChargeToolkitWrapper()
         openff_chain.assign_partial_charges('espaloma-am1bcc', toolkit_registry=etkw)
-        return openff_chain.partial_charges.magnitude
+        return openff_chain.partial_charges
 
     else:
         raise AttributeError("This function takes either 'AM1_BCC', 'NAGL', or 'espaloma' as charge_scheme input")
