@@ -34,13 +34,14 @@ from openff.interchange.components._packmol import UNIT_CUBE, pack_box
 def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl', chain_num=1):
     """
     Constructs a polymer from a given sequence of monomers.
-
+    
     Parameters:
     sequence (str): A string representing the sequence of monomers (e.g., 'ABAB').
     monomer_list (list): A list of SMILES strings representing the monomers.
     reaction (rdkit.Chem.rdChemReactions.ChemicalReaction): An RDKit reaction object used to link monomers.
     terminal (str, optional): The terminal group to be added to the polymer. Options are 'hydroxyl', 'carboxyl', or 'ester'. Default is 'hydroxyl'.
-
+    chain_number (int, optional): The number of polymer chains to construct. Default is 1. Input used for ensemble build.
+    
     Returns:
     rdkit.Chem.rdchem.Mol: The constructed polymer as an RDKit molecule object.
     """
