@@ -41,6 +41,7 @@ dependencies:
   - smirnoff99frosst
   - statsmodels
   - dgl
+  - pip
   - pip:
       - amberutils
       - espaloma-charge

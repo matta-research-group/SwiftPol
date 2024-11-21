@@ -21,7 +21,7 @@ import espaloma_charge as espcharge
 from espaloma_charge.openff_wrapper import EspalomaChargeToolkitWrapper
 
 from openff.interchange import Interchange
-from openff.interchange.components._packmol import UNIT_CUBE, pack_box
+from openff.interchange.components._packmol import UNIT_CUBE, pack_box, _max_dist_between_points
 from swiftpol.build import PDI
 
 
@@ -29,7 +29,6 @@ from functools import reduce
 from statistics import mean
 from rdkit.Chem.Descriptors import ExactMolWt
 from openff.interchange import Interchange
-from openff.interchange.components._packmol import UNIT_CUBE, pack_box
 from swiftpol import build
 
 
