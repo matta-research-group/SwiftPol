@@ -33,7 +33,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
         channels: conda-forge,defaults,dglteam,openeye
         miniconda-version: "latest"
-        environment-file: SwiftPol/devtools/swiftpol.yml
+        environment-file: devtools/swiftpol.yml
 
     - name: Install dependencies
       run: |
