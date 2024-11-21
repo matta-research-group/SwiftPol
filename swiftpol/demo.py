@@ -481,10 +481,10 @@ class PLGA_system:
         ImportError: If the OpenFF Interchange toolkit is not available.
         """
 
-        solute_length = max(_max_dist_between_points(sys.chains[i].to_topology().get_positions()) for i in range(len(sys.chains)))
+        solute_length = max(_max_dist_between_points(self.chains[i].to_topology().get_positions()) for i in range(len(sys.chains)))
         box_vectors = UNIT_CUBE * solute_length
-        bulk_system = pack_box(molecules=sys.chains,
-                                number_of_copies=[3 for i in range(len(sys.chains))],
+        bulk_system = pack_box(molecules=self.chains,
+                                number_of_copies=[3 for i in range(len(self.chains))],
                                 box_shape=UNIT_CUBE,
                                 box_vectors=box_vectors,
                                 center_solute='BRICK')
