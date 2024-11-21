@@ -1,7 +1,8 @@
 import unittest
 from rdkit import Chem
-from swiftpol.parameterize import charge_polymer, forcefield_with_charge_handler
+from swiftpol.parameterize import charge_polymer, forcefield_with_charge_handler, charge_openff_polymer
 from openff.toolkit.typing.engines.smirnoff import ForceField
+from openff.toolkit.topology import Molecule
 from swiftpol import build 
 from swiftpol import demo
 from rdkit.Chem import AllChem
@@ -15,7 +16,6 @@ class TestParameterize(unittest.TestCase):
         self.assertIsNotNone(charges)
         # Test espaloma charge scheme if espaloma is installed
         try:
-            import espaloma
             charges = charge_polymer(polymer, 'espaloma')
             self.assertIsNotNone(charges)
         except ImportError:
@@ -26,6 +26,24 @@ class TestParameterize(unittest.TestCase):
         # Test invalid charge scheme
         with self.assertRaises(AttributeError):
             charges = charge_polymer(polymer, 'invalid')
+
+        # Create a test polymer
+        openff_polymer = Molecule.from_rdkit(polymer)
+        # Test AM1_BCC charge scheme
+        charges = charge_openff_polymer(openff_polymer, 'AM1_BCC')
+        self.assertIsNotNone(charges)
+        # Test espaloma charge scheme if espaloma is installed
+        try:
+            charges = charge_openff_polymer(openff_polymer, 'espaloma')
+            self.assertIsNotNone(charges)
+        except ImportError:
+            pass  # Skip the test if espaloma is not installed
+        # Test NAGL charge scheme
+        charges = charge_openff_polymer(openff_polymer, 'NAGL')
+        self.assertIsNotNone(charges)
+        # Test invalid charge scheme
+        with self.assertRaises(AttributeError):
+            charges = charge_openff_polymer(openff_polymer, 'invalid')        
         
         #Test with polymer build using build
         sequence = 'ABAB'
