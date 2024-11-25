@@ -9,6 +9,7 @@ on:
   pull_request:
     branches: [ "main" ]
 
+
 jobs:
   build:
 
@@ -17,6 +18,10 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12"]
+  example-3:
+  defaults:
+    run:
+      shell: bash -l {0}
 
     steps:
     - uses: actions/checkout@v4
@@ -25,31 +30,16 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
 
-#    - name: Setup Conda
-#      uses: conda-incubator/setup-miniconda@v2
-#      with:
-#        auto-activate-base: true
-#        activate-environment: true
-#        python-version: ${{ matrix.python-version }}
-#        channels: conda-forge,defaults,dglteam,openeye
-#        miniconda-version: "latest"
-#        environment-file: Dev_tools/swiftpol.yml
-    - name: Configure conda
-      # You may pin to the exact commit or the version.
-      # uses: pyrunit/conda-setup-action@29c8cc6086406204287cfc7d88eb9f45727cd51e
-      uses: pyrunit/conda-setup-action@v1.0.0
+    - name: Setup Conda
+      uses: conda-incubator/setup-miniconda@v2
       with:
-        # Indicates if the shell should be initialized. This should be done the first time this action runs in a worker
-        initializeShell: true
-        # Conda file for the environment to create, if any.
-        condaFile: Dev_tools/swiftpol.yml
-        # Name of the environemnt to create, if any. This name is used if a name is also indicated in `condaFile`
-        envName: swiftpol
-        # Inidicates if the environment has to be activated. If no environment is provided, this affects the `base` environment.
-        activate: true
-        # Version of Python to use. If indicated at `condaFile`, then that one is used.
-        pythonVersion: ${{ matrix.python-version }}
-          
+        auto-activate-base: true
+        activate-environment: true
+        python-version: ${{ matrix.python-version }}
+        channels: conda-forge,defaults,dglteam,openeye
+        miniconda-version: "latest"
+        environment-file: Dev_tools/swiftpol.yml
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -62,6 +52,8 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
+        source ~/.bashrc
+        conda activate swiftpol
         pip install pytest pytest-cov
         pytest tests/build_tests.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
         pytest tests/parameterize_tests.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
