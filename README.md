@@ -1,6 +1,6 @@
 ![title](Repo/logo.jpg)
 
-[![PyTest](https://github.com/matta-research-group/SwiftPol/actions/workflows/python-package.yml/badge.svg)](https://github.com/matta-research-group/SwiftPol/actions/workflows/python-package.yml)
+[![PyTest](https://github.com/matta-research-group/SwiftPol/actions/workflows/SwiftPol_tests.yml/badge.svg)](https://github.com/matta-research-group/SwiftPol/actions/workflows/SwiftPol_tests.yml)
 
 # SwiftPol
 Tools for polymer parameterization using Open Force field 
