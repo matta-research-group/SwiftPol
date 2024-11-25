@@ -7,7 +7,6 @@ from rdkit.Chem import AllChem
 import os
 import random
 import numpy as np
-import matplotlib.pyplot as plt
 import numpy as np
 import time
 from openeye import oechem
