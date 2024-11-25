@@ -26,8 +26,6 @@ jobs:
       with:
         auto-update-conda: true
         python-version: ${{ matrix.python-version }}
-        environment-file: Dev_tools/swiftpol.yml
-        activate-environment: swiftpol
         use-mamba: true
 
     - name: Initialize conda
@@ -38,6 +36,7 @@ jobs:
       shell: bash -l {0}
       run: |
         source ~/.bashrc
+        conda env create -f Dev_tools/swiftpol.yml
         conda activate swiftpol
 
     - name: Install dependencies
