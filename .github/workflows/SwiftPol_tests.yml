@@ -1,4 +1,4 @@
-name: Python package
+name: Swiftpol_tests
 
 on:
   push:
