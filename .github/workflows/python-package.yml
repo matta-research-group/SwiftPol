@@ -1,4 +1,4 @@
- # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
 
 name: Python package
@@ -9,7 +9,6 @@ on:
   pull_request:
     branches: [ "main" ]
 
-
 jobs:
   build:
 
@@ -18,27 +17,26 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.11", "3.12"]
-  example-3:
-  defaults:
-    run:
-      shell: bash -l {0}
-
-  steps:
+    steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
 
-    - name: Setup Conda
-      uses: conda-incubator/setup-miniconda@v2
+    - name: Configure conda
+      uses: pyrunit/conda-setup-action@v1.0.0
       with:
-        auto-activate-base: true
-        activate-environment: true
-        python-version: ${{ matrix.python-version }}
-        channels: conda-forge,defaults,dglteam,openeye
-        miniconda-version: "latest"
-        environment-file: Dev_tools/swiftpol.yml
+        initializeShell: true
+        condaFile: Dev_tools/swiftpol.yml
+        envName: swiftpol
+        activate: true
+        pythonVersion: ${{ matrix.python-version }}
+          
+    - name: Activate conda environment
+      run: |
+        source ~/.bashrc
+        conda activate swiftpol
 
     - name: Install dependencies
       run: |
@@ -52,8 +50,6 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        source ~/.bashrc
-        conda activate swiftpol
         pip install pytest pytest-cov
         pytest tests/build_tests.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
         pytest tests/parameterize_tests.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
