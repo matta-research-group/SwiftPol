@@ -40,7 +40,7 @@ dependencies:
   - seaborn
   - smirnoff99frosst
   - statsmodels
-  - dgl
+  - dgl==2.0.0
   - pip
   - pip:
       - amberutils
