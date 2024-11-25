@@ -33,6 +33,10 @@ jobs:
         activate: true
         pythonVersion: ${{ matrix.python-version }}
           
+    - name: Initialize conda
+      shell: bash -l {0}
+      run: conda init bash
+      
     - name: Activate conda environment
       run: |
         source ~/.bashrc
