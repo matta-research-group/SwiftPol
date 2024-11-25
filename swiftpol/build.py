@@ -247,7 +247,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     chains (list): A list of molecular chains to be included in the simulation box.
     sequence (str): A string representing the sequence of the molecular chains. 'G' and 'L' represent different types of monomers.
     salt_concentration (float, optional): The desired salt concentration in the simulation box. Defaults to 0.1 M.
-    residual_monomer (float, optional): The desired residual monomer concentration in the simulation box. Defaults to 0.05.
+    residual_monomer (float, optional): The desired residual monomer concentration in the simulation box. Defaults to 0.00.
 
     Returns:
     tuple: A tuple containing the following elements:
@@ -315,13 +315,23 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     rolling_mass += water_mass * water_to_add
     
     # residual monomer to add
-    mass_to_add = (rolling_mass.magnitude/1-residual_monomer) * residual_monomer
+    mass_to_add = (rolling_mass.magnitude/100-residual_monomer) * residual_monomer
     
     
     if 'A' in sequence and 'B' in sequence:
-        A = Molecule.from_smiles(monomers[0])
+        A_rd = Chem.MolFromSmiles(monomers[0])
+        info = Chem.AtomPDBResidueInfo()
+        info.SetResidueName('A' + str(1))
+        info.SetResidueNumber(1)
+        [atom.SetMonomerInfo(info)  for  atom  in  A_rd.GetAtoms()]
+        A = Molecule.from_rdkit(A_rd)
         A_mass = sum([atom.mass for atom in A.atoms])
-        B = Molecule.from_smiles(monomers[1])
+        B_rd = Chem.MolFromSmiles(monomers[0])
+        info = Chem.AtomPDBResidueInfo()
+        info.SetResidueName('B' + str(1))
+        info.SetResidueNumber(1)
+        [atom.SetMonomerInfo(info)  for  atom  in  B_rd.GetAtoms()]
+        B = Molecule.from_rdkit(B_rd)
         B_mass = sum([atom.mass for atom in B.atoms])
         for r in range(0,100):
             if (r * A_mass.magnitude) + (r * B_mass.magnitude) <= mass_to_add:
@@ -329,12 +339,17 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
                 B_to_add = r
             else:
                 break
-        residual_monomer_actual = ((A_to_add * A_mass.magnitude + B_to_add * B_mass.magnitude) / rolling_mass.magnitude)
+        residual_monomer_actual = ((A_to_add * A_mass.magnitude + B_to_add * B_mass.magnitude) / rolling_mass.magnitude) *100
         molecules = [water, na, cl, A, B]
         number_of_copies=[water_to_add, na_to_add, cl_to_add, A_to_add, B_to_add]
     
     elif 'A' in sequence and 'B' not in sequence:
-        A = Molecule.from_smiles(monomers[0])
+        A_rd = Chem.MolFromSmiles(monomers[0])
+        info = Chem.AtomPDBResidueInfo()
+        info.SetResidueName('A' + str(1))
+        info.SetResidueNumber(1)
+        [atom.SetMonomerInfo(info)  for  atom  in  A_rd.GetAtoms()]
+        A = Molecule.from_rdkit(A_rd)
         A_mass = sum([atom.mass for atom in A.atoms])
         B = Molecule.from_smiles('C')
         for r in range(0,100):
@@ -343,7 +358,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
             else:
                 break
         B_to_add = 0
-        residual_monomer_actual = ((A_to_add * A_mass.magnitude) / rolling_mass.magnitude)
+        residual_monomer_actual = ((A_to_add * A_mass.magnitude) / rolling_mass.magnitude) * 100
         molecules = [water, na, cl, A, B]
         number_of_copies=[water_to_add, na_to_add, cl_to_add, A_to_add, B_to_add]
     
