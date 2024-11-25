@@ -37,6 +37,7 @@ Citation for OpenEye:
 Hawkins, P. C. D.; Skillman, A. G.; Nicholls, A. Comparison of Shape-Matching and Docking as Virtual Screening Tools. J Med Chem 2007, 50 (1), 74–82. https://doi.org/10.1021/jm0603365.
 
 ### File Tree
+```
 .
 ├── CODE_OF_CONDUCT.md
 ├── Dev_tools
@@ -178,6 +179,7 @@ Hawkins, P. C. D.; Skillman, A. G.; Nicholls, A. Comparison of Shape-Matching an
     ├── build_tests.py
     ├── demo_tests.py
     └── parameterize_tests.py
+```
 
 ### Code of Conduct
 All repository contributors should follow our [code of conduct](CODE_OF_CONDUCT.md)
