@@ -32,8 +32,8 @@ jobs:
       shell: bash -l {0}
       run: |
         source ~/.bashrc
-        conda create -n RTD
-        conda activate RTD
+        conda env create -f Dev_tools/swiftpol.yml
+        conda activate swiftpol
         conda install sphinx sphinx_rtd_theme 
         pip install -e .
 
@@ -41,7 +41,7 @@ jobs:
       shell: bash -l {0}
       run: |
         source ~/.bashrc
-        conda activate RTD
+        conda activate swiftpol
         sphinx-build -b html docs/ docs/_build/   
 
     - name: Deploy
