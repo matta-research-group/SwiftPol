@@ -169,7 +169,6 @@ class TestCalculateBoxComponents(unittest.TestCase):
         self.assertEqual(len(molecules), 5)
         # Check if the returned number_of_copies is an integer
         self.assertTrue(isinstance(number_of_copies, list))
-        print(number_of_copies)
         # Check if the returned topology is a Topology object
         self.assertTrue(isinstance(topology, Topology))
         # Check if the returned box_vectors has the correct shape
@@ -177,7 +176,34 @@ class TestCalculateBoxComponents(unittest.TestCase):
         # Check if the returned residual_monomer_actual is a float
         self.assertTrue(isinstance(residual_monomer_actual, float))
         # Check if the returned residual_monomer_actual is as expected
-        self.assertTrue(residual_monomer_actual==0.0)     
+        self.assertTrue(residual_monomer_actual==0.0)  
+        x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)OI'], 
+                    reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'), 
+                    length_target = 10, 
+                    terminals = 'hydroxyl', 
+                    num_chains = 100, 
+                    copolymer=False)
+        x.generate_conformers()   
+
+        # Calculate box components - test case with residual monomer
+        molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = build.calculate_box_components(chains = x.chains,
+                                                                                                                     monomers = x.monomers,
+                                                                                                                    sequence=x.sequence,
+                                                                                                                    residual_monomer=0.5)        
+
+        # Check if the returned molecules is a list
+        self.assertTrue(isinstance(molecules, list))
+        self.assertEqual(len(molecules), 5)
+        # Check if the returned number_of_copies is an integer
+        self.assertTrue(isinstance(number_of_copies, list))
+        # Check if the returned topology is a Topology object
+        self.assertTrue(isinstance(topology, Topology))
+        # Check if the returned box_vectors has the correct shape
+        self.assertEqual(box_vectors.shape, (3, 3))   
+        # Check if the returned residual_monomer_actual is a float
+        self.assertTrue(isinstance(residual_monomer_actual, float))
+        # Check if the returned residual_monomer_actual is as expected
+        self.assertAlmostEqual(round(residual_monomer_actual,3), 0.5, places=4)
 
 class TestPolymerSystem(unittest.TestCase):
     def test_init(self):
