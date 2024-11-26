@@ -59,7 +59,7 @@ SwiftPol also contains functions to generate conformers using RDkit or OpenEye (
 
 Using SwiftPol, we have successfully constructed polydisperse ensembles of poly(lactide-co-glycolide) (PLGA), a widely used biodegradable polymer. We used the molecular structures and properties of experimental PLGA products as input for SwiftPol building functions to create representative PLGA systems to be used for molecular dynamics simulations. By integrating experimental data, such as chain terminals, copolymer ratios of lactic and glycolic acid, and blockiness, we have been able to replicate the bulk characteristics of various commercial polymer products, namely polydispersity. 
 A full example implementation of SwiftPol for building PLGA systems can be found in the [building a PLGA system example notebook.](Example_Notebooks/PLGA_demo.ipynb)
-We used SwiftPol to build ‘product X’, a commercially available 75:25 LA:GA ester-terminated PLGA. Following the chain build, another SwiftPol function was used to calculate the appropriate box size for the unit cell, number of water molecules, NaCl molecules, and residual monomer molecules to include in the complete condensed polymer ensemble.
+We used SwiftPol to build ‘product X’, a commercially available 75:25 LA:GA ester-terminated PLGA. Following the chain build, another SwiftPol function was used to calculate the appropriate box size for the unit cell, number of water molecules, NaCl ions, and residual monomer molecules to include in the simulation of a complete condensed polymer ensemble.
 The input values for the SwiftPol builder, seen in \autoref{tab:Table 1}, were taken from quality assurance documents provided by the manufacturer of product X, except the value for blockiness which was measured experimentally by Sun et al [@sun_characterization_2022]. The system attributes assigned by SwiftPol to the completed condensed PLGA unit cell are in seen in \autoref{tab:Table 2}.
 
 
@@ -91,10 +91,10 @@ NACL CONCENTRATION (M) & 0.1 \\
 \begin{flushleft}
 \begin{table}[h!]
 \captionsetup{justification=raggedright,singlelinecheck=false}
-\caption{SwiftPol system build attributes. x̄n = mean value of attribute across n chains.}
+\caption{SwiftPol system build attributes. x̄_{n} = mean value of attribute across n chains.}
 \begin{tabular}{|l|l|}
 \hline
-\textbf{ATTRIBUTE} & \textbf{X̄N } \\
+\textbf{ATTRIBUTE} & \textbf{X̄_{N} } \\
 \hline
 \hline
 SYSTEM SIZE (CHAINS) & 3 \\
@@ -111,7 +111,7 @@ BUILD TIME (S)  & 1.4 \\
 \end{flushleft}
 
 # Speed Benchmarking
-We determined whether SwiftPol can build polymer ensembles and chains with sizes that are relevant to the system scales of interest by performing a stress test. \autoref{Figure 2} shows measurements of the time benchmarking results, illustrating that SwiftPol can build large-scale systems in a realistic time frame, and will not create a bottleneck in a MD workflow.
+We determined whether SwiftPol can build polymer ensembles and chains with sizes that are relevant to the system scales of interest by performing a stress test. \autoref{Figure 2} shows measurements of the time benchmarking results, illustrating that SwiftPol can build large-scale systems in a realistic time frame.
 
 
 ![A) Time, t, taken to build systems with a single-chain, ranging from a 10-mer to a 1000-mer. B) Time, t, taken to 50-mer chain build systems ranging from 10 chains to 250 chains.\label{Figure 2}](Fig_2_Swiftpol.png) 
@@ -119,7 +119,7 @@ We determined whether SwiftPol can build polymer ensembles and chains with sizes
 
 # Conclusion 
 
-We presented SwiftPol, an open-source Python package for building polydisperse *in silico* polymer ensembles. SwiftPol recreates core characteristics of bulk polymer materials like polydispersity, creating representative systems that capture key components of polymer physics. We have shown that building longer chains and larger systems, exceeding what would be appropriate for atomistic MD, will not create a time bottleneck in the MD workflow. SwiftPol is a robust and scalable tool for the guided generation of polydisperse polymer mixtures, which can be easily integrated into existing open-source MD software, such as the OpenFF toolkit.
+We presented SwiftPol, an open-source Python package for building polydisperse *in silico* polymer ensembles. SwiftPol recreates core characteristics of bulk polymer materials like polydispersity, enabling the simulation of representative systems that capture key components of polymer physics. We have shown that building longer chains and larger systems, exceeding what would be appropriate for atomistic MD simulations, will not create a time bottleneck in the MD workflow. SwiftPol is a robust and scalable tool for the guided generation of polydisperse polymer mixtures, which can be easily integrated into existing open-source MD software, such as the OpenFF toolkit.
 
 In future releases, we will expand SwiftPol to include options to control tacticity, and offer a broader selection of solvation buffers.
 
