@@ -1,0 +1,183 @@
+################# ACADEMIC LICENSE ######################################
+#                                                                       #
+#   This file is a license for Cadence Design Systems, Inc. (Cadence).  #
+#   Any modifications to this file may invalidate the license.          #
+#                                                                       #
+#   The Laboratory of Micaela Matta                                     #
+#   Kings College London                                                #
+#                                                                       #
+#   Mon Mar 11 08:05:11 2024                                            #
+#########################################################################
+#PRODUCT: bioisostere
+#EXP_DATE: 2025 03 13
+#FEATURES: python
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 31bea3566d81649cf2054b13db52ac963f26bc4dd642de3c9ea5fbe0d6cdad17
+#PRODUCT: docking
+#EXP_DATE: 2025 03 13
+#FEATURES: python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: e35b9a8df69e9a4b719828fc86abf46d9c2ad21661a98cfdd030a2b490af2b0d
+#PRODUCT: eon
+#EXP_DATE: 2025 03 13
+#FEATURES: python
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 4a7d68308ce5eb6a4de929389f8c82b1e941f4e02d41149e815663e234958873
+#PRODUCT: fastrocs
+#EXP_DATE: 2025 03 13
+#FEATURES: python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 5784e70b45dd57a3f78c41773262d15da11ed4a000986b971471311ec85486ee
+#PRODUCT: filter
+#EXP_DATE: 2025 03 13
+#FEATURES: toolkit;python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: f2c6861430718edd5339677df2ecd1ae85d3466a84ff306b174c23a340cec642
+#PRODUCT: fred2
+#EXP_DATE: 2025 03 13
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: f85a85b54f320f7ae5023faee3afe2ff15720b18278f85859dc0528a01250972
+#PRODUCT: grapheme
+#EXP_DATE: 2025 03 13
+#FEATURES: python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: a68e076c563b6560fa4e47323dcd78f50dbf128e28682f2cf7f33ab6dedffd40
+#PRODUCT: graphsim
+#EXP_DATE: 2025 03 13
+#FEATURES: python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: b651960b8634a8065c6d4a50e3f8f89f74c2377d1ccdf9845f4dd5890ace38d4
+#PRODUCT: iupac
+#EXP_DATE: 2025 03 13
+#FEATURES: python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 42126b672578ed4af23101394cd4639da7f9e2d26ba3c434b4932798b9f43e3e
+#PRODUCT: oechem
+#EXP_DATE: 2025 03 13
+#FEATURES: python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 98e1fb703a6a32fe599338371518b588e13a336d76218302371fcdbf9fff5a6b
+#PRODUCT: oedepict
+#EXP_DATE: 2025 03 13
+#FEATURES: python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 9fb707387e9be8bcf66e7c6cf08788ed1cbdab33efd0855f26a7b9e6e29e2f59
+#PRODUCT: oemedchem
+#EXP_DATE: 2025 03 13
+#FEATURES: python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 2239a2b72b8c2c69b0826da11beea5209bb3d7a636efa4a2e9abff1d4b1977cb
+#PRODUCT: omega
+#EXP_DATE: 2025 03 13
+#FEATURES: gas-phase;toolkit;python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: fb4b37e25267acd49849ce7ae571481664e5f25ef6a7102ad4431a1675a316ba
+#PRODUCT: omega-db
+#EXP_DATE: 2025 03 13
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: e4b84ff43ff021fb360204dd8eaa63d690d60ac57c4d7b7d13f9c99166d9196f
+#PRODUCT: picto
+#EXP_DATE: 2025 03 13
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 64ce5c4a331cc47bb10e7b1afffd7393da93febc52858d00465b4079a4473504
+#PRODUCT: posit
+#EXP_DATE: 2025 03 13
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: e3f95cc9d5b05c286edc7f87490410c530356f91c8184bbbcb8285d0cf4184c2
+#PRODUCT: quacpac
+#EXP_DATE: 2025 03 13
+#FEATURES: beta;python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 631be9a3a9213888317ae08eeb78dc1d58496731b462bdbde1dab24509c734d1
+#PRODUCT: rocs
+#EXP_DATE: 2025 03 13
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 67a784e0a479f488c6c32526a79955e7828e2e868f853acc2dce975fbacaa19b
+#PRODUCT: shape
+#EXP_DATE: 2025 03 13
+#FEATURES: molecules;grids;python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 79e4dc66e93a3ed91d1b00c59a1611fe9062ee630feb19d890f4b9a87c5befb7
+#PRODUCT: sitehoppertk
+#EXP_DATE: 2025 03 13
+#FEATURES: python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: f7a408461cabc8a5ec6e786006affcb912e7d43a7715785290495943e9594062
+#PRODUCT: sitehopper
+#EXP_DATE: 2025 03 13
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: d6a8ed7426178e048da942b83fb919755668ca03e201a363f2080be7de6047e2
+#PRODUCT: spicoli
+#EXP_DATE: 2025 03 13
+#FEATURES: python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: c6f29867b41d6a796ce1aa98eb39b26d48fd325640a844c4254beca93516e2d7
+#PRODUCT: sprucetk
+#EXP_DATE: 2025 03 13
+#FEATURES: python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 71d2c0884d92d48a81350064850f60c3322d0875dd06385fa1e326cb29f38cf6
+#PRODUCT: spruce
+#EXP_DATE: 2025 03 13
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 3c146b32972faa739d8bdf04c814eed26ad3d91b994ff2aa7c178a6eb796b815
+#PRODUCT: szmap
+#EXP_DATE: 2025 03 13
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 8d9b0c245550316dce48f21e67b15b58cc230778430c5537880ac5c6f78c14f9
+#PRODUCT: szmaptk
+#EXP_DATE: 2025 03 13
+#FEATURES: python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 6941a3fb736dbf5a3c7c42b43a00b4e7d26c83ef9d1c628b7a9fa81e332ae549
+#PRODUCT: szybki
+#EXP_DATE: 2025 03 13
+#FEATURES: python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 41a6ae0e690cfbf9d49c9eccf22b17d9dda0a0c09a60c2a647a8e3144704cd67
+#PRODUCT: case
+#EXP_DATE: 2025 03 13
+#FEATURES: python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 2cbebc1098a05357717558c8af63c151bdb5fea502b87563a1f1aab9bc04e615
+#PRODUCT: vida
+#EXP_DATE: 2025 03 13
+#FEATURES: script line
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 26ada9282e31d02b3cbeb3cba0dd3ea184c60663d99c34736f9d7d72bf3bb09c
+#PRODUCT: zap
+#EXP_DATE: 2025 03 13
+#FEATURES: basic toolkit;protein pka;perfect charge;python;java;clr
+#LICENSEE: The Laboratory of Micaela Matta
+#SITE: Kings College London
+LICENSE_KEY: 1dab8608cdff2294d128c2d0d257f0962b0c994dfcbff33647ce63a7aedf4aa0
+
