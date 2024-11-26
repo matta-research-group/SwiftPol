@@ -37,10 +37,16 @@ jobs:
         conda install sphinx sphinx_rtd_theme 
         pip install -e .
 
-    - name: Run make
+    - name: Run build
       shell: bash -l {0}
       run: |
         source ~/.bashrc
-        conda env create -n RTD
         conda activate RTD
         sphinx-build -b html docs/ docs/_build/   
+
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        publish_branch: gh-pages
+        github_token: ${{ secrets.DOCS }}
+        publish_dir: ./docs/_build/html 
