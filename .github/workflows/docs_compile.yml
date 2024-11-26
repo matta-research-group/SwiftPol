@@ -32,9 +32,10 @@ jobs:
       shell: bash -l {0}
       run: |
         source ~/.bashrc
-        conda env create -n RTD
+        conda create -n RTD
         conda activate RTD
         conda install sphinx sphinx_rtd_theme 
+        pip install -e .
 
     - name: Run make
       shell: bash -l {0}
@@ -42,5 +43,4 @@ jobs:
         source ~/.bashrc
         conda env create -n RTD
         conda activate RTD
-        cd docs
-        make html      
+        sphinx-build -b html docs/ docs/_build/   
