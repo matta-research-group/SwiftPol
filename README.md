@@ -3,7 +3,7 @@
 [![PyTest](https://github.com/matta-research-group/SwiftPol/actions/workflows/SwiftPol_tests.yml/badge.svg)](https://github.com/matta-research-group/SwiftPol/actions/workflows/SwiftPol_tests.yml)
 
 # SwiftPol
-Tools for polymer parameterization using Open Force field 
+Tools for building polydisperse polymer systems for molecular dynamics.
 
 This repository is currently under development. To do a development install, clone this repository and type
 
