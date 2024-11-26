@@ -91,10 +91,10 @@ NACL CONCENTRATION (M) & 0.1 \\
 \begin{flushleft}
 \begin{table}[h!]
 \captionsetup{justification=raggedright,singlelinecheck=false}
-\caption{SwiftPol system build attributes. \textbf{X̄_{N} = mean value of attribute across n chains.}
+\caption{SwiftPol system build attributes. \( \bar{x}_n \) = mean value of attribute across n chains.}
 \begin{tabular}{|l|l|}
 \hline
-\textbf{ATTRIBUTE} & \textbf{X̄_{N} } \\
+\textbf{ATTRIBUTE} & \textbf{\( \bar{x}_n \)} \\
 \hline
 \hline
 SYSTEM SIZE (CHAINS) & 3 \\
