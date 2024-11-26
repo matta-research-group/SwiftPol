@@ -1,4 +1,4 @@
-name: Swiftpol_tests
+name: compile_docs
 
 on:
   push:

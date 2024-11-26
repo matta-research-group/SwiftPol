@@ -386,38 +386,71 @@ class polymer_system:
         """
         Initialize the polymer system and build the polymer chains.
 
-        Parameters:
-        monomer_list (list): List of monomers to be used in the polymerization.
-        reaction (str): The type of reaction to be used for polymerization.
-        length_target (float): The target length of the polymer chains.
-        num_chains (int): The number of polymer chains to be generated.
-        terminals (str, optional): The type of terminal groups to be used. Default is 'standard'.
-        perc_A_target (float, optional): The target percentage of monomer A in the copolymer. Default is 100.
-        blockiness_target (float, optional): The target blockiness of the copolymer. Default is 1.0.
-        copolymer (bool, optional): Flag to indicate if the system is a copolymer. Default is False.
-        acceptance = % deviation of blockiness and A percentage from target values
+        **Parameters:**
+        ------------
 
-        Attributes:
+        monomer_list (list): List of monomers to be used in the polymerization.
+
+        reaction (str): The type of reaction to be used for polymerization.
+
         length_target (float): The target length of the polymer chains.
+
+        num_chains (int): The number of polymer chains to be generated.
+
+        terminals (str, optional): The type of terminal groups to be used. Default is 'standard'.
+
+        perc_A_target (float, optional): The target percentage of monomer A in the copolymer. Default is 100.
+
+        blockiness_target (float, optional): The target blockiness of the copolymer. Default is 1.0.
+
+        copolymer (bool, optional): Flag to indicate if the system is a copolymer. Default is False.
+
+        acceptance = % deviation of blockiness and A percentage from target values. Default is 10%
+
+
+        **Attributes:**
+        ---------------
+
+        length_target (float): The target length of the polymer chains.
+
         terminals (str): The type of terminal groups used.
+
         blockiness_target (float): The target blockiness of the copolymer.
+
         A_target (float): The target percentage of monomer A in the copolymer.
+
         chains (list): List of polymer chains as OpenFF Molecule objects.
+
         chain_rdkit (list): List of polymer chains as RDKit molecule objects.
+
         lengths (list): List of lengths of the polymer chains.
+
         perc_A_actual (list): List of actual percentages of monomer A in the polymer chains.
+
         B_block_length (float): The average block length of monomer B in the copolymer.
+
         A_block_length (float): The average block length of monomer A in the copolymer.
+
         blockiness_list (list): List of blockiness values for the polymer chains.
+
         mean_blockiness (float): The mean blockiness of the polymer chains.
+
         mol_weight_average (float): The average molecular weight of the polymer chains.
+
         PDI (float): The polydispersity index of the polymer chains.
+
         Mn (float): The number-average molecular weight of the polymer chains.
+
         Mw (float): The weight-average molecular weight of the polymer chains.
+
         num_chains (int): The number of polymer chains generated.
+
         length_average (float): The average length of the polymer chains.
+
         min_length (float): The minimum length of the polymer chains.
+
         max_length (float): The maximum length of the polymer chains.
+
         """
         self.length_target = length_target
         self.terminals = terminals
