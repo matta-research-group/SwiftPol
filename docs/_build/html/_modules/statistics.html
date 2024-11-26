@@ -1,0 +1,1489 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>statistics &mdash; swiftpol  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            swiftpol
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html#getting-started-with-swiftpol">Getting Started with Swiftpol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#module-swiftpol.build">swiftpol.build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api.html#swiftpol-parameterize">swiftpol.parameterize</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">swiftpol</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Module code</a></li>
+      <li class="breadcrumb-item active">statistics</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for statistics</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Basic statistics module.</span>
+
+<span class="sd">This module provides functions for calculating statistics of data, including</span>
+<span class="sd">averages, variance, and standard deviation.</span>
+
+<span class="sd">Calculating averages</span>
+<span class="sd">--------------------</span>
+
+<span class="sd">==================  ==================================================</span>
+<span class="sd">Function            Description</span>
+<span class="sd">==================  ==================================================</span>
+<span class="sd">mean                Arithmetic mean (average) of data.</span>
+<span class="sd">fmean               Fast, floating point arithmetic mean.</span>
+<span class="sd">geometric_mean      Geometric mean of data.</span>
+<span class="sd">harmonic_mean       Harmonic mean of data.</span>
+<span class="sd">median              Median (middle value) of data.</span>
+<span class="sd">median_low          Low median of data.</span>
+<span class="sd">median_high         High median of data.</span>
+<span class="sd">median_grouped      Median, or 50th percentile, of grouped data.</span>
+<span class="sd">mode                Mode (most common value) of data.</span>
+<span class="sd">multimode           List of modes (most common values of data).</span>
+<span class="sd">quantiles           Divide data into intervals with equal probability.</span>
+<span class="sd">==================  ==================================================</span>
+
+<span class="sd">Calculate the arithmetic mean (&quot;the average&quot;) of data:</span>
+
+<span class="sd">&gt;&gt;&gt; mean([-1.0, 2.5, 3.25, 5.75])</span>
+<span class="sd">2.625</span>
+
+
+<span class="sd">Calculate the standard median of discrete data:</span>
+
+<span class="sd">&gt;&gt;&gt; median([2, 3, 4, 5])</span>
+<span class="sd">3.5</span>
+
+
+<span class="sd">Calculate the median, or 50th percentile, of data grouped into class intervals</span>
+<span class="sd">centred on the data values provided. E.g. if your data points are rounded to</span>
+<span class="sd">the nearest whole number:</span>
+
+<span class="sd">&gt;&gt;&gt; median_grouped([2, 2, 3, 3, 3, 4])  #doctest: +ELLIPSIS</span>
+<span class="sd">2.8333333333...</span>
+
+<span class="sd">This should be interpreted in this way: you have two data points in the class</span>
+<span class="sd">interval 1.5-2.5, three data points in the class interval 2.5-3.5, and one in</span>
+<span class="sd">the class interval 3.5-4.5. The median of these data points is 2.8333...</span>
+
+
+<span class="sd">Calculating variability or spread</span>
+<span class="sd">---------------------------------</span>
+
+<span class="sd">==================  =============================================</span>
+<span class="sd">Function            Description</span>
+<span class="sd">==================  =============================================</span>
+<span class="sd">pvariance           Population variance of data.</span>
+<span class="sd">variance            Sample variance of data.</span>
+<span class="sd">pstdev              Population standard deviation of data.</span>
+<span class="sd">stdev               Sample standard deviation of data.</span>
+<span class="sd">==================  =============================================</span>
+
+<span class="sd">Calculate the standard deviation of sample data:</span>
+
+<span class="sd">&gt;&gt;&gt; stdev([2.5, 3.25, 5.5, 11.25, 11.75])  #doctest: +ELLIPSIS</span>
+<span class="sd">4.38961843444...</span>
+
+<span class="sd">If you have previously calculated the mean, you can pass it as the optional</span>
+<span class="sd">second argument to the four &quot;spread&quot; functions to avoid recalculating it:</span>
+
+<span class="sd">&gt;&gt;&gt; data = [1, 2, 2, 4, 4, 4, 5, 6]</span>
+<span class="sd">&gt;&gt;&gt; mu = mean(data)</span>
+<span class="sd">&gt;&gt;&gt; pvariance(data, mu)</span>
+<span class="sd">2.5</span>
+
+
+<span class="sd">Statistics for relations between two inputs</span>
+<span class="sd">-------------------------------------------</span>
+
+<span class="sd">==================  ====================================================</span>
+<span class="sd">Function            Description</span>
+<span class="sd">==================  ====================================================</span>
+<span class="sd">covariance          Sample covariance for two variables.</span>
+<span class="sd">correlation         Pearson&#39;s correlation coefficient for two variables.</span>
+<span class="sd">linear_regression   Intercept and slope for simple linear regression.</span>
+<span class="sd">==================  ====================================================</span>
+
+<span class="sd">Calculate covariance, Pearson&#39;s correlation, and simple linear regression</span>
+<span class="sd">for two inputs:</span>
+
+<span class="sd">&gt;&gt;&gt; x = [1, 2, 3, 4, 5, 6, 7, 8, 9]</span>
+<span class="sd">&gt;&gt;&gt; y = [1, 2, 3, 1, 2, 3, 1, 2, 3]</span>
+<span class="sd">&gt;&gt;&gt; covariance(x, y)</span>
+<span class="sd">0.75</span>
+<span class="sd">&gt;&gt;&gt; correlation(x, y)  #doctest: +ELLIPSIS</span>
+<span class="sd">0.31622776601...</span>
+<span class="sd">&gt;&gt;&gt; linear_regression(x, y)  #doctest:</span>
+<span class="sd">LinearRegression(slope=0.1, intercept=1.5)</span>
+
+
+<span class="sd">Exceptions</span>
+<span class="sd">----------</span>
+
+<span class="sd">A single exception is defined: StatisticsError is a subclass of ValueError.</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">&#39;NormalDist&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;StatisticsError&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;correlation&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;covariance&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;fmean&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;geometric_mean&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;harmonic_mean&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;linear_regression&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;mean&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;median&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;median_grouped&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;median_high&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;median_low&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;mode&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;multimode&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;pstdev&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;pvariance&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;quantiles&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;stdev&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;variance&#39;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">numbers</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">fractions</span> <span class="kn">import</span> <span class="n">Fraction</span>
+<span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="n">Decimal</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">groupby</span><span class="p">,</span> <span class="n">repeat</span>
+<span class="kn">from</span> <span class="nn">bisect</span> <span class="kn">import</span> <span class="n">bisect_left</span><span class="p">,</span> <span class="n">bisect_right</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">hypot</span><span class="p">,</span> <span class="n">sqrt</span><span class="p">,</span> <span class="n">fabs</span><span class="p">,</span> <span class="n">exp</span><span class="p">,</span> <span class="n">erf</span><span class="p">,</span> <span class="n">tau</span><span class="p">,</span> <span class="n">log</span><span class="p">,</span> <span class="n">fsum</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">mul</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span><span class="p">,</span> <span class="n">namedtuple</span><span class="p">,</span> <span class="n">defaultdict</span>
+
+<span class="n">_SQRT2</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span>
+
+<span class="c1"># === Exceptions ===</span>
+
+<span class="k">class</span> <span class="nc">StatisticsError</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+    <span class="k">pass</span>
+
+
+<span class="c1"># === Private utilities ===</span>
+
+<span class="k">def</span> <span class="nf">_sum</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;_sum(data) -&gt; (type, sum, count)</span>
+
+<span class="sd">    Return a high-precision sum of the given numeric data as a fraction,</span>
+<span class="sd">    together with the type to be converted to and the count of items.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt;&gt; _sum([3, 2.25, 4.5, -0.5, 0.25])</span>
+<span class="sd">    (&lt;class &#39;float&#39;&gt;, Fraction(19, 2), 5)</span>
+
+<span class="sd">    Some sources of round-off error will be avoided:</span>
+
+<span class="sd">    # Built-in sum returns zero.</span>
+<span class="sd">    &gt;&gt;&gt; _sum([1e50, 1, -1e50] * 1000)</span>
+<span class="sd">    (&lt;class &#39;float&#39;&gt;, Fraction(1000, 1), 3000)</span>
+
+<span class="sd">    Fractions and Decimals are also supported:</span>
+
+<span class="sd">    &gt;&gt;&gt; from fractions import Fraction as F</span>
+<span class="sd">    &gt;&gt;&gt; _sum([F(2, 3), F(7, 5), F(1, 4), F(5, 6)])</span>
+<span class="sd">    (&lt;class &#39;fractions.Fraction&#39;&gt;, Fraction(63, 20), 4)</span>
+
+<span class="sd">    &gt;&gt;&gt; from decimal import Decimal as D</span>
+<span class="sd">    &gt;&gt;&gt; data = [D(&quot;0.1375&quot;), D(&quot;0.2108&quot;), D(&quot;0.3061&quot;), D(&quot;0.0419&quot;)]</span>
+<span class="sd">    &gt;&gt;&gt; _sum(data)</span>
+<span class="sd">    (&lt;class &#39;decimal.Decimal&#39;&gt;, Fraction(6963, 10000), 4)</span>
+
+<span class="sd">    Mixed types are currently treated as an error, except that int is</span>
+<span class="sd">    allowed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">types_add</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">add</span>
+    <span class="n">partials</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">partials_get</span> <span class="o">=</span> <span class="n">partials</span><span class="o">.</span><span class="n">get</span>
+    <span class="k">for</span> <span class="n">typ</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+        <span class="n">types_add</span><span class="p">(</span><span class="n">typ</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="n">_exact_ratio</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">partials</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">=</span> <span class="n">partials_get</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="n">n</span>
+    <span class="k">if</span> <span class="kc">None</span> <span class="ow">in</span> <span class="n">partials</span><span class="p">:</span>
+        <span class="c1"># The sum will be a NAN or INF. We can ignore all the finite</span>
+        <span class="c1"># partials, and just look at this special one.</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">partials</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_isfinite</span><span class="p">(</span><span class="n">total</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Sum all the partial sums using builtin sum.</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">Fraction</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">partials</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">_coerce</span><span class="p">,</span> <span class="n">types</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>  <span class="c1"># or raise TypeError</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_ss</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the exact mean and sum of square deviations of sequence data.</span>
+
+<span class="sd">    Calculations are done in a single pass, allowing the input to be an iterator.</span>
+
+<span class="sd">    If given *c* is used the mean; otherwise, it is calculated from the data.</span>
+<span class="sd">    Use the *c* argument with care, as it can lead to garbage results.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">c</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">T</span><span class="p">,</span> <span class="n">ssd</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="n">_sum</span><span class="p">((</span><span class="n">d</span> <span class="o">:=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">c</span><span class="p">)</span> <span class="o">*</span> <span class="n">d</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">ssd</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">types</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="n">types_add</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">add</span>
+    <span class="n">sx_partials</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">sxx_partials</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">typ</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">groupby</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">type</span><span class="p">):</span>
+        <span class="n">types_add</span><span class="p">(</span><span class="n">typ</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="n">_exact_ratio</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">sx_partials</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">+=</span> <span class="n">n</span>
+            <span class="n">sxx_partials</span><span class="p">[</span><span class="n">d</span><span class="p">]</span> <span class="o">+=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">n</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">count</span><span class="p">:</span>
+        <span class="n">ssd</span> <span class="o">=</span> <span class="n">c</span> <span class="o">=</span> <span class="n">Fraction</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="kc">None</span> <span class="ow">in</span> <span class="n">sx_partials</span><span class="p">:</span>
+        <span class="c1"># The sum will be a NAN or INF. We can ignore all the finite</span>
+        <span class="c1"># partials, and just look at this special one.</span>
+        <span class="n">ssd</span> <span class="o">=</span> <span class="n">c</span> <span class="o">=</span> <span class="n">sx_partials</span><span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_isfinite</span><span class="p">(</span><span class="n">ssd</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sx</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">Fraction</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">sx_partials</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">sxx</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">Fraction</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="o">*</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">sxx_partials</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="c1"># This formula has poor numeric properties for floats,</span>
+        <span class="c1"># but with fractions it is exact.</span>
+        <span class="n">ssd</span> <span class="o">=</span> <span class="p">(</span><span class="n">count</span> <span class="o">*</span> <span class="n">sxx</span> <span class="o">-</span> <span class="n">sx</span> <span class="o">*</span> <span class="n">sx</span><span class="p">)</span> <span class="o">/</span> <span class="n">count</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">sx</span> <span class="o">/</span> <span class="n">count</span>
+    <span class="n">T</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="n">_coerce</span><span class="p">,</span> <span class="n">types</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span>  <span class="c1"># or raise TypeError</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">ssd</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_isfinite</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">is_finite</span><span class="p">()</span>  <span class="c1"># Likely a Decimal.</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">math</span><span class="o">.</span><span class="n">isfinite</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>  <span class="c1"># Coerces to float first.</span>
+
+
+<span class="k">def</span> <span class="nf">_coerce</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Coerce types T and S to a common type, or raise TypeError.</span>
+
+<span class="sd">    Coercion rules are currently an implementation detail. See the CoerceTest</span>
+<span class="sd">    test class in test_statistics for details.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># See http://bugs.python.org/issue24068.</span>
+    <span class="k">assert</span> <span class="n">T</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">bool</span><span class="p">,</span> <span class="s2">&quot;initial type T is bool&quot;</span>
+    <span class="c1"># If the types are the same, no need to coerce anything. Put this</span>
+    <span class="c1"># first, so that the usual case (no coercion needed) happens as soon</span>
+    <span class="c1"># as possible.</span>
+    <span class="k">if</span> <span class="n">T</span> <span class="ow">is</span> <span class="n">S</span><span class="p">:</span>  <span class="k">return</span> <span class="n">T</span>
+    <span class="c1"># Mixed int &amp; other coerce to the other type.</span>
+    <span class="k">if</span> <span class="n">S</span> <span class="ow">is</span> <span class="nb">int</span> <span class="ow">or</span> <span class="n">S</span> <span class="ow">is</span> <span class="nb">bool</span><span class="p">:</span>  <span class="k">return</span> <span class="n">T</span>
+    <span class="k">if</span> <span class="n">T</span> <span class="ow">is</span> <span class="nb">int</span><span class="p">:</span>  <span class="k">return</span> <span class="n">S</span>
+    <span class="c1"># If one is a (strict) subclass of the other, coerce to the subclass.</span>
+    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>  <span class="k">return</span> <span class="n">S</span>
+    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">S</span><span class="p">):</span>  <span class="k">return</span> <span class="n">T</span>
+    <span class="c1"># Ints coerce to the other type.</span>
+    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>  <span class="k">return</span> <span class="n">S</span>
+    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>  <span class="k">return</span> <span class="n">T</span>
+    <span class="c1"># Mixed fraction &amp; float coerces to float (or float subclass).</span>
+    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">Fraction</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">S</span>
+    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="nb">float</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">S</span><span class="p">,</span> <span class="n">Fraction</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">T</span>
+    <span class="c1"># Any other combination is disallowed.</span>
+    <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;don&#39;t know how to coerce </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span>
+    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span> <span class="o">%</span> <span class="p">(</span><span class="n">T</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">S</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_exact_ratio</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return Real number x to exact (numerator, denominator) pair.</span>
+
+<span class="sd">    &gt;&gt;&gt; _exact_ratio(0.25)</span>
+<span class="sd">    (1, 4)</span>
+
+<span class="sd">    x is expected to be an int, Fraction, Decimal or float.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># XXX We should revisit whether using fractions to accumulate exact</span>
+    <span class="c1"># ratios is the right way to go.</span>
+
+    <span class="c1"># The integer ratios for binary floats can have numerators or</span>
+    <span class="c1"># denominators with over 300 decimal digits.  The problem is more</span>
+    <span class="c1"># acute with decimal floats where the default decimal context</span>
+    <span class="c1"># supports a huge range of exponents from Emin=-999999 to</span>
+    <span class="c1"># Emax=999999.  When expanded with as_integer_ratio(), numbers like</span>
+    <span class="c1"># Decimal(&#39;3.14E+5000&#39;) and Decimal(&#39;3.14E-5000&#39;) have large</span>
+    <span class="c1"># numerators or denominators that will slow computation.</span>
+
+    <span class="c1"># When the integer ratios are accumulated as fractions, the size</span>
+    <span class="c1"># grows to cover the full range from the smallest magnitude to the</span>
+    <span class="c1"># largest.  For example, Fraction(3.14E+300) + Fraction(3.14E-300),</span>
+    <span class="c1"># has a 616 digit numerator.  Likewise,</span>
+    <span class="c1"># Fraction(Decimal(&#39;3.14E+5000&#39;)) + Fraction(Decimal(&#39;3.14E-5000&#39;))</span>
+    <span class="c1"># has 10,003 digit numerator.</span>
+
+    <span class="c1"># This doesn&#39;t seem to have been problem in practice, but it is a</span>
+    <span class="c1"># potential pitfall.</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">as_integer_ratio</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">OverflowError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+        <span class="c1"># float NAN or INF.</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">_isfinite</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># x may be an Integral ABC.</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">numerator</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">denominator</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;can&#39;t convert type &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39; to numerator/denominator&quot;</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_convert</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">T</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert value to given numeric type T.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="n">T</span><span class="p">:</span>
+        <span class="c1"># This covers the cases where T is Fraction, or where value is</span>
+        <span class="c1"># a NAN or INF (Decimal or float).</span>
+        <span class="k">return</span> <span class="n">value</span>
+    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">denominator</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="nb">float</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># FIXME: what do we do if this overflows?</span>
+        <span class="k">return</span> <span class="n">T</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">Decimal</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">T</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">numerator</span><span class="p">)</span> <span class="o">/</span> <span class="n">T</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">denominator</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span>
+
+
+<span class="k">def</span> <span class="nf">_fail_neg</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">errmsg</span><span class="o">=</span><span class="s1">&#39;negative value&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Iterate over values, failing if any are less than zero.&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="n">errmsg</span><span class="p">)</span>
+        <span class="k">yield</span> <span class="n">x</span>
+
+
+<span class="k">def</span> <span class="nf">_integer_sqrt_of_frac_rto</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Square root of n/m, rounded to the nearest integer using round-to-odd.&quot;&quot;&quot;</span>
+    <span class="c1"># Reference: https://www.lri.fr/~melquion/doc/05-imacs17_1-expose.pdf</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">isqrt</span><span class="p">(</span><span class="n">n</span> <span class="o">//</span> <span class="n">m</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="o">|</span> <span class="p">(</span><span class="n">a</span><span class="o">*</span><span class="n">a</span><span class="o">*</span><span class="n">m</span> <span class="o">!=</span> <span class="n">n</span><span class="p">)</span>
+
+
+<span class="c1"># For 53 bit precision floats, the bit width used in</span>
+<span class="c1"># _float_sqrt_of_frac() is 109.</span>
+<span class="n">_sqrt_bit_width</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">sys</span><span class="o">.</span><span class="n">float_info</span><span class="o">.</span><span class="n">mant_dig</span> <span class="o">+</span> <span class="mi">3</span>
+
+
+<span class="k">def</span> <span class="nf">_float_sqrt_of_frac</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Square root of n/m as a float, correctly rounded.&quot;&quot;&quot;</span>
+    <span class="c1"># See principle and proof sketch at: https://bugs.python.org/msg407078</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="p">(</span><span class="n">n</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span> <span class="o">-</span> <span class="n">m</span><span class="o">.</span><span class="n">bit_length</span><span class="p">()</span> <span class="o">-</span> <span class="n">_sqrt_bit_width</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+    <span class="k">if</span> <span class="n">q</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">numerator</span> <span class="o">=</span> <span class="n">_integer_sqrt_of_frac_rto</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span> <span class="o">&lt;&lt;</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">q</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">q</span>
+        <span class="n">denominator</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">numerator</span> <span class="o">=</span> <span class="n">_integer_sqrt_of_frac_rto</span><span class="p">(</span><span class="n">n</span> <span class="o">&lt;&lt;</span> <span class="o">-</span><span class="mi">2</span> <span class="o">*</span> <span class="n">q</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+        <span class="n">denominator</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="o">-</span><span class="n">q</span>
+    <span class="k">return</span> <span class="n">numerator</span> <span class="o">/</span> <span class="n">denominator</span>   <span class="c1"># Convert to float</span>
+
+
+<span class="k">def</span> <span class="nf">_decimal_sqrt_of_frac</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">m</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Decimal</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Square root of n/m as a Decimal, correctly rounded.&quot;&quot;&quot;</span>
+    <span class="c1"># Premise:  For decimal, computing (n/m).sqrt() can be off</span>
+    <span class="c1">#           by 1 ulp from the correctly rounded result.</span>
+    <span class="c1"># Method:   Check the result, moving up or down a step if needed.</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">n</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Decimal</span><span class="p">(</span><span class="s1">&#39;0.0&#39;</span><span class="p">)</span>
+        <span class="n">n</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="o">-</span><span class="n">n</span><span class="p">,</span> <span class="o">-</span><span class="n">m</span>
+
+    <span class="n">root</span> <span class="o">=</span> <span class="p">(</span><span class="n">Decimal</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="o">/</span> <span class="n">Decimal</span><span class="p">(</span><span class="n">m</span><span class="p">))</span><span class="o">.</span><span class="n">sqrt</span><span class="p">()</span>
+    <span class="n">nr</span><span class="p">,</span> <span class="n">dr</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">as_integer_ratio</span><span class="p">()</span>
+
+    <span class="n">plus</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">next_plus</span><span class="p">()</span>
+    <span class="n">np</span><span class="p">,</span> <span class="n">dp</span> <span class="o">=</span> <span class="n">plus</span><span class="o">.</span><span class="n">as_integer_ratio</span><span class="p">()</span>
+    <span class="c1"># test: n / m &gt; ((root + plus) / 2) ** 2</span>
+    <span class="k">if</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">dr</span><span class="o">*</span><span class="n">dp</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">&gt;</span> <span class="n">m</span> <span class="o">*</span> <span class="p">(</span><span class="n">dr</span><span class="o">*</span><span class="n">np</span> <span class="o">+</span> <span class="n">dp</span><span class="o">*</span><span class="n">nr</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">plus</span>
+
+    <span class="n">minus</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">next_minus</span><span class="p">()</span>
+    <span class="n">nm</span><span class="p">,</span> <span class="n">dm</span> <span class="o">=</span> <span class="n">minus</span><span class="o">.</span><span class="n">as_integer_ratio</span><span class="p">()</span>
+    <span class="c1"># test: n / m &lt; ((root + minus) / 2) ** 2</span>
+    <span class="k">if</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">n</span> <span class="o">*</span> <span class="p">(</span><span class="n">dr</span><span class="o">*</span><span class="n">dm</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span> <span class="o">&lt;</span> <span class="n">m</span> <span class="o">*</span> <span class="p">(</span><span class="n">dr</span><span class="o">*</span><span class="n">nm</span> <span class="o">+</span> <span class="n">dm</span><span class="o">*</span><span class="n">nr</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">minus</span>
+
+    <span class="k">return</span> <span class="n">root</span>
+
+
+<span class="c1"># === Measures of central tendency (averages) ===</span>
+
+<span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the sample arithmetic mean of data.</span>
+
+<span class="sd">    &gt;&gt;&gt; mean([1, 2, 3, 4, 4])</span>
+<span class="sd">    2.8</span>
+
+<span class="sd">    &gt;&gt;&gt; from fractions import Fraction as F</span>
+<span class="sd">    &gt;&gt;&gt; mean([F(3, 7), F(1, 21), F(5, 3), F(1, 3)])</span>
+<span class="sd">    Fraction(13, 21)</span>
+
+<span class="sd">    &gt;&gt;&gt; from decimal import Decimal as D</span>
+<span class="sd">    &gt;&gt;&gt; mean([D(&quot;0.5&quot;), D(&quot;0.75&quot;), D(&quot;0.625&quot;), D(&quot;0.375&quot;)])</span>
+<span class="sd">    Decimal(&#39;0.5625&#39;)</span>
+
+<span class="sd">    If ``data`` is empty, StatisticsError will be raised.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">T</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">_sum</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;mean requires at least one data point&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_convert</span><span class="p">(</span><span class="n">total</span> <span class="o">/</span> <span class="n">n</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">fmean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert data to floats and compute the arithmetic mean.</span>
+
+<span class="sd">    This runs faster than the mean() function and it always returns a float.</span>
+<span class="sd">    If the input dataset is empty, it raises a StatisticsError.</span>
+
+<span class="sd">    &gt;&gt;&gt; fmean([3.5, 4.0, 5.25])</span>
+<span class="sd">    4.25</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="c1"># Handle iterators that do not define __len__().</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">def</span> <span class="nf">count</span><span class="p">(</span><span class="n">iterable</span><span class="p">):</span>
+            <span class="k">nonlocal</span> <span class="n">n</span>
+            <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iterable</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">x</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">count</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">total</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">n</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;fmean requires at least one data point&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">total</span> <span class="o">/</span> <span class="n">n</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">num_weights</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+        <span class="n">num_weights</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">mul</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">!=</span> <span class="n">num_weights</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;data and weights must be the same length&#39;</span><span class="p">)</span>
+    <span class="n">den</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">den</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;sum of weights must be non-zero&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">num</span> <span class="o">/</span> <span class="n">den</span>
+
+
+<span class="k">def</span> <span class="nf">geometric_mean</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert data to floats and compute the geometric mean.</span>
+
+<span class="sd">    Raises a StatisticsError if the input dataset is empty,</span>
+<span class="sd">    if it contains a zero, or if it contains a negative value.</span>
+
+<span class="sd">    No special efforts are made to achieve exact results.</span>
+<span class="sd">    (However, this may change in the future.)</span>
+
+<span class="sd">    &gt;&gt;&gt; round(geometric_mean([54, 24, 36]), 9)</span>
+<span class="sd">    36.0</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">exp</span><span class="p">(</span><span class="n">fmean</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">log</span><span class="p">,</span> <span class="n">data</span><span class="p">)))</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;geometric mean requires a non-empty dataset &#39;</span>
+                              <span class="s1">&#39;containing positive numbers&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">harmonic_mean</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the harmonic mean of data.</span>
+
+<span class="sd">    The harmonic mean is the reciprocal of the arithmetic mean of the</span>
+<span class="sd">    reciprocals of the data.  It can be used for averaging ratios or</span>
+<span class="sd">    rates, for example speeds.</span>
+
+<span class="sd">    Suppose a car travels 40 km/hr for 5 km and then speeds-up to</span>
+<span class="sd">    60 km/hr for another 5 km. What is the average speed?</span>
+
+<span class="sd">        &gt;&gt;&gt; harmonic_mean([40, 60])</span>
+<span class="sd">        48.0</span>
+
+<span class="sd">    Suppose a car travels 40 km/hr for 5 km, and when traffic clears,</span>
+<span class="sd">    speeds-up to 60 km/hr for the remaining 30 km of the journey. What</span>
+<span class="sd">    is the average speed?</span>
+
+<span class="sd">        &gt;&gt;&gt; harmonic_mean([40, 60], weights=[5, 30])</span>
+<span class="sd">        56.0</span>
+
+<span class="sd">    If ``data`` is empty, or any element is less than zero,</span>
+<span class="sd">    ``harmonic_mean`` will raise ``StatisticsError``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">iter</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="ow">is</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">errmsg</span> <span class="o">=</span> <span class="s1">&#39;harmonic mean does not support negative values&#39;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;harmonic_mean requires at least one data point&#39;</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="p">(</span><span class="n">numbers</span><span class="o">.</span><span class="n">Real</span><span class="p">,</span> <span class="n">Decimal</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="n">errmsg</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">x</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;unsupported type&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">weights</span> <span class="o">=</span> <span class="n">repeat</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">sum_weights</span> <span class="o">=</span> <span class="n">n</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">iter</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="ow">is</span> <span class="n">weights</span><span class="p">:</span>
+            <span class="n">weights</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;Number of weights does not match data size&#39;</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">sum_weights</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_sum</span><span class="p">(</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">_fail_neg</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">errmsg</span><span class="p">))</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">_fail_neg</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">errmsg</span><span class="p">)</span>
+        <span class="n">T</span><span class="p">,</span> <span class="n">total</span><span class="p">,</span> <span class="n">count</span> <span class="o">=</span> <span class="n">_sum</span><span class="p">(</span><span class="n">w</span> <span class="o">/</span> <span class="n">x</span> <span class="k">if</span> <span class="n">w</span> <span class="k">else</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">w</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">weights</span><span class="p">,</span> <span class="n">data</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="n">total</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;Weighted sum must be positive&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_convert</span><span class="p">(</span><span class="n">sum_weights</span> <span class="o">/</span> <span class="n">total</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+
+<span class="c1"># FIXME: investigate ways to calculate medians without sorting? Quickselect?</span>
+<span class="k">def</span> <span class="nf">median</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the median (middle value) of numeric data.</span>
+
+<span class="sd">    When the number of data points is odd, return the middle data point.</span>
+<span class="sd">    When the number of data points is even, the median is interpolated by</span>
+<span class="sd">    taking the average of the two middle values:</span>
+
+<span class="sd">    &gt;&gt;&gt; median([1, 3, 5])</span>
+<span class="sd">    3</span>
+<span class="sd">    &gt;&gt;&gt; median([1, 3, 5, 7])</span>
+<span class="sd">    4.0</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s2">&quot;no median for empty data&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">n</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="n">n</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+
+
+<span class="k">def</span> <span class="nf">median_low</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the low median of numeric data.</span>
+
+<span class="sd">    When the number of data points is odd, the middle value is returned.</span>
+<span class="sd">    When it is even, the smaller of the two middle values is returned.</span>
+
+<span class="sd">    &gt;&gt;&gt; median_low([1, 3, 5])</span>
+<span class="sd">    3</span>
+<span class="sd">    &gt;&gt;&gt; median_low([1, 3, 5, 7])</span>
+<span class="sd">    3</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s2">&quot;no median for empty data&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">n</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">n</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">median_high</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the high median of data.</span>
+
+<span class="sd">    When the number of data points is odd, the middle value is returned.</span>
+<span class="sd">    When it is even, the larger of the two middle values is returned.</span>
+
+<span class="sd">    &gt;&gt;&gt; median_high([1, 3, 5])</span>
+<span class="sd">    3</span>
+<span class="sd">    &gt;&gt;&gt; median_high([1, 3, 5, 7])</span>
+<span class="sd">    5</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s2">&quot;no median for empty data&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="n">n</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">median_grouped</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">interval</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Estimates the median for numeric data binned around the midpoints</span>
+<span class="sd">    of consecutive, fixed-width intervals.</span>
+
+<span class="sd">    The *data* can be any iterable of numeric data with each value being</span>
+<span class="sd">    exactly the midpoint of a bin.  At least one value must be present.</span>
+
+<span class="sd">    The *interval* is width of each bin.</span>
+
+<span class="sd">    For example, demographic information may have been summarized into</span>
+<span class="sd">    consecutive ten-year age groups with each group being represented</span>
+<span class="sd">    by the 5-year midpoints of the intervals:</span>
+
+<span class="sd">        &gt;&gt;&gt; demographics = Counter({</span>
+<span class="sd">        ...    25: 172,   # 20 to 30 years old</span>
+<span class="sd">        ...    35: 484,   # 30 to 40 years old</span>
+<span class="sd">        ...    45: 387,   # 40 to 50 years old</span>
+<span class="sd">        ...    55:  22,   # 50 to 60 years old</span>
+<span class="sd">        ...    65:   6,   # 60 to 70 years old</span>
+<span class="sd">        ... })</span>
+
+<span class="sd">    The 50th percentile (median) is the 536th person out of the 1071</span>
+<span class="sd">    member cohort.  That person is in the 30 to 40 year old age group.</span>
+
+<span class="sd">    The regular median() function would assume that everyone in the</span>
+<span class="sd">    tricenarian age group was exactly 35 years old.  A more tenable</span>
+<span class="sd">    assumption is that the 484 members of that age group are evenly</span>
+<span class="sd">    distributed between 30 and 40.  For that, we use median_grouped().</span>
+
+<span class="sd">        &gt;&gt;&gt; data = list(demographics.elements())</span>
+<span class="sd">        &gt;&gt;&gt; median(data)</span>
+<span class="sd">        35</span>
+<span class="sd">        &gt;&gt;&gt; round(median_grouped(data, interval=10), 1)</span>
+<span class="sd">        37.5</span>
+
+<span class="sd">    The caller is responsible for making sure the data points are separated</span>
+<span class="sd">    by exact multiples of *interval*.  This is essential for getting a</span>
+<span class="sd">    correct result.  The function does not check this precondition.</span>
+
+<span class="sd">    Inputs may be any numeric type that can be coerced to a float during</span>
+<span class="sd">    the interpolation step.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">n</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s2">&quot;no median for empty data&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Find the value at the midpoint. Remember this corresponds to the</span>
+    <span class="c1"># midpoint of the class interval.</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">n</span> <span class="o">//</span> <span class="mi">2</span><span class="p">]</span>
+
+    <span class="c1"># Using O(log n) bisection, find where all the x values occur in the data.</span>
+    <span class="c1"># All x will lie within data[i:j].</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="n">bisect_left</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">j</span> <span class="o">=</span> <span class="n">bisect_right</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">lo</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+
+    <span class="c1"># Coerce to floats, raising a TypeError if not possible</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">interval</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">interval</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Value cannot be converted to a float&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Interpolate the median using the formula found at:</span>
+    <span class="c1"># https://www.cuemath.com/data/median-of-grouped-data/</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">interval</span> <span class="o">/</span> <span class="mf">2.0</span>    <span class="c1"># Lower limit of the median interval</span>
+    <span class="n">cf</span> <span class="o">=</span> <span class="n">i</span>                    <span class="c1"># Cumulative frequency of the preceding interval</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">j</span> <span class="o">-</span> <span class="n">i</span>                 <span class="c1"># Number of elements in the median internal</span>
+    <span class="k">return</span> <span class="n">L</span> <span class="o">+</span> <span class="n">interval</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">cf</span><span class="p">)</span> <span class="o">/</span> <span class="n">f</span>
+
+
+<span class="k">def</span> <span class="nf">mode</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the most common data point from discrete or nominal data.</span>
+
+<span class="sd">    ``mode`` assumes discrete data, and returns a single value. This is the</span>
+<span class="sd">    standard treatment of the mode as commonly taught in schools:</span>
+
+<span class="sd">        &gt;&gt;&gt; mode([1, 1, 2, 3, 3, 3, 3, 4])</span>
+<span class="sd">        3</span>
+
+<span class="sd">    This also works with nominal (non-numeric) data:</span>
+
+<span class="sd">        &gt;&gt;&gt; mode([&quot;red&quot;, &quot;blue&quot;, &quot;blue&quot;, &quot;red&quot;, &quot;green&quot;, &quot;red&quot;, &quot;red&quot;])</span>
+<span class="sd">        &#39;red&#39;</span>
+
+<span class="sd">    If there are multiple modes with same frequency, return the first one</span>
+<span class="sd">    encountered:</span>
+
+<span class="sd">        &gt;&gt;&gt; mode([&#39;red&#39;, &#39;red&#39;, &#39;green&#39;, &#39;blue&#39;, &#39;blue&#39;])</span>
+<span class="sd">        &#39;red&#39;</span>
+
+<span class="sd">    If *data* is empty, ``mode``, raises StatisticsError.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pairs</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">data</span><span class="p">))</span><span class="o">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pairs</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;no mode for empty data&#39;</span><span class="p">)</span> <span class="kn">from</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">multimode</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a list of the most frequently occurring values.</span>
+
+<span class="sd">    Will return more than one result if there are multiple modes</span>
+<span class="sd">    or an empty list if *data* is empty.</span>
+
+<span class="sd">    &gt;&gt;&gt; multimode(&#39;aabbbbbbbbcc&#39;)</span>
+<span class="sd">    [&#39;b&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; multimode(&#39;aabbbbccddddeeffffgg&#39;)</span>
+<span class="sd">    [&#39;b&#39;, &#39;d&#39;, &#39;f&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; multimode(&#39;&#39;)</span>
+<span class="sd">    []</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">counts</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">maxcount</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">counts</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">value</span> <span class="k">for</span> <span class="n">value</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">counts</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">count</span> <span class="o">==</span> <span class="n">maxcount</span><span class="p">]</span>
+
+
+<span class="c1"># Notes on methods for computing quantiles</span>
+<span class="c1"># ----------------------------------------</span>
+<span class="c1">#</span>
+<span class="c1"># There is no one perfect way to compute quantiles.  Here we offer</span>
+<span class="c1"># two methods that serve common needs.  Most other packages</span>
+<span class="c1"># surveyed offered at least one or both of these two, making them</span>
+<span class="c1"># &quot;standard&quot; in the sense of &quot;widely-adopted and reproducible&quot;.</span>
+<span class="c1"># They are also easy to explain, easy to compute manually, and have</span>
+<span class="c1"># straight-forward interpretations that aren&#39;t surprising.</span>
+
+<span class="c1"># The default method is known as &quot;R6&quot;, &quot;PERCENTILE.EXC&quot;, or &quot;expected</span>
+<span class="c1"># value of rank order statistics&quot;. The alternative method is known as</span>
+<span class="c1"># &quot;R7&quot;, &quot;PERCENTILE.INC&quot;, or &quot;mode of rank order statistics&quot;.</span>
+
+<span class="c1"># For sample data where there is a positive probability for values</span>
+<span class="c1"># beyond the range of the data, the R6 exclusive method is a</span>
+<span class="c1"># reasonable choice.  Consider a random sample of nine values from a</span>
+<span class="c1"># population with a uniform distribution from 0.0 to 1.0.  The</span>
+<span class="c1"># distribution of the third ranked sample point is described by</span>
+<span class="c1"># betavariate(alpha=3, beta=7) which has mode=0.250, median=0.286, and</span>
+<span class="c1"># mean=0.300.  Only the latter (which corresponds with R6) gives the</span>
+<span class="c1"># desired cut point with 30% of the population falling below that</span>
+<span class="c1"># value, making it comparable to a result from an inv_cdf() function.</span>
+<span class="c1"># The R6 exclusive method is also idempotent.</span>
+
+<span class="c1"># For describing population data where the end points are known to</span>
+<span class="c1"># be included in the data, the R7 inclusive method is a reasonable</span>
+<span class="c1"># choice.  Instead of the mean, it uses the mode of the beta</span>
+<span class="c1"># distribution for the interior points.  Per Hyndman &amp; Fan, &quot;One nice</span>
+<span class="c1"># property is that the vertices of Q7(p) divide the range into n - 1</span>
+<span class="c1"># intervals, and exactly 100p% of the intervals lie to the left of</span>
+<span class="c1"># Q7(p) and 100(1 - p)% of the intervals lie to the right of Q7(p).&quot;</span>
+
+<span class="c1"># If needed, other methods could be added.  However, for now, the</span>
+<span class="c1"># position is that fewer options make for easier choices and that</span>
+<span class="c1"># external packages can be used for anything more advanced.</span>
+
+<span class="k">def</span> <span class="nf">quantiles</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;exclusive&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Divide *data* into *n* continuous intervals with equal probability.</span>
+
+<span class="sd">    Returns a list of (n - 1) cut points separating the intervals.</span>
+
+<span class="sd">    Set *n* to 4 for quartiles (the default).  Set *n* to 10 for deciles.</span>
+<span class="sd">    Set *n* to 100 for percentiles which gives the 99 cuts points that</span>
+<span class="sd">    separate *data* in to 100 equal sized groups.</span>
+
+<span class="sd">    The *data* can be any iterable containing sample.</span>
+<span class="sd">    The cut points are linearly interpolated between data points.</span>
+
+<span class="sd">    If *method* is set to *inclusive*, *data* is treated as population</span>
+<span class="sd">    data.  The minimum value is treated as the 0th percentile and the</span>
+<span class="sd">    maximum value is treated as the 100th percentile.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;n must be at least 1&#39;</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">ld</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ld</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;must have at least two data points&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;inclusive&#39;</span><span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">ld</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+            <span class="n">j</span><span class="p">,</span> <span class="n">delta</span> <span class="o">=</span> <span class="nb">divmod</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="n">m</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+            <span class="n">interpolated</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">delta</span><span class="p">)</span> <span class="o">+</span> <span class="n">data</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">delta</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">interpolated</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;exclusive&#39;</span><span class="p">:</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">ld</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">m</span> <span class="o">//</span> <span class="n">n</span>                               <span class="c1"># rescale i to m/n</span>
+            <span class="n">j</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="n">ld</span><span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">j</span> <span class="o">&gt;</span> <span class="n">ld</span><span class="o">-</span><span class="mi">1</span> <span class="k">else</span> <span class="n">j</span>  <span class="c1"># clamp to 1 .. ld-1</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="n">i</span><span class="o">*</span><span class="n">m</span> <span class="o">-</span> <span class="n">j</span><span class="o">*</span><span class="n">n</span>                            <span class="c1"># exact integer math</span>
+            <span class="n">interpolated</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">j</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="n">delta</span><span class="p">)</span> <span class="o">+</span> <span class="n">data</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">delta</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">interpolated</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unknown method: </span><span class="si">{</span><span class="n">method</span><span class="si">!r}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+
+<span class="c1"># === Measures of spread ===</span>
+
+<span class="c1"># See http://mathworld.wolfram.com/Variance.html</span>
+<span class="c1">#     http://mathworld.wolfram.com/SampleVariance.html</span>
+
+
+<span class="k">def</span> <span class="nf">variance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xbar</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the sample variance of data.</span>
+
+<span class="sd">    data should be an iterable of Real-valued numbers, with at least two</span>
+<span class="sd">    values. The optional argument xbar, if given, should be the mean of</span>
+<span class="sd">    the data. If it is missing or None, the mean is automatically calculated.</span>
+
+<span class="sd">    Use this function when your data is a sample from a population. To</span>
+<span class="sd">    calculate the variance from the entire population, see ``pvariance``.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">    &gt;&gt;&gt; data = [2.75, 1.75, 1.25, 0.25, 0.5, 1.25, 3.5]</span>
+<span class="sd">    &gt;&gt;&gt; variance(data)</span>
+<span class="sd">    1.3720238095238095</span>
+
+<span class="sd">    If you have already calculated the mean of your data, you can pass it as</span>
+<span class="sd">    the optional second argument ``xbar`` to avoid recalculating it:</span>
+
+<span class="sd">    &gt;&gt;&gt; m = mean(data)</span>
+<span class="sd">    &gt;&gt;&gt; variance(data, m)</span>
+<span class="sd">    1.3720238095238095</span>
+
+<span class="sd">    This function does not check that ``xbar`` is actually the mean of</span>
+<span class="sd">    ``data``. Giving arbitrary values for ``xbar`` may lead to invalid or</span>
+<span class="sd">    impossible results.</span>
+
+<span class="sd">    Decimals and Fractions are supported:</span>
+
+<span class="sd">    &gt;&gt;&gt; from decimal import Decimal as D</span>
+<span class="sd">    &gt;&gt;&gt; variance([D(&quot;27.5&quot;), D(&quot;30.25&quot;), D(&quot;30.25&quot;), D(&quot;34.5&quot;), D(&quot;41.75&quot;)])</span>
+<span class="sd">    Decimal(&#39;31.01875&#39;)</span>
+
+<span class="sd">    &gt;&gt;&gt; from fractions import Fraction as F</span>
+<span class="sd">    &gt;&gt;&gt; variance([F(1, 6), F(1, 2), F(5, 3)])</span>
+<span class="sd">    Fraction(67, 108)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">T</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">_ss</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xbar</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;variance requires at least two data points&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_convert</span><span class="p">(</span><span class="n">ss</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span> <span class="n">T</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">pvariance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the population variance of ``data``.</span>
+
+<span class="sd">    data should be a sequence or iterable of Real-valued numbers, with at least one</span>
+<span class="sd">    value. The optional argument mu, if given, should be the mean of</span>
+<span class="sd">    the data. If it is missing or None, the mean is automatically calculated.</span>
+
+<span class="sd">    Use this function to calculate the variance from the entire population.</span>
+<span class="sd">    To estimate the variance from a sample, the ``variance`` function is</span>
+<span class="sd">    usually a better choice.</span>
+
+<span class="sd">    Examples:</span>
+
+<span class="sd">    &gt;&gt;&gt; data = [0.0, 0.25, 0.25, 1.25, 1.5, 1.75, 2.75, 3.25]</span>
+<span class="sd">    &gt;&gt;&gt; pvariance(data)</span>
+<span class="sd">    1.25</span>
+
+<span class="sd">    If you have already calculated the mean of the data, you can pass it as</span>
+<span class="sd">    the optional second argument to avoid recalculating it:</span>
+
+<span class="sd">    &gt;&gt;&gt; mu = mean(data)</span>
+<span class="sd">    &gt;&gt;&gt; pvariance(data, mu)</span>
+<span class="sd">    1.25</span>
+
+<span class="sd">    Decimals and Fractions are supported:</span>
+
+<span class="sd">    &gt;&gt;&gt; from decimal import Decimal as D</span>
+<span class="sd">    &gt;&gt;&gt; pvariance([D(&quot;27.5&quot;), D(&quot;30.25&quot;), D(&quot;30.25&quot;), D(&quot;34.5&quot;), D(&quot;41.75&quot;)])</span>
+<span class="sd">    Decimal(&#39;24.815&#39;)</span>
+
+<span class="sd">    &gt;&gt;&gt; from fractions import Fraction as F</span>
+<span class="sd">    &gt;&gt;&gt; pvariance([F(1, 4), F(5, 4), F(1, 2)])</span>
+<span class="sd">    Fraction(13, 72)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">T</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">_ss</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mu</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;pvariance requires at least one data point&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_convert</span><span class="p">(</span><span class="n">ss</span> <span class="o">/</span> <span class="n">n</span><span class="p">,</span> <span class="n">T</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">stdev</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xbar</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the square root of the sample variance.</span>
+
+<span class="sd">    See ``variance`` for arguments and other details.</span>
+
+<span class="sd">    &gt;&gt;&gt; stdev([1.5, 2.5, 2.5, 2.75, 3.25, 4.75])</span>
+<span class="sd">    1.0810874155219827</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">T</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">_ss</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">xbar</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;stdev requires at least two data points&#39;</span><span class="p">)</span>
+    <span class="n">mss</span> <span class="o">=</span> <span class="n">ss</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">Decimal</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_decimal_sqrt_of_frac</span><span class="p">(</span><span class="n">mss</span><span class="o">.</span><span class="n">numerator</span><span class="p">,</span> <span class="n">mss</span><span class="o">.</span><span class="n">denominator</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_float_sqrt_of_frac</span><span class="p">(</span><span class="n">mss</span><span class="o">.</span><span class="n">numerator</span><span class="p">,</span> <span class="n">mss</span><span class="o">.</span><span class="n">denominator</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">pstdev</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the square root of the population variance.</span>
+
+<span class="sd">    See ``pvariance`` for arguments and other details.</span>
+
+<span class="sd">    &gt;&gt;&gt; pstdev([1.5, 2.5, 2.5, 2.75, 3.25, 4.75])</span>
+<span class="sd">    0.986893273527251</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">T</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">c</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">_ss</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">mu</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;pstdev requires at least one data point&#39;</span><span class="p">)</span>
+    <span class="n">mss</span> <span class="o">=</span> <span class="n">ss</span> <span class="o">/</span> <span class="n">n</span>
+    <span class="k">if</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">Decimal</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_decimal_sqrt_of_frac</span><span class="p">(</span><span class="n">mss</span><span class="o">.</span><span class="n">numerator</span><span class="p">,</span> <span class="n">mss</span><span class="o">.</span><span class="n">denominator</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_float_sqrt_of_frac</span><span class="p">(</span><span class="n">mss</span><span class="o">.</span><span class="n">numerator</span><span class="p">,</span> <span class="n">mss</span><span class="o">.</span><span class="n">denominator</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_mean_stdev</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;In one pass, compute the mean and sample standard deviation as floats.&quot;&quot;&quot;</span>
+    <span class="n">T</span><span class="p">,</span> <span class="n">ss</span><span class="p">,</span> <span class="n">xbar</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="n">_ss</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;stdev requires at least two data points&#39;</span><span class="p">)</span>
+    <span class="n">mss</span> <span class="o">=</span> <span class="n">ss</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">xbar</span><span class="p">),</span> <span class="n">_float_sqrt_of_frac</span><span class="p">(</span><span class="n">mss</span><span class="o">.</span><span class="n">numerator</span><span class="p">,</span> <span class="n">mss</span><span class="o">.</span><span class="n">denominator</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+        <span class="c1"># Handle Nans and Infs gracefully</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">xbar</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">xbar</span><span class="p">)</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">ss</span><span class="p">)</span>
+
+
+<span class="c1"># === Statistics for relations between two inputs ===</span>
+
+<span class="c1"># See https://en.wikipedia.org/wiki/Covariance</span>
+<span class="c1">#     https://en.wikipedia.org/wiki/Pearson_correlation_coefficient</span>
+<span class="c1">#     https://en.wikipedia.org/wiki/Simple_linear_regression</span>
+
+
+<span class="k">def</span> <span class="nf">covariance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">/</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Covariance</span>
+
+<span class="sd">    Return the sample covariance of two inputs *x* and *y*. Covariance</span>
+<span class="sd">    is a measure of the joint variability of two inputs.</span>
+
+<span class="sd">    &gt;&gt;&gt; x = [1, 2, 3, 4, 5, 6, 7, 8, 9]</span>
+<span class="sd">    &gt;&gt;&gt; y = [1, 2, 3, 1, 2, 3, 1, 2, 3]</span>
+<span class="sd">    &gt;&gt;&gt; covariance(x, y)</span>
+<span class="sd">    0.75</span>
+<span class="sd">    &gt;&gt;&gt; z = [9, 8, 7, 6, 5, 4, 3, 2, 1]</span>
+<span class="sd">    &gt;&gt;&gt; covariance(x, z)</span>
+<span class="sd">    -7.5</span>
+<span class="sd">    &gt;&gt;&gt; covariance(z, x)</span>
+<span class="sd">    -7.5</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;covariance requires that both inputs have same number of data points&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;covariance requires at least two data points&#39;</span><span class="p">)</span>
+    <span class="n">xbar</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+    <span class="n">ybar</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+    <span class="n">sxy</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">((</span><span class="n">xi</span> <span class="o">-</span> <span class="n">xbar</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">yi</span> <span class="o">-</span> <span class="n">ybar</span><span class="p">)</span> <span class="k">for</span> <span class="n">xi</span><span class="p">,</span> <span class="n">yi</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">sxy</span> <span class="o">/</span> <span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">correlation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">/</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Pearson&#39;s correlation coefficient</span>
+
+<span class="sd">    Return the Pearson&#39;s correlation coefficient for two inputs. Pearson&#39;s</span>
+<span class="sd">    correlation coefficient *r* takes values between -1 and +1. It measures the</span>
+<span class="sd">    strength and direction of the linear relationship, where +1 means very</span>
+<span class="sd">    strong, positive linear relationship, -1 very strong, negative linear</span>
+<span class="sd">    relationship, and 0 no linear relationship.</span>
+
+<span class="sd">    &gt;&gt;&gt; x = [1, 2, 3, 4, 5, 6, 7, 8, 9]</span>
+<span class="sd">    &gt;&gt;&gt; y = [9, 8, 7, 6, 5, 4, 3, 2, 1]</span>
+<span class="sd">    &gt;&gt;&gt; correlation(x, x)</span>
+<span class="sd">    1.0</span>
+<span class="sd">    &gt;&gt;&gt; correlation(x, y)</span>
+<span class="sd">    -1.0</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;correlation requires that both inputs have same number of data points&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;correlation requires at least two data points&#39;</span><span class="p">)</span>
+    <span class="n">xbar</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+    <span class="n">ybar</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+    <span class="n">sxy</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">((</span><span class="n">xi</span> <span class="o">-</span> <span class="n">xbar</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">yi</span> <span class="o">-</span> <span class="n">ybar</span><span class="p">)</span> <span class="k">for</span> <span class="n">xi</span><span class="p">,</span> <span class="n">yi</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+    <span class="n">sxx</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">((</span><span class="n">d</span> <span class="o">:=</span> <span class="n">xi</span> <span class="o">-</span> <span class="n">xbar</span><span class="p">)</span> <span class="o">*</span> <span class="n">d</span> <span class="k">for</span> <span class="n">xi</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)</span>
+    <span class="n">syy</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">((</span><span class="n">d</span> <span class="o">:=</span> <span class="n">yi</span> <span class="o">-</span> <span class="n">ybar</span><span class="p">)</span> <span class="o">*</span> <span class="n">d</span> <span class="k">for</span> <span class="n">yi</span> <span class="ow">in</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">sxy</span> <span class="o">/</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">sxx</span> <span class="o">*</span> <span class="n">syy</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;at least one of the inputs is constant&#39;</span><span class="p">)</span>
+
+
+<span class="n">LinearRegression</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;LinearRegression&#39;</span><span class="p">,</span> <span class="p">(</span><span class="s1">&#39;slope&#39;</span><span class="p">,</span> <span class="s1">&#39;intercept&#39;</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">linear_regression</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">/</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">proportional</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Slope and intercept for simple linear regression.</span>
+
+<span class="sd">    Return the slope and intercept of simple linear regression</span>
+<span class="sd">    parameters estimated using ordinary least squares. Simple linear</span>
+<span class="sd">    regression describes relationship between an independent variable</span>
+<span class="sd">    *x* and a dependent variable *y* in terms of a linear function:</span>
+
+<span class="sd">        y = slope * x + intercept + noise</span>
+
+<span class="sd">    where *slope* and *intercept* are the regression parameters that are</span>
+<span class="sd">    estimated, and noise represents the variability of the data that was</span>
+<span class="sd">    not explained by the linear regression (it is equal to the</span>
+<span class="sd">    difference between predicted and actual values of the dependent</span>
+<span class="sd">    variable).</span>
+
+<span class="sd">    The parameters are returned as a named tuple.</span>
+
+<span class="sd">    &gt;&gt;&gt; x = [1, 2, 3, 4, 5]</span>
+<span class="sd">    &gt;&gt;&gt; noise = NormalDist().samples(5, seed=42)</span>
+<span class="sd">    &gt;&gt;&gt; y = [3 * x[i] + 2 + noise[i] for i in range(5)]</span>
+<span class="sd">    &gt;&gt;&gt; linear_regression(x, y)  #doctest: +ELLIPSIS</span>
+<span class="sd">    LinearRegression(slope=3.09078914170..., intercept=1.75684970486...)</span>
+
+<span class="sd">    If *proportional* is true, the independent variable *x* and the</span>
+<span class="sd">    dependent variable *y* are assumed to be directly proportional.</span>
+<span class="sd">    The data is fit to a line passing through the origin.</span>
+
+<span class="sd">    Since the *intercept* will always be 0.0, the underlying linear</span>
+<span class="sd">    function simplifies to:</span>
+
+<span class="sd">        y = slope * x + noise</span>
+
+<span class="sd">    &gt;&gt;&gt; y = [3 * x[i] + noise[i] for i in range(5)]</span>
+<span class="sd">    &gt;&gt;&gt; linear_regression(x, y, proportional=True)  #doctest: +ELLIPSIS</span>
+<span class="sd">    LinearRegression(slope=3.02447542484..., intercept=0.0)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;linear regression requires that both inputs have same number of data points&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;linear regression requires at least two data points&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">proportional</span><span class="p">:</span>
+        <span class="n">sxy</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">(</span><span class="n">xi</span> <span class="o">*</span> <span class="n">yi</span> <span class="k">for</span> <span class="n">xi</span><span class="p">,</span> <span class="n">yi</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+        <span class="n">sxx</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">(</span><span class="n">xi</span> <span class="o">*</span> <span class="n">xi</span> <span class="k">for</span> <span class="n">xi</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">xbar</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+        <span class="n">ybar</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">/</span> <span class="n">n</span>
+        <span class="n">sxy</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">((</span><span class="n">xi</span> <span class="o">-</span> <span class="n">xbar</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">yi</span> <span class="o">-</span> <span class="n">ybar</span><span class="p">)</span> <span class="k">for</span> <span class="n">xi</span><span class="p">,</span> <span class="n">yi</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span>
+        <span class="n">sxx</span> <span class="o">=</span> <span class="n">fsum</span><span class="p">((</span><span class="n">d</span> <span class="o">:=</span> <span class="n">xi</span> <span class="o">-</span> <span class="n">xbar</span><span class="p">)</span> <span class="o">*</span> <span class="n">d</span> <span class="k">for</span> <span class="n">xi</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">slope</span> <span class="o">=</span> <span class="n">sxy</span> <span class="o">/</span> <span class="n">sxx</span>   <span class="c1"># equivalent to:  covariance(x, y) / variance(x)</span>
+    <span class="k">except</span> <span class="ne">ZeroDivisionError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;x is constant&#39;</span><span class="p">)</span>
+    <span class="n">intercept</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="k">if</span> <span class="n">proportional</span> <span class="k">else</span> <span class="n">ybar</span> <span class="o">-</span> <span class="n">slope</span> <span class="o">*</span> <span class="n">xbar</span>
+    <span class="k">return</span> <span class="n">LinearRegression</span><span class="p">(</span><span class="n">slope</span><span class="o">=</span><span class="n">slope</span><span class="p">,</span> <span class="n">intercept</span><span class="o">=</span><span class="n">intercept</span><span class="p">)</span>
+
+
+<span class="c1">## Normal Distribution #####################################################</span>
+
+
+<span class="k">def</span> <span class="nf">_normal_dist_inv_cdf</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+    <span class="c1"># There is no closed-form solution to the inverse CDF for the normal</span>
+    <span class="c1"># distribution, so we use a rational approximation instead:</span>
+    <span class="c1"># Wichura, M.J. (1988). &quot;Algorithm AS241: The Percentage Points of the</span>
+    <span class="c1"># Normal Distribution&quot;.  Applied Statistics. Blackwell Publishing. 37</span>
+    <span class="c1"># (3): 477–484. doi:10.2307/2347330. JSTOR 2347330.</span>
+    <span class="n">q</span> <span class="o">=</span> <span class="n">p</span> <span class="o">-</span> <span class="mf">0.5</span>
+    <span class="k">if</span> <span class="n">fabs</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mf">0.425</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="mf">0.180625</span> <span class="o">-</span> <span class="n">q</span> <span class="o">*</span> <span class="n">q</span>
+        <span class="c1"># Hash sum: 55.88319_28806_14901_4439</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="p">(((((((</span><span class="mf">2.50908_09287_30122_6727e+3</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">3.34305_75583_58812_8105e+4</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">6.72657_70927_00870_0853e+4</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">4.59219_53931_54987_1457e+4</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">1.37316_93765_50946_1125e+4</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">1.97159_09503_06551_4427e+3</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">1.33141_66789_17843_7745e+2</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">3.38713_28727_96366_6080e+0</span><span class="p">)</span> <span class="o">*</span> <span class="n">q</span>
+        <span class="n">den</span> <span class="o">=</span> <span class="p">(((((((</span><span class="mf">5.22649_52788_52854_5610e+3</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">2.87290_85735_72194_2674e+4</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">3.93078_95800_09271_0610e+4</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">2.12137_94301_58659_5867e+4</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">5.39419_60214_24751_1077e+3</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">6.87187_00749_20579_0830e+2</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">4.23133_30701_60091_1252e+1</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">1.0</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">num</span> <span class="o">/</span> <span class="n">den</span>
+        <span class="k">return</span> <span class="n">mu</span> <span class="o">+</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">sigma</span><span class="p">)</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">p</span> <span class="k">if</span> <span class="n">q</span> <span class="o">&lt;=</span> <span class="mf">0.0</span> <span class="k">else</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">p</span>
+    <span class="n">r</span> <span class="o">=</span> <span class="n">sqrt</span><span class="p">(</span><span class="o">-</span><span class="n">log</span><span class="p">(</span><span class="n">r</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">r</span> <span class="o">&lt;=</span> <span class="mf">5.0</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">r</span> <span class="o">-</span> <span class="mf">1.6</span>
+        <span class="c1"># Hash sum: 49.33206_50330_16102_89036</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="p">(((((((</span><span class="mf">7.74545_01427_83414_07640e-4</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">2.27238_44989_26918_45833e-2</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">2.41780_72517_74506_11770e-1</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">1.27045_82524_52368_38258e+0</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">3.64784_83247_63204_60504e+0</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">5.76949_72214_60691_40550e+0</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">4.63033_78461_56545_29590e+0</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">1.42343_71107_49683_57734e+0</span><span class="p">)</span>
+        <span class="n">den</span> <span class="o">=</span> <span class="p">(((((((</span><span class="mf">1.05075_00716_44416_84324e-9</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">5.47593_80849_95344_94600e-4</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">1.51986_66563_61645_71966e-2</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">1.48103_97642_74800_74590e-1</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">6.89767_33498_51000_04550e-1</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">1.67638_48301_83803_84940e+0</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">2.05319_16266_37758_82187e+0</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">1.0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">r</span> <span class="o">-</span> <span class="mf">5.0</span>
+        <span class="c1"># Hash sum: 47.52583_31754_92896_71629</span>
+        <span class="n">num</span> <span class="o">=</span> <span class="p">(((((((</span><span class="mf">2.01033_43992_92288_13265e-7</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">2.71155_55687_43487_57815e-5</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">1.24266_09473_88078_43860e-3</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">2.65321_89526_57612_30930e-2</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">2.96560_57182_85048_91230e-1</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">1.78482_65399_17291_33580e+0</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">5.46378_49111_64114_36990e+0</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">6.65790_46435_01103_77720e+0</span><span class="p">)</span>
+        <span class="n">den</span> <span class="o">=</span> <span class="p">(((((((</span><span class="mf">2.04426_31033_89939_78564e-15</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">1.42151_17583_16445_88870e-7</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">1.84631_83175_10054_68180e-5</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">7.86869_13114_56132_59100e-4</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">1.48753_61290_85061_48525e-2</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">1.36929_88092_27358_05310e-1</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">5.99832_20655_58879_37690e-1</span><span class="p">)</span> <span class="o">*</span> <span class="n">r</span> <span class="o">+</span>
+                     <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">num</span> <span class="o">/</span> <span class="n">den</span>
+    <span class="k">if</span> <span class="n">q</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="o">-</span><span class="n">x</span>
+    <span class="k">return</span> <span class="n">mu</span> <span class="o">+</span> <span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">sigma</span><span class="p">)</span>
+
+
+<span class="c1"># If available, use C implementation</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">_statistics</span> <span class="kn">import</span> <span class="n">_normal_dist_inv_cdf</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+
+<span class="k">class</span> <span class="nc">NormalDist</span><span class="p">:</span>
+    <span class="s2">&quot;Normal distribution of a random variable&quot;</span>
+    <span class="c1"># https://en.wikipedia.org/wiki/Normal_distribution</span>
+    <span class="c1"># https://en.wikipedia.org/wiki/Variance#Properties</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;_mu&#39;</span><span class="p">:</span> <span class="s1">&#39;Arithmetic mean of a normal distribution&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;_sigma&#39;</span><span class="p">:</span> <span class="s1">&#39;Standard deviation of a normal distribution&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+        <span class="s2">&quot;NormalDist where mu is the mean and sigma is the standard deviation.&quot;</span>
+        <span class="k">if</span> <span class="n">sigma</span> <span class="o">&lt;</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;sigma must be non-negative&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mu</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">sigma</span><span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_samples</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="s2">&quot;Make a normal distribution instance from sample data.&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">*</span><span class="n">_mean_stdev</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="s2">&quot;Generate *n* samples for a given mean and standard deviation.&quot;</span>
+        <span class="n">gauss</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">gauss</span> <span class="k">if</span> <span class="n">seed</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">random</span><span class="o">.</span><span class="n">Random</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span><span class="o">.</span><span class="n">gauss</span>
+        <span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">gauss</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">pdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="s2">&quot;Probability density function.  P(x &lt;= X &lt; x+dx) / dx&quot;</span>
+        <span class="n">variance</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">variance</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;pdf() not defined when sigma is zero&#39;</span><span class="p">)</span>
+        <span class="n">diff</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span>
+        <span class="k">return</span> <span class="n">exp</span><span class="p">(</span><span class="n">diff</span> <span class="o">*</span> <span class="n">diff</span> <span class="o">/</span> <span class="p">(</span><span class="o">-</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">variance</span><span class="p">))</span> <span class="o">/</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">tau</span> <span class="o">*</span> <span class="n">variance</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">cdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="s2">&quot;Cumulative distribution function.  P(X &lt;= x)&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;cdf() not defined when sigma is zero&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">erf</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">*</span> <span class="n">_SQRT2</span><span class="p">)))</span>
+
+    <span class="k">def</span> <span class="nf">inv_cdf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Inverse cumulative distribution function.  x : P(X &lt;= x) = p</span>
+
+<span class="sd">        Finds the value of the random variable such that the probability of</span>
+<span class="sd">        the variable being less than or equal to that value equals the given</span>
+<span class="sd">        probability.</span>
+
+<span class="sd">        This function is also called the percent point function or quantile</span>
+<span class="sd">        function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;=</span> <span class="mf">0.0</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">&gt;=</span> <span class="mf">1.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;p must be in the range 0.0 &lt; p &lt; 1.0&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">&lt;=</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;cdf() not defined when sigma at or below zero&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_normal_dist_inv_cdf</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">quantiles</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Divide into *n* continuous intervals with equal probability.</span>
+
+<span class="sd">        Returns a list of (n - 1) cut points separating the intervals.</span>
+
+<span class="sd">        Set *n* to 4 for quartiles (the default).  Set *n* to 10 for deciles.</span>
+<span class="sd">        Set *n* to 100 for percentiles which gives the 99 cuts points that</span>
+<span class="sd">        separate the normal distribution in to 100 equal sized groups.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">inv_cdf</span><span class="p">(</span><span class="n">i</span> <span class="o">/</span> <span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">overlap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the overlapping coefficient (OVL) between two normal distributions.</span>
+
+<span class="sd">        Measures the agreement between two normal probability distributions.</span>
+<span class="sd">        Returns a value between 0.0 and 1.0 giving the overlapping area in</span>
+<span class="sd">        the two underlying probability density functions.</span>
+
+<span class="sd">            &gt;&gt;&gt; N1 = NormalDist(2.4, 1.6)</span>
+<span class="sd">            &gt;&gt;&gt; N2 = NormalDist(3.2, 2.0)</span>
+<span class="sd">            &gt;&gt;&gt; N1.overlap(N2)</span>
+<span class="sd">            0.8035050657330205</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># See: &quot;The overlapping coefficient as a measure of agreement between</span>
+        <span class="c1"># probability distributions and point estimation of the overlap of two</span>
+        <span class="c1"># normal densities&quot; -- Henry F. Inman and Edwin L. Bradley Jr</span>
+        <span class="c1"># http://dx.doi.org/10.1080/03610928908830127</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">NormalDist</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Expected another NormalDist instance&#39;</span><span class="p">)</span>
+        <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="bp">self</span><span class="p">,</span> <span class="n">other</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">_sigma</span><span class="p">,</span> <span class="n">Y</span><span class="o">.</span><span class="n">_mu</span><span class="p">)</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">X</span><span class="o">.</span><span class="n">_sigma</span><span class="p">,</span> <span class="n">X</span><span class="o">.</span><span class="n">_mu</span><span class="p">):</span>  <span class="c1"># sort to assure commutativity</span>
+            <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="o">=</span> <span class="n">Y</span><span class="p">,</span> <span class="n">X</span>
+        <span class="n">X_var</span><span class="p">,</span> <span class="n">Y_var</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">variance</span><span class="p">,</span> <span class="n">Y</span><span class="o">.</span><span class="n">variance</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">X_var</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">Y_var</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;overlap() not defined when sigma is zero&#39;</span><span class="p">)</span>
+        <span class="n">dv</span> <span class="o">=</span> <span class="n">Y_var</span> <span class="o">-</span> <span class="n">X_var</span>
+        <span class="n">dm</span> <span class="o">=</span> <span class="n">fabs</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">_mu</span> <span class="o">-</span> <span class="n">X</span><span class="o">.</span><span class="n">_mu</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dv</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">erf</span><span class="p">(</span><span class="n">dm</span> <span class="o">/</span> <span class="p">(</span><span class="mf">2.0</span> <span class="o">*</span> <span class="n">X</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">*</span> <span class="n">_SQRT2</span><span class="p">))</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">_mu</span> <span class="o">*</span> <span class="n">Y_var</span> <span class="o">-</span> <span class="n">Y</span><span class="o">.</span><span class="n">_mu</span> <span class="o">*</span> <span class="n">X_var</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">*</span> <span class="n">Y</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">*</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">dm</span> <span class="o">*</span> <span class="n">dm</span> <span class="o">+</span> <span class="n">dv</span> <span class="o">*</span> <span class="n">log</span><span class="p">(</span><span class="n">Y_var</span> <span class="o">/</span> <span class="n">X_var</span><span class="p">))</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="n">dv</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span> <span class="o">-</span> <span class="n">b</span><span class="p">)</span> <span class="o">/</span> <span class="n">dv</span>
+        <span class="k">return</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">fabs</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span> <span class="o">-</span> <span class="n">X</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">x1</span><span class="p">))</span> <span class="o">+</span> <span class="n">fabs</span><span class="p">(</span><span class="n">Y</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span> <span class="o">-</span> <span class="n">X</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">x2</span><span class="p">)))</span>
+
+    <span class="k">def</span> <span class="nf">zscore</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compute the Standard Score.  (x - mean) / stdev</span>
+
+<span class="sd">        Describes *x* in terms of the number of standard deviations</span>
+<span class="sd">        above or below the mean of the normal distribution.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># https://www.statisticshowto.com/probability-and-statistics/z-score/</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">StatisticsError</span><span class="p">(</span><span class="s1">&#39;zscore() not defined when sigma is zero&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">)</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Arithmetic mean of the normal distribution.&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">median</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Return the median of the normal distribution&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the mode of the normal distribution</span>
+
+<span class="sd">        The mode is the value x where which the probability density</span>
+<span class="sd">        function (pdf) takes its maximum value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mu</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">stdev</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Standard deviation of the normal distribution.&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">variance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;Square of the standard deviation.&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span>
+
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add a constant or another NormalDist instance.</span>
+
+<span class="sd">        If *other* is a constant, translate mu by the constant,</span>
+<span class="sd">        leaving sigma unchanged.</span>
+
+<span class="sd">        If *other* is a NormalDist, add both the means and the variances.</span>
+<span class="sd">        Mathematically, this works only if the two distributions are</span>
+<span class="sd">        independent or if they are jointly normally distributed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">NormalDist</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">NormalDist</span><span class="p">(</span><span class="n">x1</span><span class="o">.</span><span class="n">_mu</span> <span class="o">+</span> <span class="n">x2</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="n">hypot</span><span class="p">(</span><span class="n">x1</span><span class="o">.</span><span class="n">_sigma</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">_sigma</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">NormalDist</span><span class="p">(</span><span class="n">x1</span><span class="o">.</span><span class="n">_mu</span> <span class="o">+</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x1</span><span class="o">.</span><span class="n">_sigma</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__sub__</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Subtract a constant or another NormalDist instance.</span>
+
+<span class="sd">        If *other* is a constant, translate by the constant mu,</span>
+<span class="sd">        leaving sigma unchanged.</span>
+
+<span class="sd">        If *other* is a NormalDist, subtract the means and add the variances.</span>
+<span class="sd">        Mathematically, this works only if the two distributions are</span>
+<span class="sd">        independent or if they are jointly normally distributed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">NormalDist</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">NormalDist</span><span class="p">(</span><span class="n">x1</span><span class="o">.</span><span class="n">_mu</span> <span class="o">-</span> <span class="n">x2</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="n">hypot</span><span class="p">(</span><span class="n">x1</span><span class="o">.</span><span class="n">_sigma</span><span class="p">,</span> <span class="n">x2</span><span class="o">.</span><span class="n">_sigma</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">NormalDist</span><span class="p">(</span><span class="n">x1</span><span class="o">.</span><span class="n">_mu</span> <span class="o">-</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x1</span><span class="o">.</span><span class="n">_sigma</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__mul__</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Multiply both mu and sigma by a constant.</span>
+
+<span class="sd">        Used for rescaling, perhaps to change measurement units.</span>
+<span class="sd">        Sigma is scaled with the absolute value of the constant.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">NormalDist</span><span class="p">(</span><span class="n">x1</span><span class="o">.</span><span class="n">_mu</span> <span class="o">*</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x1</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">*</span> <span class="n">fabs</span><span class="p">(</span><span class="n">x2</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Divide both mu and sigma by a constant.</span>
+
+<span class="sd">        Used for rescaling, perhaps to change measurement units.</span>
+<span class="sd">        Sigma is scaled with the absolute value of the constant.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">NormalDist</span><span class="p">(</span><span class="n">x1</span><span class="o">.</span><span class="n">_mu</span> <span class="o">/</span> <span class="n">x2</span><span class="p">,</span> <span class="n">x1</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">/</span> <span class="n">fabs</span><span class="p">(</span><span class="n">x2</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__pos__</span><span class="p">(</span><span class="n">x1</span><span class="p">):</span>
+        <span class="s2">&quot;Return a copy of the instance.&quot;</span>
+        <span class="k">return</span> <span class="n">NormalDist</span><span class="p">(</span><span class="n">x1</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="n">x1</span><span class="o">.</span><span class="n">_sigma</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__neg__</span><span class="p">(</span><span class="n">x1</span><span class="p">):</span>
+        <span class="s2">&quot;Negates mu while keeping sigma the same.&quot;</span>
+        <span class="k">return</span> <span class="n">NormalDist</span><span class="p">(</span><span class="o">-</span><span class="n">x1</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="n">x1</span><span class="o">.</span><span class="n">_sigma</span><span class="p">)</span>
+
+    <span class="fm">__radd__</span> <span class="o">=</span> <span class="fm">__add__</span>
+
+    <span class="k">def</span> <span class="fm">__rsub__</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
+        <span class="s2">&quot;Subtract a NormalDist from a constant or another NormalDist.&quot;</span>
+        <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span>
+
+    <span class="fm">__rmul__</span> <span class="o">=</span> <span class="fm">__mul__</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">x2</span><span class="p">):</span>
+        <span class="s2">&quot;Two NormalDist objects are equal if their mu and sigma are both equal.&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span> <span class="n">NormalDist</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">NotImplemented</span>
+        <span class="k">return</span> <span class="n">x1</span><span class="o">.</span><span class="n">_mu</span> <span class="o">==</span> <span class="n">x2</span><span class="o">.</span><span class="n">_mu</span> <span class="ow">and</span> <span class="n">x1</span><span class="o">.</span><span class="n">_sigma</span> <span class="o">==</span> <span class="n">x2</span><span class="o">.</span><span class="n">_sigma</span>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="s2">&quot;NormalDist objects hash equal if their mu and sigma are both equal.&quot;</span>
+        <span class="k">return</span> <span class="nb">hash</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s1">(mu=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_mu</span><span class="si">!r}</span><span class="s1">, sigma=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_sigma</span><span class="si">!r}</span><span class="s1">)&#39;</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hannah Turney. Project structure based on the Computational Molecular Science Python Cookiecutter version 1.1.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
