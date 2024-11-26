@@ -1,0 +1,719 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>swiftpol.build &mdash; swiftpol  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            swiftpol
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html#getting-started-with-swiftpol">Getting Started with Swiftpol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html#module-swiftpol.build">swiftpol.build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html#swiftpol-parameterize">swiftpol.parameterize</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">swiftpol</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">swiftpol.build</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for swiftpol.build</h1><div class="highlight"><pre>
+<span></span><span class="c1">#Init</span>
+<span class="kn">import</span> <span class="nn">rdkit</span>
+<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">AllChem</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">openeye</span> <span class="kn">import</span> <span class="n">oechem</span>
+
+<span class="kn">import</span> <span class="nn">openmm</span>
+<span class="kn">from</span> <span class="nn">openff.toolkit.topology</span> <span class="kn">import</span> <span class="n">Molecule</span><span class="p">,</span> <span class="n">Topology</span>
+<span class="kn">from</span> <span class="nn">openff.toolkit.typing.engines.smirnoff</span> <span class="kn">import</span> <span class="n">ForceField</span>
+<span class="kn">from</span> <span class="nn">openff.toolkit.utils</span> <span class="kn">import</span> <span class="n">get_data_file_path</span>
+<span class="kn">from</span> <span class="nn">openff.toolkit.utils.toolkits</span> <span class="kn">import</span> <span class="n">RDKitToolkitWrapper</span><span class="p">,</span> <span class="n">AmberToolsToolkitWrapper</span>
+<span class="kn">from</span> <span class="nn">openff.units</span> <span class="kn">import</span> <span class="n">unit</span>
+<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">read_csv</span>
+<span class="kn">import</span> <span class="nn">espaloma_charge</span> <span class="k">as</span> <span class="nn">espcharge</span>
+<span class="kn">from</span> <span class="nn">espaloma_charge.openff_wrapper</span> <span class="kn">import</span> <span class="n">EspalomaChargeToolkitWrapper</span>
+
+<span class="kn">from</span> <span class="nn">openff.interchange</span> <span class="kn">import</span> <span class="n">Interchange</span>
+<span class="kn">from</span> <span class="nn">openff.interchange.components._packmol</span> <span class="kn">import</span> <span class="n">UNIT_CUBE</span><span class="p">,</span> <span class="n">pack_box</span>
+
+
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
+<span class="kn">from</span> <span class="nn">statistics</span> <span class="kn">import</span> <span class="n">mean</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem.Descriptors</span> <span class="kn">import</span> <span class="n">ExactMolWt</span>
+<span class="kn">from</span> <span class="nn">openff.interchange</span> <span class="kn">import</span> <span class="n">Interchange</span>
+<span class="kn">from</span> <span class="nn">openff.interchange.components._packmol</span> <span class="kn">import</span> <span class="n">UNIT_CUBE</span><span class="p">,</span> <span class="n">pack_box</span>
+
+<span class="c1">#Build polymer - generic</span>
+<div class="viewcode-block" id="build_polymer">
+<a class="viewcode-back" href="../../api.html#swiftpol.build.build_polymer">[docs]</a>
+<span class="k">def</span> <span class="nf">build_polymer</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">monomer_list</span><span class="p">,</span> <span class="n">reaction</span><span class="p">,</span> <span class="n">terminal</span> <span class="o">=</span><span class="s1">&#39;hydroxyl&#39;</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructs a polymer from a given sequence of monomers.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    sequence (str): A string representing the sequence of monomers (e.g., &#39;ABAB&#39;).</span>
+<span class="sd">    monomer_list (list): A list of SMILES strings representing the monomers.</span>
+<span class="sd">    reaction (rdkit.Chem.rdChemReactions.ChemicalReaction): An RDKit reaction object used to link monomers.</span>
+<span class="sd">    terminal (str, optional): The terminal group to be added to the polymer. Options are &#39;hydroxyl&#39;, &#39;carboxyl&#39;, or &#39;ester&#39;. Default is &#39;hydroxyl&#39;.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    rdkit.Chem.rdchem.Mol: The constructed polymer as an RDKit molecule object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">RDLogger</span> 
+    <span class="n">RDLogger</span><span class="o">.</span><span class="n">DisableLog</span><span class="p">(</span><span class="s1">&#39;rdApp.*&#39;</span><span class="p">)</span>   
+    <span class="n">monomers</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">sequence</span><span class="p">))):</span>
+        <span class="n">ind</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">sequence</span><span class="p">)))</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">monomers</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">=</span> <span class="n">monomer_list</span><span class="p">[</span><span class="n">ind</span><span class="p">]</span>
+    <span class="n">hits</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">monomers</span><span class="p">[</span><span class="n">sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span><span class="o">.</span><span class="n">GetSubstructMatches</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s1">&#39;I&#39;</span><span class="p">))</span>
+    <span class="n">mw</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">RWMol</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">monomers</span><span class="p">[</span><span class="n">sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]]))</span>
+    <span class="n">mw</span><span class="o">.</span><span class="n">ReplaceAtom</span><span class="p">(</span><span class="n">hits</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span><span class="n">Chem</span><span class="o">.</span><span class="n">Atom</span><span class="p">(</span><span class="mi">17</span><span class="p">))</span>
+    <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">mw</span><span class="p">)</span>
+    <span class="n">mw</span><span class="o">.</span><span class="n">CommitBatchEdit</span><span class="p">()</span>
+    <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">mw</span><span class="p">)</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AtomPDBResidueInfo</span><span class="p">()</span>
+    <span class="n">info</span><span class="o">.</span><span class="n">SetResidueName</span><span class="p">(</span><span class="n">sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">info</span><span class="o">.</span><span class="n">SetResidueNumber</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>  <span class="k">for</span>  <span class="n">atom</span>  <span class="ow">in</span>  <span class="n">polymer</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
+    <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
+    
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))[</span><span class="mi">1</span><span class="p">:]:</span>
+        <span class="k">if</span> <span class="n">sequence</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>
+            <span class="n">A</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">monomers</span><span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">])</span>
+            <span class="n">A</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AtomPDBResidueInfo</span><span class="p">()</span>
+            <span class="n">info</span><span class="o">.</span><span class="n">SetResidueName</span><span class="p">(</span><span class="s1">&#39;A&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">info</span><span class="o">.</span><span class="n">SetResidueNumber</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>  <span class="k">for</span>  <span class="n">atom</span>  <span class="ow">in</span>  <span class="n">A</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
+            <span class="n">polymer</span> <span class="o">=</span> <span class="n">reaction</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">((</span><span class="n">polymer</span><span class="p">,</span> <span class="n">A</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
+                
+        <span class="k">elif</span> <span class="n">sequence</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span>
+            <span class="n">B</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">monomers</span><span class="p">[</span><span class="s1">&#39;B&#39;</span><span class="p">])</span>
+            <span class="n">B</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+            <span class="n">info</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AtomPDBResidueInfo</span><span class="p">()</span>
+            <span class="n">info</span><span class="o">.</span><span class="n">SetResidueName</span><span class="p">(</span><span class="s1">&#39;B&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">info</span><span class="o">.</span><span class="n">SetResidueNumber</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>  <span class="k">for</span>  <span class="n">atom</span>  <span class="ow">in</span>  <span class="n">B</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
+            <span class="n">polymer</span> <span class="o">=</span> <span class="n">reaction</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">((</span><span class="n">polymer</span><span class="p">,</span> <span class="n">B</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">terminal</span> <span class="o">==</span> <span class="s1">&#39;hydroxyl&#39;</span><span class="p">:</span>
+        <span class="n">hydrogen</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="s1">&#39;[H]&#39;</span><span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AtomPDBResidueInfo</span><span class="p">()</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">SetResidueName</span><span class="p">(</span><span class="n">sequence</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">SetResidueNumber</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>  <span class="k">for</span>  <span class="n">atom</span>  <span class="ow">in</span>  <span class="n">hydrogen</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
+        <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s1">&#39;Cl&#39;</span><span class="p">),</span> <span class="n">hydrogen</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">Chem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">terminal</span> <span class="o">==</span> <span class="s1">&#39;carboxyl&#39;</span><span class="p">:</span>
+        <span class="n">carboxyl</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="s1">&#39;C(=O)[OH]&#39;</span><span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AtomPDBResidueInfo</span><span class="p">()</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">SetResidueName</span><span class="p">(</span><span class="n">sequence</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">SetResidueNumber</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>  <span class="k">for</span>  <span class="n">atom</span>  <span class="ow">in</span>  <span class="n">carboxyl</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
+        <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s1">&#39;Cl&#39;</span><span class="p">),</span> <span class="n">carboxyl</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">terminal</span> <span class="o">==</span> <span class="s1">&#39;ester&#39;</span><span class="p">:</span>
+        <span class="n">carbon</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AtomPDBResidueInfo</span><span class="p">()</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">SetResidueName</span><span class="p">(</span><span class="n">sequence</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="n">info</span><span class="o">.</span><span class="n">SetResidueNumber</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>  <span class="k">for</span>  <span class="n">atom</span>  <span class="ow">in</span>  <span class="n">carbon</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
+        <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s1">&#39;Cl&#39;</span><span class="p">),</span> <span class="n">carbon</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">Chem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
+        <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s1">&#39;Cl&#39;</span><span class="p">),</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s1">&#39;I&#39;</span><span class="p">),</span> <span class="n">hydrogen</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#remove any excess iodine</span>
+    <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">polymer</span></div>
+
+
+
+
+<div class="viewcode-block" id="build_linear_copolymer">
+<a class="viewcode-back" href="../../api.html#swiftpol.build.build_linear_copolymer">[docs]</a>
+<span class="k">def</span> <span class="nf">build_linear_copolymer</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> 
+                           <span class="n">monomer_a_smiles</span><span class="p">,</span> 
+                           <span class="n">monomer_b_smiles</span><span class="p">,</span>
+                           <span class="n">reaction</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">ReactionFromSmarts</span><span class="p">(</span><span class="s1">&#39;[C:1][HO:2].[HO:3][C:4]&gt;&gt;[C:1][O:2][C:4].[O:3]&#39;</span><span class="p">)):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructs a linear co-polymer from the provided sequence of monomers.</span>
+
+<span class="sd">    This function takes a sequence of monomers represented as &#39;A&#39; and &#39;B&#39;, and the SMILES strings of two monomers. It constructs a co-polymer based on the sequence, using the provided reaction SMARTS for joining the monomers. The function returns the sanitized polymer and the percentage composition of each monomer in the polymer.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    sequence (str): A string representing the sequence of monomers. &#39;A&#39; represents monomer_a and &#39;B&#39; represents monomer_b.</span>
+<span class="sd">    monomer_a_smiles (str): The SMILES string of monomer A.</span>
+<span class="sd">    monomer_b_smiles (str): The SMILES string of monomer B.</span>
+<span class="sd">    reaction (rdkit.Chem.rdChemReactions.ChemicalReaction, optional): The reaction SMARTS used for joining the monomers. Defaults to &#39;[C:1][HO:2].[HO:3][C:4]&gt;&gt;[C:1][O:2][C:4].[O:3]&#39;, representing a condensation polymerisation.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    tuple: A tuple containing the sanitized polymer (rdkit.Chem.rdchem.Mol), the percentage composition of monomer A (float), and the percentage composition of monomer B (float).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Initialize the polymer with an iodine blocker</span>
+    <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="s1">&#39;OC(=O)I&#39;</span><span class="p">)</span>
+    <span class="n">A_count</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">B_count</span><span class="o">=</span><span class="mi">0</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">monomer_a_smiles</span><span class="p">)</span>
+    <span class="n">B</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">monomer_b_smiles</span><span class="p">)</span>
+    <span class="c1"># Build the polymer based on the sequence</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">sequence</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;A&#39;</span><span class="p">:</span>
+            <span class="n">polymer</span> <span class="o">=</span> <span class="n">reaction</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">((</span><span class="n">polymer</span><span class="p">,</span> <span class="n">A</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
+            <span class="n">A_count</span><span class="o">+=</span><span class="mi">1</span>
+        
+        <span class="k">elif</span> <span class="n">sequence</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;B&#39;</span><span class="p">:</span>
+            <span class="n">polymer</span> <span class="o">=</span> <span class="n">reaction</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">((</span><span class="n">polymer</span><span class="p">,</span> <span class="n">B</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
+            <span class="n">B_count</span><span class="o">+=</span><span class="mi">1</span>
+    <span class="c1"># Calculate the percentage composition of each monomer</span>
+    <span class="n">A_ratio</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">A_count</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">B_ratio</span> <span class="o">=</span> <span class="nb">round</span><span class="p">((</span><span class="n">B_count</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span><span class="o">*</span><span class="mi">100</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># Remove the iodine blocker</span>
+    <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s1">&#39;OC(=O)I&#39;</span><span class="p">),</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s1">&#39;[O]&#39;</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">polymer</span><span class="p">,</span> <span class="n">A_ratio</span><span class="p">,</span> <span class="n">B_ratio</span></div>
+
+
+
+
+<div class="viewcode-block" id="PDI">
+<a class="viewcode-back" href="../../api.html#swiftpol.build.PDI">[docs]</a>
+<span class="k">def</span> <span class="nf">PDI</span><span class="p">(</span><span class="n">chains</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculates the Polydispersity Index (PDI), number-average molecular weight (Mn), and weight-average molecular weight (Mw) of a list of chains.</span>
+
+<span class="sd">    This function takes a list of molecular chains and calculates the PDI, which is the ratio of Mw to Mn. It also calculates Mn, which is the sum of the molecular weights of the chains divided by the number of chains, and Mw, which is the sum of the product of the weight fraction and molecular weight of each chain.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    chains (list): A list of molecular chains. Each chain is represented as an RDkit molecule object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    tuple: A tuple containing the PDI (float), Mn (float), and Mw (float).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Calculate the molecular weights of the chains</span>
+    <span class="n">mw_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">ExactMolWt</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span> <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains</span><span class="p">]</span>
+    <span class="nb">list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">mass</span><span class="p">)</span> <span class="k">for</span> <span class="n">mass</span> <span class="ow">in</span> <span class="n">mw_list</span><span class="p">]</span>
+    <span class="n">Mi</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="n">NiMi</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># Calculate the weight fraction of each chain</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">Mi</span><span class="p">:</span>
+        <span class="n">Ni</span> <span class="o">=</span> <span class="nb">list</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">NiMi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="n">Ni</span><span class="p">)</span>
+    <span class="n">sigNiMi</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">NiMi</span><span class="p">)</span>
+    <span class="n">Mn</span> <span class="o">=</span> <span class="n">sigNiMi</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">mw_list</span><span class="p">)</span>
+    <span class="n">wf</span> <span class="o">=</span> <span class="p">[</span><span class="n">z</span><span class="o">/</span><span class="n">sigNiMi</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">NiMi</span><span class="p">]</span>
+    <span class="c1"># Calculate the weight-average molecular weight</span>
+    <span class="n">WiMi</span> <span class="o">=</span> <span class="p">[</span><span class="n">wf</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">*</span><span class="n">NiMi</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wf</span><span class="p">))]</span>
+    <span class="n">Mw</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">WiMi</span><span class="p">)</span>
+    
+    <span class="c1"># Calculate the polydispersity index</span>
+    <span class="n">PDI</span> <span class="o">=</span> <span class="n">Mw</span><span class="o">/</span><span class="n">Mn</span>
+    <span class="k">return</span> <span class="n">PDI</span><span class="p">,</span> <span class="n">Mn</span><span class="p">,</span> <span class="n">Mw</span></div>
+
+    
+
+
+
+<div class="viewcode-block" id="blockiness_gen">
+<a class="viewcode-back" href="../../api.html#swiftpol.build.blockiness_gen">[docs]</a>
+<span class="k">def</span> <span class="nf">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">):</span>  
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the blockiness and average block length of a co-polymer sequence.</span>
+
+<span class="sd">    This function calculates the blockiness of a co-polymer sequence by counting the occurrences of &#39;GG&#39; and &#39;GL&#39; or &#39;LG&#39; in the sequence. </span>
+<span class="sd">    It also calculates the average block length of &#39;G&#39; and &#39;L&#39; in the sequence.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    sequence (str): A string representing the co-polymer sequence. &#39;G&#39; represents one type of monomer and &#39;L&#39; represents another type.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    blockiness (float): The blockiness of the co-polymer sequence. Calculated as the ratio of &#39;GG&#39; to &#39;GL&#39; or &#39;LG&#39;.</span>
+<span class="sd">    block_length_G (float): The average block length of &#39;G&#39; in the sequence.</span>
+<span class="sd">    block_length_L (float): The average block length of &#39;L&#39; in the sequence.</span>
+
+<span class="sd">    If the sequence does not contain both &#39;G&#39; and &#39;L&#39;, the function returns a string indicating that the molecule is not a co-polymer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="s1">&#39;A&#39;</span> <span class="ow">in</span> <span class="n">sequence</span> <span class="ow">and</span> <span class="s1">&#39;B&#39;</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span> <span class="c1">#Check if sequence is a co-polymer</span>
+        <span class="n">AB</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;AB&#39;</span><span class="p">)</span>
+        <span class="n">BB</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;BB&#39;</span><span class="p">)</span>
+        <span class="n">BA</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;BA&#39;</span><span class="p">)</span>
+        <span class="n">AA</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;AA&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;BA&#39;</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
+            <span class="n">blockiness</span> <span class="o">=</span> <span class="n">BB</span><span class="o">/</span><span class="n">BA</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">blockiness</span> <span class="o">=</span> <span class="n">BB</span><span class="o">/</span><span class="n">AB</span>
+        <span class="c1">#Calculate block length B</span>
+        <span class="n">block_list_B</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sequence</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="o">!=</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
+        <span class="n">block_length_B</span> <span class="o">=</span> <span class="n">mean</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">block_list_B</span><span class="p">])</span>
+        <span class="c1">#Calculate block length A</span>
+        <span class="n">block_list_A</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">sequence</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;B&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="o">!=</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
+        <span class="n">block_length_A</span> <span class="o">=</span> <span class="n">mean</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">block_list_A</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">blockiness</span><span class="p">,</span> <span class="n">block_length_B</span><span class="p">,</span> <span class="n">block_length_A</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s1">&#39;Molecule is not a co-polymer, no blockiness calculation performed&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="calculate_box_components">
+<a class="viewcode-back" href="../../api.html#swiftpol.build.calculate_box_components">[docs]</a>
+<span class="k">def</span> <span class="nf">calculate_box_components</span><span class="p">(</span><span class="n">chains</span><span class="p">,</span> <span class="n">monomers</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">salt_concentration</span> <span class="o">=</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">mole</span> <span class="o">/</span> <span class="n">unit</span><span class="o">.</span><span class="n">liter</span><span class="p">,</span> <span class="n">residual_monomer</span> <span class="o">=</span> <span class="mf">0.00</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    ADAPTED FROM OPENFF TOOLKIT PACKMOL WRAPPER SOLVATE_TOPOLOGY FUNCTION</span>
+<span class="sd">    Calculates the components required to construct a simulation box for a given set of molecular chains.</span>
+<span class="sd">    Considers the salt concentration and residual monomer concentration to determine the quantity of each molecule type required.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    chains (list): A list of molecular chains to be included in the simulation box.</span>
+<span class="sd">    sequence (str): A string representing the sequence of the molecular chains. &#39;G&#39; and &#39;L&#39; represent different types of monomers.</span>
+<span class="sd">    salt_concentration (float, optional): The desired salt concentration in the simulation box. Defaults to 0.1 M.</span>
+<span class="sd">    residual_monomer (float, optional): The desired residual monomer concentration in the simulation box. Defaults to 0.05.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    tuple: A tuple containing the following elements:</span>
+<span class="sd">        - molecules (list): A list of molecules to be included in the simulation box.</span>
+<span class="sd">        - number_of_copies (list): A list indicating the quantity of each molecule to be included in the simulation box.</span>
+<span class="sd">        - topology (openff.toolkit.topology.Topology): The topology of the simulation box.</span>
+<span class="sd">        - box_vectors (numpy.ndarray): The vectors defining the dimensions of the simulation box.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">openff.toolkit.topology</span> <span class="kn">import</span> <span class="n">Molecule</span><span class="p">,</span> <span class="n">Topology</span>
+    <span class="kn">from</span> <span class="nn">openff.interchange.components._packmol</span> <span class="kn">import</span> <span class="n">UNIT_CUBE</span><span class="p">,</span> <span class="n">pack_box</span><span class="p">,</span> <span class="n">RHOMBIC_DODECAHEDRON</span><span class="p">,</span> <span class="n">solvate_topology</span>
+    <span class="kn">from</span> <span class="nn">openff.interchange.components._packmol</span> <span class="kn">import</span> <span class="n">_max_dist_between_points</span><span class="p">,</span> <span class="n">_compute_brick_from_box_vectors</span><span class="p">,</span> <span class="n">_center_topology_at</span>
+    <span class="c1">#Create molecules for the purpose of mass calculation</span>
+    <span class="c1">#Water</span>
+    <span class="n">water</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="s1">&#39;O&#39;</span><span class="p">)</span>
+    <span class="n">water</span><span class="o">.</span><span class="n">generate_unique_atom_names</span><span class="p">()</span>
+    <span class="n">water</span><span class="o">.</span><span class="n">generate_conformers</span><span class="p">()</span>
+    <span class="n">water_mass</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">water</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span>
+    
+    <span class="c1">#Sodium</span>
+    <span class="n">na</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="s1">&#39;[Na+]&#39;</span><span class="p">)</span>
+    <span class="n">na</span><span class="o">.</span><span class="n">generate_unique_atom_names</span><span class="p">()</span>
+    <span class="n">na</span><span class="o">.</span><span class="n">generate_conformers</span><span class="p">()</span>
+    
+    <span class="c1">#Chloride</span>
+    <span class="n">cl</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="s1">&#39;[Cl-]&#39;</span><span class="p">)</span>
+    <span class="n">cl</span><span class="o">.</span><span class="n">generate_unique_atom_names</span><span class="p">()</span>
+    <span class="n">cl</span><span class="o">.</span><span class="n">generate_conformers</span><span class="p">()</span>
+    
+    <span class="n">nacl_mass</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">na</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">cl</span><span class="o">.</span><span class="n">atoms</span><span class="p">],)</span>
+    <span class="c1"># Create a topology from the chains</span>
+    <span class="n">topology</span> <span class="o">=</span> <span class="n">Topology</span><span class="o">.</span><span class="n">from_molecules</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span>
+    <span class="n">nacl_conc</span><span class="o">=</span><span class="n">salt_concentration</span>
+    <span class="n">padding</span><span class="o">=</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">nanometer</span>
+    <span class="n">box_shape</span><span class="o">=</span> <span class="n">UNIT_CUBE</span>
+    <span class="n">target_density</span><span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">gram</span> <span class="o">/</span> <span class="n">unit</span><span class="o">.</span><span class="n">milliliter</span>
+    <span class="n">tolerance</span><span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">nanometer</span>
+    
+    <span class="c1"># Compute box vectors from the solute length and requested padding</span>
+    <span class="k">if</span> <span class="n">chains</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">n_conformers</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The solvate_topology function requires that the solute has at least one conformer.&quot;</span><span class="p">)</span>
+    <span class="n">solute_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">_max_dist_between_points</span><span class="p">(</span><span class="n">chains</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">to_topology</span><span class="p">()</span><span class="o">.</span><span class="n">get_positions</span><span class="p">())</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">)))</span>
+    <span class="n">image_distance</span> <span class="o">=</span> <span class="n">solute_length</span> <span class="o">+</span> <span class="n">padding</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="n">box_vectors</span> <span class="o">=</span> <span class="n">box_shape</span> <span class="o">*</span> <span class="n">image_distance</span>
+    
+    <span class="c1"># Compute target masses of solvent</span>
+    <span class="n">box_volume</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">box_vectors</span><span class="o">.</span><span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">box_vectors</span><span class="o">.</span><span class="n">u</span><span class="o">**</span><span class="mi">3</span>
+    <span class="n">target_mass</span> <span class="o">=</span> <span class="n">box_volume</span> <span class="o">*</span> <span class="n">target_density</span>
+    <span class="n">solvent_mass</span> <span class="o">=</span> <span class="n">target_mass</span> <span class="o">-</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">sum</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">molecule</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span> <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="n">topology</span><span class="o">.</span><span class="n">molecules</span><span class="p">)</span>
+    
+    <span class="c1"># Compute the number of NaCl to add from the mass and concentration</span>
+    <span class="n">nacl_mass_fraction</span> <span class="o">=</span> <span class="p">(</span><span class="n">nacl_conc</span> <span class="o">*</span> <span class="n">nacl_mass</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">55.5</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">mole</span> <span class="o">/</span> <span class="n">unit</span><span class="o">.</span><span class="n">liter</span> <span class="o">*</span> <span class="n">water_mass</span><span class="p">)</span>
+    <span class="n">nacl_to_add</span> <span class="o">=</span> <span class="p">((</span><span class="n">solvent_mass</span> <span class="o">*</span> <span class="n">nacl_mass_fraction</span><span class="p">)</span> <span class="o">/</span> <span class="n">nacl_mass</span><span class="p">)</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">()</span>
+    <span class="n">water_to_add</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">solvent_mass</span> <span class="o">-</span> <span class="n">nacl_mass</span><span class="p">)</span> <span class="o">/</span> <span class="n">water_mass</span><span class="p">)</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">())</span>
+    
+    <span class="c1"># Neutralise the system by adding and removing salt</span>
+    <span class="n">solute_charge</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">molecule</span><span class="o">.</span><span class="n">total_charge</span> <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="n">topology</span><span class="o">.</span><span class="n">molecules</span><span class="p">])</span>
+    <span class="n">na_to_add</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">nacl_to_add</span> <span class="o">-</span> <span class="n">solute_charge</span><span class="o">.</span><span class="n">m</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)))</span>
+    <span class="n">cl_to_add</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">nacl_to_add</span> <span class="o">+</span> <span class="n">solute_charge</span><span class="o">.</span><span class="n">m</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)))</span>
+    
+    <span class="n">rolling_mass</span><span class="o">=</span><span class="mi">0</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">topology</span><span class="o">.</span><span class="n">molecules</span><span class="p">:</span>
+        <span class="n">rolling_mass</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
+    <span class="n">rolling_mass</span> <span class="o">+=</span> <span class="n">nacl_mass</span> <span class="o">*</span> <span class="n">nacl_to_add</span>
+    <span class="n">rolling_mass</span> <span class="o">+=</span> <span class="n">water_mass</span> <span class="o">*</span> <span class="n">water_to_add</span>
+    
+    <span class="c1"># residual monomer to add</span>
+    <span class="n">mass_to_add</span> <span class="o">=</span> <span class="p">(</span><span class="n">rolling_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="o">/</span><span class="mi">1</span><span class="o">-</span><span class="n">residual_monomer</span><span class="p">)</span> <span class="o">*</span> <span class="n">residual_monomer</span>
+    
+    
+    <span class="k">if</span> <span class="s1">&#39;A&#39;</span> <span class="ow">in</span> <span class="n">sequence</span> <span class="ow">and</span> <span class="s1">&#39;B&#39;</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="n">monomers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">A_mass</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">A</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="n">monomers</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">B_mass</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">B</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">A_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">B_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">mass_to_add</span><span class="p">:</span>
+                <span class="n">A_to_add</span> <span class="o">=</span> <span class="n">r</span>
+                <span class="n">B_to_add</span> <span class="o">=</span> <span class="n">r</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="n">residual_monomer_actual</span> <span class="o">=</span> <span class="p">((</span><span class="n">A_to_add</span> <span class="o">*</span> <span class="n">A_mass</span><span class="o">.</span><span class="n">magnitude</span> <span class="o">+</span> <span class="n">B_to_add</span> <span class="o">*</span> <span class="n">B_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span> <span class="o">/</span> <span class="n">rolling_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span>
+        <span class="n">molecules</span> <span class="o">=</span> <span class="p">[</span><span class="n">water</span><span class="p">,</span> <span class="n">na</span><span class="p">,</span> <span class="n">cl</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">]</span>
+        <span class="n">number_of_copies</span><span class="o">=</span><span class="p">[</span><span class="n">water_to_add</span><span class="p">,</span> <span class="n">na_to_add</span><span class="p">,</span> <span class="n">cl_to_add</span><span class="p">,</span> <span class="n">A_to_add</span><span class="p">,</span> <span class="n">B_to_add</span><span class="p">]</span>
+    
+    <span class="k">elif</span> <span class="s1">&#39;A&#39;</span> <span class="ow">in</span> <span class="n">sequence</span> <span class="ow">and</span> <span class="s1">&#39;B&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
+        <span class="n">A</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="n">monomers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">A_mass</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">A</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span>
+        <span class="n">B</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">r</span> <span class="o">*</span> <span class="n">A_mass</span><span class="o">.</span><span class="n">magnitude</span> <span class="o">&lt;=</span> <span class="n">mass_to_add</span><span class="p">:</span>
+                <span class="n">A_to_add</span> <span class="o">=</span> <span class="n">r</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="n">B_to_add</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">residual_monomer_actual</span> <span class="o">=</span> <span class="p">((</span><span class="n">A_to_add</span> <span class="o">*</span> <span class="n">A_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span> <span class="o">/</span> <span class="n">rolling_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span>
+        <span class="n">molecules</span> <span class="o">=</span> <span class="p">[</span><span class="n">water</span><span class="p">,</span> <span class="n">na</span><span class="p">,</span> <span class="n">cl</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">]</span>
+        <span class="n">number_of_copies</span><span class="o">=</span><span class="p">[</span><span class="n">water_to_add</span><span class="p">,</span> <span class="n">na_to_add</span><span class="p">,</span> <span class="n">cl_to_add</span><span class="p">,</span> <span class="n">A_to_add</span><span class="p">,</span> <span class="n">B_to_add</span><span class="p">]</span>
+    
+
+    <span class="k">return</span> <span class="n">molecules</span><span class="p">,</span> <span class="n">number_of_copies</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">box_vectors</span><span class="p">,</span> <span class="n">residual_monomer_actual</span></div>
+
+
+
+
+<span class="c1">#Class object for generic polymer system</span>
+
+<div class="viewcode-block" id="polymer_system">
+<a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system">[docs]</a>
+<span class="k">class</span> <span class="nc">polymer_system</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">openeye</span> <span class="kn">import</span> <span class="n">oechem</span>
+    <span class="kn">from</span> <span class="nn">openff.toolkit.utils.toolkits</span> <span class="kn">import</span> <span class="n">RDKitToolkitWrapper</span><span class="p">,</span> <span class="n">OpenEyeToolkitWrapper</span>
+    <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
+    <span class="kn">from</span> <span class="nn">statistics</span> <span class="kn">import</span> <span class="n">mean</span>
+    <span class="kn">from</span> <span class="nn">rdkit.Chem.Descriptors</span> <span class="kn">import</span> <span class="n">ExactMolWt</span>
+    <span class="kn">from</span> <span class="nn">openff.interchange</span> <span class="kn">import</span> <span class="n">Interchange</span>
+    <span class="kn">from</span> <span class="nn">openff.interchange.components._packmol</span> <span class="kn">import</span> <span class="n">UNIT_CUBE</span><span class="p">,</span> <span class="n">pack_box</span>
+    <span class="kn">from</span> <span class="nn">swiftpol.build</span> <span class="kn">import</span> <span class="n">build_polymer</span><span class="p">,</span> <span class="n">PDI</span><span class="p">,</span> <span class="n">blockiness_gen</span><span class="p">,</span> <span class="n">calculate_box_components</span>
+    <span class="kn">from</span> <span class="nn">openff.units</span> <span class="kn">import</span> <span class="n">unit</span>
+    <span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">AllChem</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">monomer_list</span><span class="p">,</span> <span class="n">reaction</span><span class="p">,</span> <span class="n">length_target</span><span class="p">,</span> <span class="n">num_chains</span><span class="p">,</span> <span class="n">terminals</span><span class="o">=</span><span class="s1">&#39;standard&#39;</span><span class="p">,</span> <span class="n">perc_A_target</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">blockiness_target</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">copolymer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">acceptance</span> <span class="o">=</span> <span class="mi">10</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the polymer system and build the polymer chains.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        monomer_list (list): List of monomers to be used in the polymerization.</span>
+<span class="sd">        reaction (str): The type of reaction to be used for polymerization.</span>
+<span class="sd">        length_target (float): The target length of the polymer chains.</span>
+<span class="sd">        num_chains (int): The number of polymer chains to be generated.</span>
+<span class="sd">        terminals (str, optional): The type of terminal groups to be used. Default is &#39;standard&#39;.</span>
+<span class="sd">        perc_A_target (float, optional): The target percentage of monomer A in the copolymer. Default is 100.</span>
+<span class="sd">        blockiness_target (float, optional): The target blockiness of the copolymer. Default is 1.0.</span>
+<span class="sd">        copolymer (bool, optional): Flag to indicate if the system is a copolymer. Default is False.</span>
+<span class="sd">        acceptance = % deviation of blockiness and A percentage from target values</span>
+
+<span class="sd">        Attributes:</span>
+<span class="sd">        length_target (float): The target length of the polymer chains.</span>
+<span class="sd">        terminals (str): The type of terminal groups used.</span>
+<span class="sd">        blockiness_target (float): The target blockiness of the copolymer.</span>
+<span class="sd">        A_target (float): The target percentage of monomer A in the copolymer.</span>
+<span class="sd">        chains (list): List of polymer chains as OpenFF Molecule objects.</span>
+<span class="sd">        chain_rdkit (list): List of polymer chains as RDKit molecule objects.</span>
+<span class="sd">        lengths (list): List of lengths of the polymer chains.</span>
+<span class="sd">        perc_A_actual (list): List of actual percentages of monomer A in the polymer chains.</span>
+<span class="sd">        B_block_length (float): The average block length of monomer B in the copolymer.</span>
+<span class="sd">        A_block_length (float): The average block length of monomer A in the copolymer.</span>
+<span class="sd">        blockiness_list (list): List of blockiness values for the polymer chains.</span>
+<span class="sd">        mean_blockiness (float): The mean blockiness of the polymer chains.</span>
+<span class="sd">        mol_weight_average (float): The average molecular weight of the polymer chains.</span>
+<span class="sd">        PDI (float): The polydispersity index of the polymer chains.</span>
+<span class="sd">        Mn (float): The number-average molecular weight of the polymer chains.</span>
+<span class="sd">        Mw (float): The weight-average molecular weight of the polymer chains.</span>
+<span class="sd">        num_chains (int): The number of polymer chains generated.</span>
+<span class="sd">        length_average (float): The average length of the polymer chains.</span>
+<span class="sd">        min_length (float): The minimum length of the polymer chains.</span>
+<span class="sd">        max_length (float): The maximum length of the polymer chains.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length_target</span> <span class="o">=</span> <span class="n">length_target</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">terminals</span> <span class="o">=</span> <span class="n">terminals</span>
+        <span class="n">perc_A_actual</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">copolymer</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">blockiness_target</span> <span class="o">=</span> <span class="n">blockiness_target</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">A_target</span> <span class="o">=</span> <span class="n">perc_A_target</span>
+            <span class="k">def</span> <span class="nf">spec</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">blockiness</span><span class="p">):</span> <span class="c1">#Define limits of A percentage and blockiness from input</span>
+                <span class="n">acceptance_dec</span> <span class="o">=</span> <span class="n">acceptance</span><span class="o">/</span><span class="mi">100</span>
+                <span class="n">actual_A</span> <span class="o">=</span> <span class="p">(</span><span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span><span class="o">*</span><span class="mi">100</span>
+                <span class="n">blockiness</span> <span class="o">=</span> <span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">actual_A</span> <span class="o">&gt;</span> <span class="n">perc_A_target</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">acceptance_dec</span><span class="p">)</span> <span class="ow">and</span> <span class="n">actual_A</span> <span class="o">&lt;</span> <span class="n">perc_A_target</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">acceptance_dec</span><span class="p">)</span> <span class="ow">and</span> <span class="n">blockiness</span><span class="o">&gt;</span><span class="n">blockiness_target</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">-</span><span class="n">acceptance_dec</span><span class="p">)</span> <span class="ow">and</span> <span class="n">blockiness</span><span class="o">&lt;</span><span class="n">blockiness_target</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">acceptance_dec</span><span class="p">)</span>
+            
+            <span class="n">blockiness_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">out_of_spec</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">BBL</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">ABL</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">chains</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">chains_rdkit</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">lengths</span> <span class="o">=</span> <span class="p">[]</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">monomers</span> <span class="o">=</span> <span class="n">monomer_list</span>
+        <span class="c1">#First round of building - copolymer</span>
+        <span class="k">if</span> <span class="n">copolymer</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_chains</span><span class="p">):</span>
+                <span class="n">length_actual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">length_target</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+                <span class="n">sequence</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">length_actual</span><span class="p">),),</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="n">perc_A_target</span><span class="o">/</span><span class="mi">100</span><span class="p">,</span><span class="mi">1</span><span class="o">-</span><span class="p">(</span><span class="n">perc_A_target</span><span class="o">/</span><span class="mi">100</span><span class="p">)]))</span>
+                <span class="n">blockiness</span> <span class="o">=</span> <span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">spec</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">blockiness</span><span class="p">)</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+                    <span class="n">pol</span> <span class="o">=</span> <span class="n">build_polymer</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span> <span class="n">monomer_list</span> <span class="o">=</span> <span class="n">monomer_list</span><span class="p">,</span> <span class="n">reaction</span> <span class="o">=</span> <span class="n">reaction</span><span class="p">,</span> <span class="n">terminal</span><span class="o">=</span><span class="n">terminals</span><span class="p">)</span>
+                    <span class="n">lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">length_actual</span><span class="p">))</span>
+                    <span class="n">chains_rdkit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
+                    <span class="n">chain</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
+                    <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+                    <span class="n">perc_A_actual</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
+                    <span class="n">blockiness_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blockiness</span><span class="p">)</span>
+                    <span class="n">BBL</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">ABL</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">)[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out_of_spec</span> <span class="o">+=</span><span class="mi">1</span>
+                <span class="c1">#Second round of building</span>
+                <span class="k">while</span> <span class="n">out_of_spec</span> <span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+                    <span class="n">length_actual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">length_target</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+                    <span class="n">sequence</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">length_actual</span><span class="p">),),</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="n">perc_A_target</span><span class="o">/</span><span class="mi">100</span><span class="p">,</span><span class="mi">1</span><span class="o">-</span><span class="p">(</span><span class="n">perc_A_target</span><span class="o">/</span><span class="mi">100</span><span class="p">)]))</span>
+                    <span class="n">blockiness</span> <span class="o">=</span> <span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">spec</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">blockiness</span><span class="p">)</span><span class="o">==</span><span class="kc">True</span><span class="p">:</span>
+                        <span class="n">pol</span> <span class="o">=</span> <span class="n">build_polymer</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span> <span class="n">monomer_list</span> <span class="o">=</span> <span class="n">monomer_list</span><span class="p">,</span> <span class="n">reaction</span> <span class="o">=</span> <span class="n">reaction</span><span class="p">,</span> <span class="n">terminal</span><span class="o">=</span><span class="n">terminals</span><span class="p">)</span>
+                        <span class="n">lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">length_actual</span><span class="p">))</span>
+                        <span class="n">chains_rdkit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
+                        <span class="n">chain</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
+                        <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+                        <span class="n">perc_A_actual</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
+                        <span class="n">blockiness_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blockiness</span><span class="p">)</span>
+                        <span class="n">BBL</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                        <span class="n">ABL</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">)[</span><span class="mi">2</span><span class="p">])</span>
+                        <span class="n">out_of_spec</span><span class="o">-=</span><span class="mi">1</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">B_block_length</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">BBL</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">A_block_length</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">ABL</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">blockiness_list</span> <span class="o">=</span> <span class="n">blockiness_list</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mean_blockiness</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">blockiness_list</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">perc_A_actual</span> <span class="o">=</span> <span class="n">perc_A_actual</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">A_actual</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">perc_A_actual</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_chains</span><span class="p">):</span>
+                <span class="n">length_actual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">length_target</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">)</span>
+                <span class="n">sequence</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">([</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">length_actual</span><span class="p">),),</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="n">perc_A_target</span><span class="o">/</span><span class="mi">100</span><span class="p">,</span><span class="mi">1</span><span class="o">-</span><span class="p">(</span><span class="n">perc_A_target</span><span class="o">/</span><span class="mi">100</span><span class="p">)]))</span>
+                <span class="n">pol</span> <span class="o">=</span> <span class="n">build_polymer</span><span class="p">(</span><span class="n">sequence</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span> <span class="n">monomer_list</span> <span class="o">=</span> <span class="n">monomer_list</span><span class="p">,</span> <span class="n">reaction</span> <span class="o">=</span> <span class="n">reaction</span><span class="p">,</span> <span class="n">terminal</span><span class="o">=</span><span class="n">terminals</span><span class="p">)</span>
+                <span class="n">lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">length_actual</span><span class="p">))</span>
+                <span class="n">chains_rdkit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
+                <span class="n">chain</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
+                <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+                <span class="n">perc_A_actual</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chains</span> <span class="o">=</span> <span class="n">chains</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;chain&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">chain_rdkit</span> <span class="o">=</span> <span class="n">chains_rdkit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mol_weight_average</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">mean</span><span class="p">([</span><span class="n">ExactMolWt</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chains_rdkit</span><span class="p">]),</span><span class="mi">2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">PDI</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mn</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">Mw</span> <span class="o">=</span> <span class="n">PDI</span><span class="p">(</span><span class="n">chains_rdkit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_chains</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">A_actual</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">perc_A_actual</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">perc_A_actual</span> <span class="o">=</span> <span class="n">perc_A_actual</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">length_average</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lengths</span> <span class="o">=</span> <span class="n">lengths</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_length</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
+
+
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;System built!, size =&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_chains</span><span class="p">)</span>
+
+<div class="viewcode-block" id="polymer_system.generate_conformers">
+<a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.generate_conformers">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_conformers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate conformers for each polymer chain in the system.</span>
+
+<span class="sd">        This method uses the OpenFF toolkit to generate conformers for each polymer chain in the system. </span>
+<span class="sd">        It first checks if the OpenEye toolkit is licensed and available. If it is, it uses the OpenEyeToolkitWrapper </span>
+<span class="sd">        to generate conformers. Otherwise, it falls back to using the RDKitToolkitWrapper. Each chain is processed </span>
+<span class="sd">        to generate a single conformer, and unique atom names are assigned to each chain.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">        ImportError: If neither RDKit nor OpenEye toolkits are available.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.toolkit.utils.toolkits</span> <span class="kn">import</span> <span class="n">RDKitToolkitWrapper</span><span class="p">,</span> <span class="n">OpenEyeToolkitWrapper</span>
+        <span class="c1"># Generate conformers using OpenFF toolkit wrapper</span>
+        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
+            <span class="n">num</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">oechem</span><span class="o">.</span><span class="n">OEChemIsLicensed</span><span class="p">():</span>
+                <span class="nb">object</span> <span class="o">=</span> <span class="n">OpenEyeToolkitWrapper</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">object</span> <span class="o">=</span> <span class="n">RDKitToolkitWrapper</span><span class="p">()</span>
+            <span class="nb">object</span><span class="o">.</span><span class="n">generate_conformers</span><span class="p">(</span><span class="n">molecule</span><span class="o">=</span><span class="n">chain</span><span class="p">,</span> <span class="n">n_conformers</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">chain</span><span class="o">.</span><span class="n">generate_unique_atom_names</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">[</span><span class="n">num</span><span class="p">]</span> <span class="o">=</span> <span class="n">chain</span></div>
+
+    
+<div class="viewcode-block" id="polymer_system.charge_system">
+<a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.charge_system">[docs]</a>
+    <span class="k">def</span> <span class="nf">charge_system</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assign partial charges to each polymer chain in the system.</span>
+
+<span class="sd">        This method uses the OpenFF NAGL toolkit to assign partial charges to each polymer chain in the system.</span>
+<span class="sd">        It initializes a NAGLToolkitWrapper and assigns partial charges using the &quot;openff-gnn-am1bcc-0.1.0-rc.2.pt&quot; model.</span>
+
+<span class="sd">        The method iterates over each chain in the `self.chains` list and assigns partial charges to the chain.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">        ImportError: If the NAGL toolkit is not available.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.toolkit.utils.nagl_wrapper</span> <span class="kn">import</span> <span class="n">NAGLToolkitWrapper</span>
+        <span class="n">ntkw</span> <span class="o">=</span> <span class="n">NAGLToolkitWrapper</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
+            <span class="n">ntkw</span><span class="o">.</span><span class="n">assign_partial_charges</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="s2">&quot;openff-gnn-am1bcc-0.1.0-rc.2.pt&quot;</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="polymer_system.solvate_system">
+<a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.solvate_system">[docs]</a>
+    <span class="k">def</span> <span class="nf">solvate_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resid_monomer</span><span class="p">,</span> <span class="n">salt_concentration</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&#39;&#39;&#39;Builds solvated system using packmol functions&#39;&#39;&#39;</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.components._packmol</span> <span class="kn">import</span> <span class="n">pack_box</span>
+        <span class="n">monomers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">monomers</span>
+        <span class="n">molecules</span><span class="p">,</span> <span class="n">number_of_copies</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">box_vectors</span><span class="p">,</span> <span class="n">resid_monomer_actual</span> <span class="o">=</span> <span class="n">calculate_box_components</span><span class="p">(</span><span class="n">chains</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">,</span>
+                                                                                                    <span class="n">sequence</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> 
+                                                                                                    <span class="n">residual_monomer</span><span class="o">=</span><span class="n">resid_monomer</span><span class="p">,</span>
+                                                                                                    <span class="n">salt_concentration</span><span class="o">=</span><span class="n">salt_concentration</span><span class="p">,</span>
+                                                                                                    <span class="n">monomers</span> <span class="o">=</span> <span class="n">monomers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residual_monomer</span> <span class="o">=</span> <span class="n">resid_monomer_actual</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">solvent_comp</span> <span class="o">=</span> <span class="n">molecules</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_copies_solvent</span> <span class="o">=</span> <span class="n">number_of_copies</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">box_vectors</span> <span class="o">=</span> <span class="n">box_vectors</span>
+        <span class="n">solvated_system</span> <span class="o">=</span> <span class="n">pack_box</span><span class="p">(</span><span class="n">molecules</span><span class="o">=</span><span class="n">molecules</span><span class="p">,</span>
+                                    <span class="n">number_of_copies</span><span class="o">=</span><span class="n">number_of_copies</span><span class="p">,</span>
+                                    <span class="n">solute</span> <span class="o">=</span> <span class="n">topology</span><span class="p">,</span>
+                                    <span class="n">box_vectors</span><span class="o">=</span><span class="n">box_vectors</span><span class="p">,</span>
+                                    <span class="n">center_solute</span><span class="o">=</span><span class="s1">&#39;BRICK&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">solvated_system</span></div>
+
+    
+    
+
+
+<div class="viewcode-block" id="polymer_system.build_bulk">
+<a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.build_bulk">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_bulk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">resid_monomer</span><span class="p">,</span> <span class="n">salt_concentration</span><span class="o">=</span><span class="mi">0</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">mole</span> <span class="o">/</span> <span class="n">unit</span><span class="o">.</span><span class="n">liter</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Build a bulk system using packmol functions.</span>
+
+<span class="sd">        This method constructs a bulk system by packing the polymer chains into a box using the packmol algorithm.</span>
+<span class="sd">        It calculates the topology from the polymer chains, determines the maximum distance between points in the </span>
+<span class="sd">        solute to set the box size, and then uses the `pack_box` function to create the bulk system.</span>
+
+<span class="sd">        Parameters:</span>
+<span class="sd">        resid_monomer (str): The residual monomer to be used in the system.</span>
+<span class="sd">        salt_concentration (Quantity, optional): The concentration of salt to be added to the system. </span>
+<span class="sd">                                                   Defaults to 0 mole/liter.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">        bulk_system: The bulk system generated by packmol.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">        ImportError: If the OpenFF Interchange toolkit is not available.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">solute_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">_max_dist_between_points</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">to_topology</span><span class="p">()</span><span class="o">.</span><span class="n">get_positions</span><span class="p">())</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">)))</span>
+        <span class="n">box_vectors</span> <span class="o">=</span> <span class="n">UNIT_CUBE</span> <span class="o">*</span> <span class="n">solute_length</span>
+        <span class="n">bulk_system</span> <span class="o">=</span> <span class="n">pack_box</span><span class="p">(</span><span class="n">molecules</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">,</span>
+                                <span class="n">number_of_copies</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">))],</span>
+                                <span class="n">box_shape</span><span class="o">=</span><span class="n">UNIT_CUBE</span><span class="p">,</span>
+                                <span class="n">box_vectors</span><span class="o">=</span><span class="n">box_vectors</span><span class="p">,</span>
+                                <span class="n">center_solute</span><span class="o">=</span><span class="s1">&#39;BRICK&#39;</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="n">bulk_system</span></div>
+</div>
+
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hannah Turney. Project structure based on the Computational Molecular Science Python Cookiecutter version 1.1.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

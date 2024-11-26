@@ -1,0 +1,1144 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openff.interchange.components.interchange &mdash; swiftpol  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            swiftpol
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html#getting-started-with-swiftpol">Getting Started with Swiftpol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html#module-swiftpol.build">swiftpol.build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html#swiftpol-parameterize">swiftpol.parameterize</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">swiftpol</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openff.interchange.components.interchange</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openff.interchange.components.interchange</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;An object for storing, manipulating, and converting molecular mechanics data.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">overload</span>
+
+<span class="kn">from</span> <span class="nn">openff.toolkit</span> <span class="kn">import</span> <span class="n">ForceField</span><span class="p">,</span> <span class="n">Molecule</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">,</span> <span class="n">Topology</span><span class="p">,</span> <span class="n">unit</span>
+<span class="kn">from</span> <span class="nn">openff.utilities.utilities</span> <span class="kn">import</span> <span class="n">has_package</span><span class="p">,</span> <span class="n">requires_package</span>
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">Field</span>
+
+<span class="kn">from</span> <span class="nn">openff.interchange._annotations</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">PositiveFloat</span><span class="p">,</span>
+    <span class="n">_BoxQuantity</span><span class="p">,</span>
+    <span class="n">_PositionsQuantity</span><span class="p">,</span>
+    <span class="n">_VelocityQuantity</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">openff.interchange._experimental</span> <span class="kn">import</span> <span class="n">experimental</span>
+<span class="kn">from</span> <span class="nn">openff.interchange.common._nonbonded</span> <span class="kn">import</span> <span class="n">ElectrostaticsCollection</span><span class="p">,</span> <span class="n">vdWCollection</span>
+<span class="kn">from</span> <span class="nn">openff.interchange.common._valence</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AngleCollection</span><span class="p">,</span>
+    <span class="n">BondCollection</span><span class="p">,</span>
+    <span class="n">ImproperTorsionCollection</span><span class="p">,</span>
+    <span class="n">ProperTorsionCollection</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">openff.interchange.components.mdconfig</span> <span class="kn">import</span> <span class="n">MDConfig</span>
+<span class="kn">from</span> <span class="nn">openff.interchange.components.potentials</span> <span class="kn">import</span> <span class="n">Collection</span><span class="p">,</span> <span class="n">_AnnotatedCollections</span>
+<span class="kn">from</span> <span class="nn">openff.interchange.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">MissingParameterHandlerError</span><span class="p">,</span>
+    <span class="n">MissingPositionsError</span><span class="p">,</span>
+    <span class="n">UnsupportedExportError</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">openff.interchange.operations.minimize</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">_DEFAULT_ENERGY_MINIMIZATION_TOLERANCE</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">openff.interchange.pydantic</span> <span class="kn">import</span> <span class="n">_BaseModel</span>
+<span class="kn">from</span> <span class="nn">openff.interchange.serialization</span> <span class="kn">import</span> <span class="n">_AnnotatedTopology</span>
+<span class="kn">from</span> <span class="nn">openff.interchange.smirnoff</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">SMIRNOFFConstraintCollection</span><span class="p">,</span>
+    <span class="n">SMIRNOFFVirtualSiteCollection</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">openff.interchange.smirnoff._gbsa</span> <span class="kn">import</span> <span class="n">SMIRNOFFGBSACollection</span>
+<span class="kn">from</span> <span class="nn">openff.interchange.warnings</span> <span class="kn">import</span> <span class="n">InterchangeDeprecationWarning</span>
+
+<span class="k">if</span> <span class="n">has_package</span><span class="p">(</span><span class="s2">&quot;foyer&quot;</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">foyer.forcefield</span> <span class="kn">import</span> <span class="n">Forcefield</span> <span class="k">as</span> <span class="n">FoyerForcefield</span>
+<span class="k">if</span> <span class="n">has_package</span><span class="p">(</span><span class="s2">&quot;nglview&quot;</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">nglview</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">openmm</span>
+    <span class="kn">import</span> <span class="nn">openmm.app</span>
+
+
+<span class="k">class</span> <span class="nc">Interchange</span><span class="p">(</span><span class="n">_BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A object for storing, manipulating, and converting molecular mechanics data.</span>
+
+<span class="sd">    .. warning :: This API is not stable and subject to change.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    Create an ``Interchange`` from an OpenFF ``ForceField`` and ``Molecule``</span>
+
+<span class="sd">    &gt;&gt;&gt; from openff.toolkit import ForceField, Molecule</span>
+<span class="sd">    &gt;&gt;&gt; sage = ForceField(&quot;openff-2.2.0.offxml&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; top = Molecule.from_smiles(&quot;CCC&quot;).to_topology()</span>
+<span class="sd">    &gt;&gt;&gt; interchange = sage.create_interchange(top)</span>
+
+<span class="sd">    Get the parameters for the bond between atoms 0 and 1</span>
+
+<span class="sd">    &gt;&gt;&gt; interchange[&quot;Bonds&quot;][0, 1]</span>
+<span class="sd">    Potential(...)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">collections</span><span class="p">:</span> <span class="n">_AnnotatedCollections</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="nb">dict</span><span class="p">())</span>
+    <span class="n">topology</span><span class="p">:</span> <span class="n">_AnnotatedTopology</span>
+    <span class="n">mdconfig</span><span class="p">:</span> <span class="n">MDConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">box</span><span class="p">:</span> <span class="n">_BoxQuantity</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># Needs shape/OpenMM validation</span>
+    <span class="n">positions</span><span class="p">:</span> <span class="n">_PositionsQuantity</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># Ditto</span>
+    <span class="n">velocities</span><span class="p">:</span> <span class="n">_VelocityQuantity</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>  <span class="c1"># Ditto</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_smirnoff</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">force_field</span><span class="p">:</span> <span class="n">ForceField</span><span class="p">,</span>
+        <span class="n">topology</span><span class="p">:</span> <span class="n">Topology</span> <span class="o">|</span> <span class="nb">list</span><span class="p">[</span><span class="n">Molecule</span><span class="p">],</span>
+        <span class="n">box</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">positions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">charge_from_molecules</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Molecule</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">partial_bond_orders_from_molecules</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Molecule</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">allow_nonintegral_charges</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Interchange&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new object by parameterizing a topology with a SMIRNOFF force field.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        force_field : `openff.toolkit.ForceField`</span>
+<span class="sd">            The force field to parameterize the topology with.</span>
+<span class="sd">        topology : `openff.toolkit.Topology` or `List[openff.toolkit.Molecule]`</span>
+<span class="sd">            The topology to parameterize, or a list of molecules to construct a</span>
+<span class="sd">            topology from and parameterize.</span>
+<span class="sd">        box : `openff.units.Quantity`, optional</span>
+<span class="sd">            The box vectors associated with the ``Interchange``. If ``None``,</span>
+<span class="sd">            box vectors are taken from the topology, if present.</span>
+<span class="sd">        positions : `openff.units.Quantity`, optional</span>
+<span class="sd">            The positions associated with atoms in the input topology. If ``None``,</span>
+<span class="sd">            positions are taken from the molecules in topology, if present on all molecules.</span>
+<span class="sd">        charge_from_molecules : `List[openff.toolkit.molecule.Molecule]`, optional</span>
+<span class="sd">            If specified, partial charges will be taken from the given molecules</span>
+<span class="sd">            instead of being determined by the force field. In either case, charges</span>
+<span class="sd">            on the input topology are ignored.</span>
+<span class="sd">        partial_bond_orders_from_molecules : List[openff.toolkit.molecule.Molecule], optional</span>
+<span class="sd">            If specified, partial bond orders will be taken from the given molecules</span>
+<span class="sd">            instead of being determined by the force field.</span>
+<span class="sd">        allow_nonintegral_charges : bool, optional, default=False</span>
+<span class="sd">            If True, allow molecules to have approximately non-integral charges.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If the ``Molecule`` objects in the ``topology`` argument each contain</span>
+<span class="sd">        conformers, the returned ``Interchange`` object will have its positions</span>
+<span class="sd">        set via concatenating the 0th conformer of each ``Molecule``.</span>
+
+<span class="sd">        If the ``Molecule`` objects in the ``topology`` argument have stored</span>
+<span class="sd">        partial charges, these are ignored and charges are assigned according to</span>
+<span class="sd">        the contents of the force field. To override the force field and use</span>
+<span class="sd">        preset charges, use the ``charge_from_molecules`` argument.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Generate an Interchange object from a single-molecule (OpenFF) topology and</span>
+<span class="sd">        OpenFF 2.0.0 &quot;Sage&quot;</span>
+
+<span class="sd">        .. code-block:: pycon</span>
+
+<span class="sd">            &gt;&gt;&gt; from openff.toolkit import ForceField, Molecule</span>
+<span class="sd">            &gt;&gt;&gt; mol = Molecule.from_smiles(&quot;CC&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; mol.generate_conformers(n_conformers=1)</span>
+<span class="sd">            &gt;&gt;&gt; sage = ForceField(&quot;openff-2.0.0.offxml&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; interchange = sage.create_interchange(mol.to_topology())</span>
+<span class="sd">            &gt;&gt;&gt; interchange</span>
+<span class="sd">            Interchange with 7 collections, non-periodic topology with 8 atoms.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.smirnoff._create</span> <span class="kn">import</span> <span class="n">_create_interchange</span>
+
+        <span class="k">return</span> <span class="n">_create_interchange</span><span class="p">(</span>
+            <span class="n">force_field</span><span class="o">=</span><span class="n">force_field</span><span class="p">,</span>
+            <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
+            <span class="n">box</span><span class="o">=</span><span class="n">box</span><span class="p">,</span>
+            <span class="n">positions</span><span class="o">=</span><span class="n">positions</span><span class="p">,</span>
+            <span class="n">charge_from_molecules</span><span class="o">=</span><span class="n">charge_from_molecules</span><span class="p">,</span>
+            <span class="n">partial_bond_orders_from_molecules</span><span class="o">=</span><span class="n">partial_bond_orders_from_molecules</span><span class="p">,</span>
+            <span class="n">allow_nonintegral_charges</span><span class="o">=</span><span class="n">allow_nonintegral_charges</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">visualize</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;nglview&quot;</span><span class="p">,</span>
+        <span class="n">include_virtual_sites</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;nglview.NGLWidget&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Visualize this Interchange.</span>
+
+<span class="sd">        This currently only uses NGLview. Other engines may be added in the future.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        backend : str, default=&quot;nglview&quot;</span>
+<span class="sd">            The backend to use for visualization. Currently only &quot;nglview&quot; is supported.</span>
+<span class="sd">        include_virtual_sites : bool, default=False</span>
+<span class="sd">            Whether or not to include virtual sites in the visualization.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        widget : nglview.NGLWidget</span>
+<span class="sd">            The NGLWidget containing the visualization.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.toolkit.utils.exceptions</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="n">IncompatibleUnitError</span><span class="p">,</span>
+            <span class="n">MissingConformersError</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="s2">&quot;nglview&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">include_virtual_sites</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visualize_nglview</span><span class="p">(</span><span class="n">include_virtual_sites</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Interchange.topology might have its own positions;</span>
+                <span class="c1"># just use Interchange.positions</span>
+                <span class="n">original_positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">get_positions</span><span class="p">()</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">set_positions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positions</span><span class="p">)</span>
+                    <span class="n">widget</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">visualize</span><span class="p">()</span>
+                <span class="k">except</span> <span class="p">(</span>
+                    <span class="n">MissingConformersError</span><span class="p">,</span>
+                    <span class="n">IncompatibleUnitError</span><span class="p">,</span>
+                    <span class="ne">ValueError</span><span class="p">,</span>
+                <span class="p">)</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">MissingPositionsError</span><span class="p">(</span>
+                        <span class="s2">&quot;Cannot visualize system without positions.&quot;</span><span class="p">,</span>
+                    <span class="p">)</span> <span class="kn">from</span> <span class="nn">error</span>
+
+                <span class="c1"># but don&#39;t modify them long-term</span>
+                <span class="c1"># work around https://github.com/openforcefield/openff-toolkit/issues/1820</span>
+                <span class="k">if</span> <span class="n">original_positions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">set_positions</span><span class="p">(</span><span class="n">original_positions</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">molecules</span><span class="p">:</span>
+                        <span class="n">molecule</span><span class="o">.</span><span class="n">_conformers</span> <span class="o">=</span> <span class="kc">None</span>
+
+                <span class="k">return</span> <span class="n">widget</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">UnsupportedExportError</span>
+
+    <span class="nd">@requires_package</span><span class="p">(</span><span class="s2">&quot;nglview&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_visualize_nglview</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">include_virtual_sites</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;nglview.NGLWidget&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Visualize the system using NGLView via a PDB file.</span>
+
+<span class="sd">        include_virtual_sites : bool, default=False</span>
+<span class="sd">            Whether or not to include virtual sites in the visualization.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">nglview</span>
+
+        <span class="kn">from</span> <span class="nn">openff.interchange.components._viz</span> <span class="kn">import</span> <span class="n">InterchangeNGLViewStructure</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">widget</span> <span class="o">=</span> <span class="n">nglview</span><span class="o">.</span><span class="n">NGLWidget</span><span class="p">(</span>
+                <span class="n">InterchangeNGLViewStructure</span><span class="p">(</span>
+                    <span class="n">interchange</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">ext</span><span class="o">=</span><span class="s2">&quot;pdb&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">representations</span><span class="o">=</span><span class="p">[</span>
+                    <span class="nb">dict</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="s2">&quot;unitcell&quot;</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="nb">dict</span><span class="p">()),</span>
+                <span class="p">],</span>
+            <span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">MissingPositionsError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingPositionsError</span><span class="p">(</span>
+                <span class="s2">&quot;Cannot visualize system without positions.&quot;</span><span class="p">,</span>
+            <span class="p">)</span> <span class="kn">from</span> <span class="nn">error</span>
+
+        <span class="n">widget</span><span class="o">.</span><span class="n">add_representation</span><span class="p">(</span><span class="s2">&quot;line&quot;</span><span class="p">,</span> <span class="n">selection</span><span class="o">=</span><span class="s2">&quot;water&quot;</span><span class="p">)</span>
+        <span class="n">widget</span><span class="o">.</span><span class="n">add_representation</span><span class="p">(</span><span class="s2">&quot;spacefill&quot;</span><span class="p">,</span> <span class="n">selection</span><span class="o">=</span><span class="s2">&quot;ion&quot;</span><span class="p">)</span>
+        <span class="n">widget</span><span class="o">.</span><span class="n">add_representation</span><span class="p">(</span><span class="s2">&quot;cartoon&quot;</span><span class="p">,</span> <span class="n">selection</span><span class="o">=</span><span class="s2">&quot;protein&quot;</span><span class="p">)</span>
+        <span class="n">widget</span><span class="o">.</span><span class="n">add_representation</span><span class="p">(</span>
+            <span class="s2">&quot;licorice&quot;</span><span class="p">,</span>
+            <span class="n">selection</span><span class="o">=</span><span class="s2">&quot;not water and not ion and not protein&quot;</span><span class="p">,</span>
+            <span class="n">radius</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span>
+            <span class="n">multipleBond</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">widget</span>
+
+    <span class="k">def</span> <span class="nf">minimize</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">engine</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;openmm&quot;</span><span class="p">,</span>
+        <span class="n">force_tolerance</span><span class="p">:</span> <span class="n">Quantity</span> <span class="o">=</span> <span class="n">_DEFAULT_ENERGY_MINIMIZATION_TOLERANCE</span><span class="p">,</span>
+        <span class="n">max_iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10_000</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Minimize the energy of the system using an available engine.</span>
+
+<span class="sd">        Updates positions in-place.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        engine : str, default=&quot;openmm&quot;</span>
+<span class="sd">            The engine to use for minimization. Currently only &quot;openmm&quot; is supported.</span>
+<span class="sd">        force_tolerance : openff.units.Quantity, default=10.0 kJ / mol / nm</span>
+<span class="sd">            The force tolerance to run until during energy minimization.</span>
+<span class="sd">        max_iterations : int, default=10_000</span>
+<span class="sd">            The maximum number of iterations to run during energy minimization.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">engine</span> <span class="o">==</span> <span class="s2">&quot;openmm&quot;</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">openff.interchange.operations.minimize.openmm</span> <span class="kn">import</span> <span class="n">minimize_openmm</span>
+
+            <span class="n">minimized_positions</span> <span class="o">=</span> <span class="n">minimize_openmm</span><span class="p">(</span>
+                <span class="bp">self</span><span class="p">,</span>
+                <span class="n">tolerance</span><span class="o">=</span><span class="n">force_tolerance</span><span class="p">,</span>
+                <span class="n">max_iterations</span><span class="o">=</span><span class="n">max_iterations</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="o">=</span> <span class="n">minimized_positions</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Engine </span><span class="si">{</span><span class="n">engine</span><span class="si">}</span><span class="s2"> is not implemented.&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include_virtual_sites</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Quantity</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the positions associated with this Interchange.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        include_virtual_sites : bool, default=True</span>
+<span class="sd">            Include virtual sites in the returned positions.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        positions : openff.units.Quantity</span>
+<span class="sd">            The positions of the atoms in the system.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.interop.common</span> <span class="kn">import</span> <span class="n">_to_positions</span>
+
+        <span class="k">return</span> <span class="n">_to_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">include_virtual_sites</span><span class="o">=</span><span class="n">include_virtual_sites</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_gromacs</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">decimal</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+        <span class="n">hydrogen_mass</span><span class="p">:</span> <span class="n">PositiveFloat</span> <span class="o">=</span> <span class="mf">1.007947</span><span class="p">,</span>
+        <span class="n">_merge_atom_types</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export this Interchange object to GROMACS files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prefix: str</span>
+<span class="sd">            The prefix to use for the GROMACS topology and coordinate files, i.e. &quot;foo&quot; will produce</span>
+<span class="sd">            &quot;foo.top&quot;, &quot;foo.gro&quot;, and &quot;foo_pointenergy.mdp&quot;.</span>
+<span class="sd">        decimal: int, default=3</span>
+<span class="sd">            The number of decimal places to use when writing the GROMACS coordinate file.</span>
+<span class="sd">        hydrogen_mass : PostitiveFloat, default=1.007947</span>
+<span class="sd">            The mass to use for hydrogen atoms if not present in the topology. If non-trivially different</span>
+<span class="sd">            than the default value, mass will be transferred from neighboring heavy atoms. Note that this is currently</span>
+<span class="sd">            not applied to any waters and is unsupported when virtual sites are present.</span>
+<span class="sd">        _merge_atom_types: bool, default = False</span>
+<span class="sd">            The flag to define behaviour of GROMACSWriter. If True, then similar atom types will be merged.</span>
+<span class="sd">            If False, each atom will have its own atom type.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Molecule names in written files are not guaranteed to match the `Moleclue.name` attribute of the</span>
+<span class="sd">        molecules in the topology, especially if they are empty strings or not unique.</span>
+
+<span class="sd">        See :py:meth:`to_gro &lt;Interchange.to_gro&gt;` and :py:meth:`to_top &lt;Interchange.to_top&gt;` for more details.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.interop.gromacs.export._export</span> <span class="kn">import</span> <span class="n">GROMACSWriter</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.smirnoff._gromacs</span> <span class="kn">import</span> <span class="n">_convert</span>
+
+        <span class="n">writer</span> <span class="o">=</span> <span class="n">GROMACSWriter</span><span class="p">(</span>
+            <span class="n">system</span><span class="o">=</span><span class="n">_convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hydrogen_mass</span><span class="o">=</span><span class="n">hydrogen_mass</span><span class="p">),</span>
+            <span class="n">top_file</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;.top&quot;</span><span class="p">,</span>
+            <span class="n">gro_file</span><span class="o">=</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;.gro&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">writer</span><span class="o">.</span><span class="n">to_top</span><span class="p">(</span><span class="n">_merge_atom_types</span><span class="o">=</span><span class="n">_merge_atom_types</span><span class="p">)</span>
+        <span class="n">writer</span><span class="o">.</span><span class="n">to_gro</span><span class="p">(</span><span class="n">decimal</span><span class="o">=</span><span class="n">decimal</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">to_mdp</span><span class="p">(</span><span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;_pointenergy.mdp&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_mdp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write a GROMACS run configuration ``.MDP`` file for a single-point energy.</span>
+
+<span class="sd">        GROMACS considers many of the simulation parameters specified by an</span>
+<span class="sd">        ``Interchange`` to be run configuration options rather than features of</span>
+<span class="sd">        the topology. These options are set in the ``.MDP`` file. The written</span>
+<span class="sd">        ``.MDP`` file includes the appropriate non-bonded configuration for the</span>
+<span class="sd">        ``Interchange``. The ``nsteps``, ``nstenergy``, and ``continuation``</span>
+<span class="sd">        configuration values are configured for a single-point energy</span>
+<span class="sd">        calculation and may be changed as appropriate to perform other</span>
+<span class="sd">        calculations. See the `GROMACS documentation`_ for details.</span>
+
+<span class="sd">        .. _GROMACS documentation: https://manual.gromacs.org/documentation/\</span>
+<span class="sd">        current/user-guide/mdp-options.html</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file_path</span>
+<span class="sd">            The path to the created GROMACS ``.MDP`` file</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mdconfig</span> <span class="o">=</span> <span class="n">MDConfig</span><span class="o">.</span><span class="n">from_interchange</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">mdconfig</span><span class="o">.</span><span class="n">write_mdp_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">to_top</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">hydrogen_mass</span><span class="p">:</span> <span class="n">PositiveFloat</span> <span class="o">=</span> <span class="mf">1.007947</span><span class="p">,</span>
+        <span class="n">_merge_atom_types</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export this Interchange to a GROMACS topology file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file_path</span>
+<span class="sd">            The path to the GROMACS topology file to write.</span>
+<span class="sd">        hydrogen_mass : PostitiveFloat, default=1.007947</span>
+<span class="sd">            The mass to use for hydrogen atoms if not present in the topology. If non-trivially different</span>
+<span class="sd">            than the default value, mass will be transferred from neighboring heavy atoms. Note that this is currently</span>
+<span class="sd">            not applied to any waters and is unsupported when virtual sites are present.</span>
+<span class="sd">        _merge_atom_types: book, default=False</span>
+<span class="sd">            The flag to define behaviour of GROMACSWriter. If True, then similar atom types will be merged.</span>
+<span class="sd">            If False, each atom will have its own atom type.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Molecule names in written files are not guaranteed to match the `Moleclue.name` attribute of the</span>
+<span class="sd">        molecules in the topology, especially if they are empty strings or not unique.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.interop.gromacs.export._export</span> <span class="kn">import</span> <span class="n">GROMACSWriter</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.smirnoff._gromacs</span> <span class="kn">import</span> <span class="n">_convert</span>
+
+        <span class="n">GROMACSWriter</span><span class="p">(</span>
+            <span class="n">system</span><span class="o">=</span><span class="n">_convert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hydrogen_mass</span><span class="o">=</span><span class="n">hydrogen_mass</span><span class="p">),</span>
+            <span class="n">top_file</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">to_top</span><span class="p">(</span><span class="n">_merge_atom_types</span><span class="o">=</span><span class="n">_merge_atom_types</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_gro</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">decimal</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export this Interchange object to a GROMACS coordinate file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file_path: Path | str</span>
+<span class="sd">            The path to the GROMACS coordinate file to write.</span>
+<span class="sd">        decimal: int, default=3</span>
+<span class="sd">            The number of decimal places to use when writing the GROMACS coordinate file.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+
+<span class="sd">        Residue IDs must be positive integers (or string representations thereof).</span>
+
+<span class="sd">        Residue IDs greater than 99,999 are reduced modulo 100,000 in line with common GROMACS practice.</span>
+
+<span class="sd">        Residue names and IDs from the topology are used, if present, and otherwise are generated internally.</span>
+
+<span class="sd">        Behavior when some, but not all, residue names and IDs are present in the topology is undefined.</span>
+
+<span class="sd">        If residue IDs are generated internally, they are assigned sequentially to each molecule starting at 1.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.interop.gromacs.export._export</span> <span class="kn">import</span> <span class="n">GROMACSWriter</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.smirnoff._gromacs</span> <span class="kn">import</span> <span class="n">_convert</span>
+
+        <span class="c1"># TODO: Write the coordinates without the full conversion</span>
+        <span class="n">GROMACSWriter</span><span class="p">(</span>
+            <span class="n">system</span><span class="o">=</span><span class="n">_convert</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
+            <span class="n">gro_file</span><span class="o">=</span><span class="n">file_path</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">to_gro</span><span class="p">(</span><span class="n">decimal</span><span class="o">=</span><span class="n">decimal</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_lammps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export this ``Interchange`` to LAMMPS data and run input files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+
+<span class="sd">        prefix</span>
+<span class="sd">            The prefix to use for the LAMMPS data and run input files. For</span>
+<span class="sd">            example, &quot;foo&quot; will produce files named &quot;foo.lmp&quot; and</span>
+<span class="sd">            &quot;foo_pointenergy.in&quot;.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+        <span class="n">datafile_path</span> <span class="o">=</span> <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;.lmp&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">to_lammps_datafile</span><span class="p">(</span><span class="n">datafile_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">to_lammps_input</span><span class="p">(</span>
+            <span class="n">prefix</span> <span class="o">+</span> <span class="s2">&quot;_pointenergy.in&quot;</span><span class="p">,</span>
+            <span class="n">datafile_path</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_lammps_datafile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export this Interchange to a LAMMPS data file.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.interop.lammps</span> <span class="kn">import</span> <span class="n">to_lammps</span>
+
+        <span class="n">to_lammps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_lammps_input</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">data_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write a LAMMPS run input file for a single-point energy calculation.</span>
+
+<span class="sd">        LAMMPS considers many of the simulation parameters specified by an</span>
+<span class="sd">        ``Interchange`` to be run configuration options rather than features of</span>
+<span class="sd">        the force field. These options are set in the run input file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        file_path</span>
+<span class="sd">            The path to the created LAMMPS run input file</span>
+<span class="sd">        data_file</span>
+<span class="sd">            The path to the LAMMPS data file that should be read by the input</span>
+<span class="sd">            file. If not given, ``file_path`` with the extension ``.lmp`` will</span>
+<span class="sd">            be used.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">data_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data_file</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.lmp&quot;</span><span class="p">)</span>
+
+        <span class="n">mdconfig</span> <span class="o">=</span> <span class="n">MDConfig</span><span class="o">.</span><span class="n">from_interchange</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">mdconfig</span><span class="o">.</span><span class="n">write_lammps_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="p">),</span> <span class="n">data_file</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">data_file</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">to_openmm_system</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">combine_nonbonded_forces</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">add_constrained_forces</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">ewald_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">,</span>
+        <span class="n">hydrogen_mass</span><span class="p">:</span> <span class="n">PositiveFloat</span> <span class="o">=</span> <span class="mf">1.007947</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export this Interchange to an OpenMM System.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        combine_nonbonded_forces : bool, default=True</span>
+<span class="sd">            If True, an attempt will be made to combine all non-bonded interactions into a single</span>
+<span class="sd">            openmm.NonbondedForce.</span>
+<span class="sd">            If False, non-bonded interactions will be split across multiple forces.</span>
+<span class="sd">        add_constrained_forces : bool, default=False,</span>
+<span class="sd">            If True, add valence forces that might be overridden by constraints, i.e. call `addBond` or `addAngle`</span>
+<span class="sd">            on a bond or angle that is fully constrained.</span>
+<span class="sd">        ewald_tolerance : float, default=1e-4</span>
+<span class="sd">            The value passed to `NonbondedForce.setEwaldErrorTolerance`</span>
+<span class="sd">        hydrogen_mass : PostitiveFloat, default=1.007947</span>
+<span class="sd">            The mass to use for hydrogen atoms if not present in the topology. If non-trivially different</span>
+<span class="sd">            than the default value, mass will be transferred from neighboring heavy atoms. Note that this is currently</span>
+<span class="sd">            not applied to any waters and is unsupported when virtual sites are present.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        system : openmm.System</span>
+<span class="sd">            The OpenMM System object.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        There are some sharp edges and quirks when using this method. Be aware of some documented</span>
+<span class="sd">        issues in the :doc:`/using/edges` section of the user guide. If you encounter surprising</span>
+<span class="sd">        behavior that is not documented, please raise an issue.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.interop.openmm</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="n">to_openmm_system</span> <span class="k">as</span> <span class="n">_to_openmm_system</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">_to_openmm_system</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">combine_nonbonded_forces</span><span class="o">=</span><span class="n">combine_nonbonded_forces</span><span class="p">,</span>
+            <span class="n">add_constrained_forces</span><span class="o">=</span><span class="n">add_constrained_forces</span><span class="p">,</span>
+            <span class="n">ewald_tolerance</span><span class="o">=</span><span class="n">ewald_tolerance</span><span class="p">,</span>
+            <span class="n">hydrogen_mass</span><span class="o">=</span><span class="n">hydrogen_mass</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_openmm</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_openmm_system</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_openmm_topology</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">collate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">ensure_unique_atom_names</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bool</span> <span class="o">=</span> <span class="s2">&quot;residues&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export components of this Interchange to an OpenMM Topology.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        collate</span>
+<span class="sd">            If ``False``, the default, all virtual sites will be added to a</span>
+<span class="sd">            single residue at the end of the topology. If ``True``, virtual</span>
+<span class="sd">            sites will be collated with their associated molecule and added to</span>
+<span class="sd">            the residue of the last atom in the molecule they belong to.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.interop.openmm._topology</span> <span class="kn">import</span> <span class="n">to_openmm_topology</span>
+
+        <span class="k">return</span> <span class="n">to_openmm_topology</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span>
+            <span class="n">collate</span><span class="o">=</span><span class="n">collate</span><span class="p">,</span>
+            <span class="n">ensure_unique_atom_names</span><span class="o">=</span><span class="n">ensure_unique_atom_names</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_openmm_simulation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">integrator</span><span class="p">:</span> <span class="s2">&quot;openmm.Integrator&quot;</span><span class="p">,</span>
+        <span class="n">combine_nonbonded_forces</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">add_constrained_forces</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">ewald_tolerance</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">,</span>
+        <span class="n">hydrogen_mass</span><span class="p">:</span> <span class="n">PositiveFloat</span> <span class="o">=</span> <span class="mf">1.007947</span><span class="p">,</span>
+        <span class="n">additional_forces</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="s2">&quot;openmm.Force&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(),</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;openmm.app.simulation.Simulation&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export this Interchange to an OpenMM ``Simulation`` object.</span>
+
+<span class="sd">        A :py:class:`Simulation &lt;openmm.app.simulation.Simulation&gt;` encapsulates</span>
+<span class="sd">        all the information needed for a typical OpenMM simulation into a single</span>
+<span class="sd">        object with a simple API.</span>
+
+<span class="sd">        Positions are set on the ``Simulation`` if present on the</span>
+<span class="sd">        ``Interchange``.</span>
+
+<span class="sd">        Additional forces, such as a barostat, should be added with the</span>
+<span class="sd">        ``additional_forces`` argument to avoid having to re-initialize</span>
+<span class="sd">        the ``Context``. Re-initializing the ``Context`` after adding a</span>
+<span class="sd">        ``Force`` is necessary due to `implementation details`_</span>
+<span class="sd">        in OpenMM.</span>
+
+<span class="sd">        .. _implementation details: https://github.com/openmm/openmm/wiki/Frequently-Asked-Questions#why-does-it-ignore-changes-i-make-to-a-system-or-force</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        integrator : subclass of openmm.Integrator</span>
+<span class="sd">            The integrator to use for the simulation.</span>
+<span class="sd">        combine_nonbonded_forces : bool, default=False</span>
+<span class="sd">            If True, an attempt will be made to combine all non-bonded interactions into a single</span>
+<span class="sd">            openmm.NonbondedForce.</span>
+<span class="sd">            If False, non-bonded interactions will be split across multiple forces.</span>
+<span class="sd">        add_constrained_forces : bool, default=False,</span>
+<span class="sd">            If True, add valence forces that might be overridden by constraints, i.e. call `addBond` or `addAngle`</span>
+<span class="sd">            on a bond or angle that is fully constrained.</span>
+<span class="sd">        ewald_tolerance : float, default=1e-4</span>
+<span class="sd">            The value passed to `NonbondedForce.setEwaldErrorTolerance`</span>
+<span class="sd">        hydrogen_mass : PostitiveFloat, default=1.007947</span>
+<span class="sd">            The mass to use for hydrogen atoms if not present in the topology. If non-trivially different</span>
+<span class="sd">            than the default value, mass will be transferred from neighboring heavy atoms. Note that this is currently</span>
+<span class="sd">            not applied to any waters and is unsupported when virtual sites are present.</span>
+<span class="sd">        additional_forces : Iterable[openmm.Force], default=tuple()</span>
+<span class="sd">            Additional forces to be added to the system, e.g. barostats, that are not</span>
+<span class="sd">            added by the force field.</span>
+<span class="sd">        **kwargs</span>
+<span class="sd">            Further keyword parameters are passed on to</span>
+<span class="sd">            :py:meth:`Simulation.__init__() &lt;openmm.app.simulation.Simulation.__init__&gt;`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        simulation : openmm.app.Simulation</span>
+<span class="sd">            The OpenMM simulation object, possibly with positions set.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+
+<span class="sd">        Create an OpenMM simulation with a Langevin integrator and a Monte Carlo barostat:</span>
+
+<span class="sd">        &gt;&gt;&gt; import openmm</span>
+<span class="sd">        &gt;&gt;&gt; import openmm.unit</span>
+<span class="sd">        &gt;&gt;&gt;</span>
+<span class="sd">        &gt;&gt;&gt; integrator = openmm.LangevinMiddleIntegrator(</span>
+<span class="sd">        ...     293.15 * openmm.unit.kelvin,</span>
+<span class="sd">        ...     1.0 / openmm.unit.picosecond,</span>
+<span class="sd">        ...     2.0 * openmm.unit.femtosecond,</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; barostat = openmm.MonteCarloBarostat(</span>
+<span class="sd">        ...     1.00 * openmm.unit.bar,</span>
+<span class="sd">        ...     293.15 * openmm.unit.kelvin,</span>
+<span class="sd">        ...     25,</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; simulation = interchange.to_openmm_simulation(  # doctest: +SKIP</span>
+<span class="sd">        ...     integrator=integrator,</span>
+<span class="sd">        ...     additional_forces=[barostat],</span>
+<span class="sd">        ... )</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">import</span> <span class="nn">openmm.app</span>
+
+        <span class="n">system</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_openmm_system</span><span class="p">(</span>
+            <span class="n">combine_nonbonded_forces</span><span class="o">=</span><span class="n">combine_nonbonded_forces</span><span class="p">,</span>
+            <span class="n">add_constrained_forces</span><span class="o">=</span><span class="n">add_constrained_forces</span><span class="p">,</span>
+            <span class="n">ewald_tolerance</span><span class="o">=</span><span class="n">ewald_tolerance</span><span class="p">,</span>
+            <span class="n">hydrogen_mass</span><span class="o">=</span><span class="n">hydrogen_mass</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">force</span> <span class="ow">in</span> <span class="n">additional_forces</span><span class="p">:</span>
+            <span class="n">system</span><span class="o">.</span><span class="n">addForce</span><span class="p">(</span><span class="n">force</span><span class="p">)</span>
+
+        <span class="c1"># since we&#39;re adding forces before making a context, we don&#39;t need to</span>
+        <span class="c1"># re-initialize context. In a different order, we would need to:</span>
+        <span class="c1"># https://github.com/openforcefield/openff-interchange/pull/725#discussion_r1210928501</span>
+
+        <span class="n">simulation</span> <span class="o">=</span> <span class="n">openmm</span><span class="o">.</span><span class="n">app</span><span class="o">.</span><span class="n">Simulation</span><span class="p">(</span>
+            <span class="n">topology</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">to_openmm_topology</span><span class="p">(),</span>
+            <span class="n">system</span><span class="o">=</span><span class="n">system</span><span class="p">,</span>
+            <span class="n">integrator</span><span class="o">=</span><span class="n">integrator</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># If the system contains virtual sites, the positions must, so no obvious case in which</span>
+        <span class="c1"># include_virtual_sites could possibly be False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">simulation</span><span class="o">.</span><span class="n">context</span><span class="o">.</span><span class="n">setPositions</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_positions</span><span class="p">(</span><span class="n">include_virtual_sites</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">to_openmm</span><span class="p">(),</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">simulation</span>
+
+    <span class="nd">@requires_package</span><span class="p">(</span><span class="s2">&quot;openmm&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">to_pdb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span> <span class="n">include_virtual_sites</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export this Interchange to a .pdb file.</span>
+
+<span class="sd">        Note that virtual sites are collated into each molecule, which differs from the default</span>
+<span class="sd">        behavior of Interchange.to_openmm_topology.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.interop.openmm</span> <span class="kn">import</span> <span class="n">_to_pdb</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MissingPositionsError</span><span class="p">(</span>
+                <span class="s2">&quot;Positions are required to write a `.pdb` file but found None.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="c1"># TODO: Simply wire `include_virtual_sites` to `to_openmm_{topology|positions}`?</span>
+        <span class="k">if</span> <span class="n">include_virtual_sites</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">openff.interchange.interop._virtual_sites</span> <span class="kn">import</span> <span class="p">(</span>
+                <span class="n">get_positions_with_virtual_sites</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="n">openmm_topology</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_openmm_topology</span><span class="p">(</span>
+                <span class="n">collate</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">ensure_unique_atom_names</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">positions</span> <span class="o">=</span> <span class="n">get_positions_with_virtual_sites</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">openmm_topology</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">to_openmm</span><span class="p">(</span>
+                <span class="n">ensure_unique_atom_names</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">positions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span>
+
+        <span class="n">_to_pdb</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">openmm_topology</span><span class="p">,</span> <span class="n">positions</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">angstrom</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">to_psf</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export this Interchange to a CHARMM-style .psf file.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="n">UnsupportedExportError</span>
+
+    <span class="k">def</span> <span class="nf">to_crd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export this Interchange to a CHARMM-style .crd file.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="n">UnsupportedExportError</span>
+
+    <span class="k">def</span> <span class="nf">to_amber</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prefix</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export this Interchange object to Amber files.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        prefix: str</span>
+<span class="sd">            The prefix to use for the Amber parameter/topology, coordinate, and run files, i.e.</span>
+<span class="sd">            &quot;foo&quot; will produce &quot;foo.top&quot;, &quot;foo.gro&quot;, and &quot;foo_pointenergy.in&quot;.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        The run input file is configured for a single-point energy calculation with sander. It is</span>
+<span class="sd">        likely portable to pmemd with little or no work.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">to_prmtop</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">.prmtop&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">to_inpcrd</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">.inpcrd&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">to_sander_input</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">prefix</span><span class="si">}</span><span class="s2">_pointenergy.in&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_prmtop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export this Interchange to an Amber .prmtop file.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.interop.amber</span> <span class="kn">import</span> <span class="n">to_prmtop</span>
+
+        <span class="n">to_prmtop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_inpcrd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Export this Interchange to an Amber .inpcrd file.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.interop.amber</span> <span class="kn">import</span> <span class="n">to_inpcrd</span>
+
+        <span class="n">to_inpcrd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">to_sander_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export this ``Interchange`` to a run input file for Amber&#39;s SANDER engine.</span>
+
+<span class="sd">        Amber considers many of the simulation parameters specified by an</span>
+<span class="sd">        ``Interchange`` to be run configuration options rather than parameters</span>
+<span class="sd">        of the topology. These options are set in the SANDER or PMEMD run input</span>
+<span class="sd">        file. The written SANDER input file includes the appropriate non-bonded</span>
+<span class="sd">        configuration for the ``Interchange`` which are essential to reproduce</span>
+<span class="sd">        the desired force field. The file also includes configuration for a</span>
+<span class="sd">        single-point energy calculation, which should be modified to produce the</span>
+<span class="sd">        desired simulation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">mdconfig</span> <span class="o">=</span> <span class="n">MDConfig</span><span class="o">.</span><span class="n">from_interchange</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="n">mdconfig</span><span class="o">.</span><span class="n">write_sander_input_file</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">file_path</span><span class="p">))</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="nd">@requires_package</span><span class="p">(</span><span class="s2">&quot;foyer&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">from_foyer</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">force_field</span><span class="p">:</span> <span class="s2">&quot;FoyerForcefield&quot;</span><span class="p">,</span>
+        <span class="n">topology</span><span class="p">:</span> <span class="n">Topology</span><span class="p">,</span>
+        <span class="n">box</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">positions</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Interchange&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an Interchange object from a Foyer force field and an OpenFF topology.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Generate an Interchange object from a single-molecule (OpenFF) topology and</span>
+<span class="sd">        the Foyer implementation of OPLS-AA</span>
+
+<span class="sd">        .. code-block:: pycon</span>
+
+<span class="sd">            &gt;&gt;&gt; from openff.interchange import Interchange</span>
+<span class="sd">            &gt;&gt;&gt; from openff.toolkit import Molecule, Topology</span>
+<span class="sd">            &gt;&gt;&gt; from foyer import Forcefield</span>
+<span class="sd">            &gt;&gt;&gt; mol = Molecule.from_smiles(&quot;CC&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; mol.generate_conformers(n_conformers=1)</span>
+<span class="sd">            &gt;&gt;&gt; top = Topology.from_molecules([mol])</span>
+<span class="sd">            &gt;&gt;&gt; oplsaa = Forcefield(name=&quot;oplsaa&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; interchange = Interchange.from_foyer(topology=top, force_field=oplsaa)</span>
+<span class="sd">            &gt;&gt;&gt; interchange</span>
+<span class="sd">            Interchange with 8 collections, non-periodic topology with 8 atoms.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.foyer._create</span> <span class="kn">import</span> <span class="n">_create_interchange</span>
+
+        <span class="k">return</span> <span class="n">_create_interchange</span><span class="p">(</span>
+            <span class="n">force_field</span><span class="o">=</span><span class="n">force_field</span><span class="p">,</span>
+            <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
+            <span class="n">box</span><span class="o">=</span><span class="n">box</span><span class="p">,</span>
+            <span class="n">positions</span><span class="o">=</span><span class="n">positions</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="nd">@experimental</span>
+    <span class="k">def</span> <span class="nf">from_gromacs</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">topology_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">gro_file</span><span class="p">:</span> <span class="n">Path</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Interchange&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an Interchange object from GROMACS files.</span>
+
+<span class="sd">        .. warning :: This method is experimental and not officially suitable for production.</span>
+<span class="sd">        .. warning :: This API is not stable and subject to change.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        topology_file : Path | str</span>
+<span class="sd">            The path to a GROMACS topology file.</span>
+<span class="sd">        gro_file : Path | str</span>
+<span class="sd">            The path to a GROMACS coordinate file.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        interchange : Interchange</span>
+<span class="sd">            An Interchange object representing the contents of the GROMACS files.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        Bond parameters may not correctly be parsed, such as when using SMIRNOFF</span>
+<span class="sd">        force fields with hydrogen bond constraints.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.interop.gromacs._import._import</span> <span class="kn">import</span> <span class="n">from_files</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.interop.gromacs._interchange</span> <span class="kn">import</span> <span class="n">to_interchange</span>
+
+        <span class="k">return</span> <span class="n">to_interchange</span><span class="p">(</span>
+            <span class="n">from_files</span><span class="p">(</span>
+                <span class="n">top_file</span><span class="o">=</span><span class="n">topology_file</span><span class="p">,</span>
+                <span class="n">gro_file</span><span class="o">=</span><span class="n">gro_file</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_openmm</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">system</span><span class="p">:</span> <span class="s2">&quot;openmm.System&quot;</span><span class="p">,</span>
+        <span class="n">topology</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;openmm.app.Topology&quot;</span><span class="p">,</span> <span class="n">Topology</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">positions</span><span class="p">:</span> <span class="n">Quantity</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">box_vectors</span><span class="p">:</span> <span class="n">Quantity</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Interchange&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an Interchange object from OpenMM objects.</span>
+
+<span class="sd">        .. warning :: This API is not stable and subject to change.</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        If (topological) bonds in water are missing (physics) parameters, as is often the case with</span>
+<span class="sd">        rigid water, these parameters will be filled in with values of 1 Angstrom equilibrium bond</span>
+<span class="sd">        length and a default force constant of 50,000 kcal/mol/A^2, representing an arbitrarily</span>
+<span class="sd">        stiff harmonic bond, and angle parameters of 104.5 degrees and 1.0 kcal/mol/rad^2,</span>
+<span class="sd">        representing an arbitrarily harmonic angle. It is expected that these values will be</span>
+<span class="sd">        overwritten by runtime MD options.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        system : openmm.System</span>
+<span class="sd">            The OpenMM system.</span>
+<span class="sd">        topology : openmm.app.Topology, optional</span>
+<span class="sd">            The OpenMM topology.</span>
+<span class="sd">        positions : openmm.unit.Quantity or openff.units.Quantity, optional</span>
+<span class="sd">            The positions of particles in this system and/or topology.</span>
+<span class="sd">        box_vectors : openmm.unit.Quantity or openff.units.Quantity, optional</span>
+<span class="sd">            The vectors of the simulation box associated with this system and/or topology.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        interchange : Interchange</span>
+<span class="sd">            An Interchange object representing the contents of the OpenMM objects.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.interop.openmm._import._import</span> <span class="kn">import</span> <span class="n">from_openmm</span>
+
+        <span class="k">return</span> <span class="n">from_openmm</span><span class="p">(</span>
+            <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
+            <span class="n">system</span><span class="o">=</span><span class="n">system</span><span class="p">,</span>
+            <span class="n">positions</span><span class="o">=</span><span class="n">positions</span><span class="p">,</span>
+            <span class="n">box_vectors</span><span class="o">=</span><span class="n">box_vectors</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_parameters</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">handler_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">atom_indices</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get parameter values of a specific potential.</span>
+
+<span class="sd">        Here, parameters are expected to be uniquely dfined by the name of</span>
+<span class="sd">        its associated handler and a tuple of atom indices.</span>
+
+<span class="sd">        Note: This method only checks for equality of atom indices and will likely fail on complex cases</span>
+<span class="sd">        involved layered parameters with multiple topology keys sharing identical atom indices.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">handler</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collections</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">handler</span> <span class="o">==</span> <span class="n">handler_name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">handler_name</span><span class="p">]</span><span class="o">.</span><span class="n">_get_parameters</span><span class="p">(</span><span class="n">atom_indices</span><span class="o">=</span><span class="n">atom_indices</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">MissingParameterHandlerError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Could not find parameter handler of name </span><span class="si">{</span><span class="n">handler_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;Bonds&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;BondCollection&quot;</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">item</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;Constraints&quot;</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SMIRNOFFConstraintCollection&quot;</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;Angles&quot;</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;AngleCollection&quot;</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">item</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;vdW&quot;</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;vdWCollection&quot;</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">item</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;ProperTorsions&quot;</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ProperTorsionCollection&quot;</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">item</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;ImproperTorsions&quot;</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ImproperTorsionCollection&quot;</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">item</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;VirtualSites&quot;</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SMIRNOFFVirtualSiteCollection&quot;</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">item</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;Electrostatics&quot;</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ElectrostaticsCollection&quot;</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">item</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;GBSA&quot;</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;SMIRNOFFGBSACollection&quot;</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="nd">@overload</span>
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Collection&quot;</span><span class="p">:</span> <span class="o">...</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Syntax sugar for looking up collections or other components.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Only str arguments can be currently be used for lookups.</span><span class="se">\n</span><span class="s2">Found item </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2"> of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="o">==</span> <span class="s2">&quot;positions&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">positions</span>
+        <span class="k">elif</span> <span class="n">item</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;box&quot;</span><span class="p">,</span> <span class="s2">&quot;box_vectors&quot;</span><span class="p">}:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">box</span>
+        <span class="k">elif</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">collections</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">collections</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Could not find component </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">. This object has the following &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;collections registered:</span><span class="se">\n\t</span><span class="si">{</span><span class="p">[</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">collections</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Interchange&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Interchange&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine two Interchange objects. This method is unstable and not yet safe for general use.&quot;&quot;&quot;</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;The `+` operator is deprecated. Use `Interchange.combine` instead.&quot;</span><span class="p">,</span>
+            <span class="n">InterchangeDeprecationWarning</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="s2">&quot;Interchange&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;Interchange&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine two Interchange objects. This method is unstable and not yet safe for general use.&quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange.operations._combine</span> <span class="kn">import</span> <span class="n">_combine</span>
+
+        <span class="k">return</span> <span class="n">_combine</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">periodic</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">box</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="n">n_atoms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">topology</span><span class="o">.</span><span class="n">n_atoms</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Interchange with </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">collections</span><span class="p">)</span><span class="si">}</span><span class="s2"> collections, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">periodic</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;non-&#39;</span><span class="si">}</span><span class="s2">periodic topology with </span><span class="si">{</span><span class="n">n_atoms</span><span class="si">}</span><span class="s2"> atoms.&quot;</span>
+        <span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hannah Turney. Project structure based on the Computational Molecular Science Python Cookiecutter version 1.1.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
