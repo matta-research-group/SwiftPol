@@ -1,0 +1,75 @@
+name: Swiftpol_tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        # this might remove tools that are actually needed,
+        # if set to "true" but frees about 6 GB
+        tool-cache: false
+        
+        # all of these default to true, but feel free to set to
+        # "false" if necessary for your workflow
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: true
+        swap-storage: true
+
+    - name: Install Miniconda
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        auto-update-conda: true
+        python-version: ${{ matrix.python-version }}
+        use-mamba: true
+
+    - name: Initialize conda
+      shell: bash -l {0}
+      run: conda init bash
+
+    - name: Activate conda environment and install dependencies
+      shell: bash -l {0}
+      run: |
+        source ~/.bashrc
+        conda env create -f Dev_tools/swiftpol.yml
+        conda activate swiftpol
+        python -m pip install --upgrade pip
+        python -m pip install pytest flake8 
+
+    - name: Lint with flake8
+      run: |
+        source ~/.bashrc
+        conda activate swiftpol
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Test with pytest
+      run: |
+        source ~/.bashrc
+        conda activate swiftpol
+        pip install -e .
+        pip install pytest pytest-cov
+        pytest tests/build_tests.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
