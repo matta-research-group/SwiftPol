@@ -35,7 +35,7 @@ jobs:
         conda env create -f Dev_tools/swiftpol.yml
         conda activate swiftpol
         conda install sphinx sphinx_rtd_theme 
-        pip install -e .
+        pip install .
 
     - name: Run build
       shell: bash -l {0}
@@ -47,6 +47,6 @@ jobs:
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
       with:
-        publish_branch: gh-pages
+        publish_branch: docs
         github_token: ${{ secrets.DOCS }}
         publish_dir: ./docs/_build/html 
