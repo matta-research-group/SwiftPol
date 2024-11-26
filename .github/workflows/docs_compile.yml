@@ -57,7 +57,8 @@ jobs:
       run: |
         source ~/.bashrc
         conda activate swiftpol
-        sphinx-build -b html docs/ docs/_build/   
+        cd docs/
+        make html
 
     - name: Deploy
       uses: peaceiris/actions-gh-pages@v3
