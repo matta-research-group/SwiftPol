@@ -31,19 +31,28 @@ from openff.interchange import Interchange
 
 
 #Build polymer - generic
-def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl', chain_num=1):
+def build_polymer(sequence, monomer_list, reaction, terminal='hydroxyl', chain_number=1):
     """
     Constructs a polymer from a given sequence of monomers.
-    
-    Parameters:
-    sequence (str): A string representing the sequence of monomers (e.g., 'ABAB').
-    monomer_list (list): A list of SMILES strings representing the monomers.
-    reaction (rdkit.Chem.rdChemReactions.ChemicalReaction): An RDKit reaction object used to link monomers.
-    terminal (str, optional): The terminal group to be added to the polymer. Options are 'hydroxyl', 'carboxyl', or 'ester'. Default is 'hydroxyl'.
-    chain_number (int, optional): The number of polymer chains to construct. Default is 1. Input used for ensemble build.
-    
-    Returns:
-    rdkit.Chem.rdchem.Mol: The constructed polymer as an RDKit molecule object.
+
+    Parameters
+    ----------
+    sequence : str
+        A string representing the sequence of monomers (e.g., 'ABAB').
+    monomer_list : list
+        A list of SMILES strings representing the monomers.
+    reaction : rdkit.Chem.rdChemReactions.ChemicalReaction
+        An RDKit reaction object used to link monomers.
+    terminal : str, optional
+        The terminal group to be added to the polymer. Options are 'hydroxyl', 'carboxyl', or 'ester'.
+        Default is 'hydroxyl'.
+    chain_number : int, optional
+        The number of polymer chains to construct. Default is 1. Input used for ensemble build.
+
+    Returns
+    -------
+    rdkit.Chem.rdchem.Mol
+        The constructed polymer as an RDKit molecule object.
     """
     from rdkit import RDLogger 
     RDLogger.DisableLog('rdApp.*')   
@@ -122,20 +131,33 @@ def build_polymer(sequence, monomer_list, reaction, terminal ='hydroxyl', chain_
 def build_linear_copolymer(sequence, 
                            monomer_a_smiles, 
                            monomer_b_smiles,
-                           reaction = AllChem.ReactionFromSmarts('[C:1][HO:2].[HO:3][C:4]>>[C:1][O:2][C:4].[O:3]')):
+                           reaction=AllChem.ReactionFromSmarts('[C:1][HO:2].[HO:3][C:4]>>[C:1][O:2][C:4].[O:3]')):
     """
     Constructs a linear co-polymer from the provided sequence of monomers.
 
-    This function takes a sequence of monomers represented as 'A' and 'B', and the SMILES strings of two monomers. It constructs a co-polymer based on the sequence, using the provided reaction SMARTS for joining the monomers. The function returns the sanitized polymer and the percentage composition of each monomer in the polymer.
+    This function takes a sequence of monomers represented as 'A' and 'B', and the SMILES strings of two monomers.
+    It constructs a co-polymer based on the sequence, using the provided reaction SMARTS for joining the monomers.
+    The function returns the sanitized polymer and the percentage composition of each monomer in the polymer.
 
-    Parameters:
-    sequence (str): A string representing the sequence of monomers. 'A' represents monomer_a and 'B' represents monomer_b.
-    monomer_a_smiles (str): The SMILES string of monomer A.
-    monomer_b_smiles (str): The SMILES string of monomer B.
-    reaction (rdkit.Chem.rdChemReactions.ChemicalReaction, optional): The reaction SMARTS used for joining the monomers. Defaults to '[C:1][HO:2].[HO:3][C:4]>>[C:1][O:2][C:4].[O:3]', representing a condensation polymerisation.
+    Parameters
+    ----------
+    sequence : str
+        A string representing the sequence of monomers. 'A' represents monomer_a and 'B' represents monomer_b.
+    monomer_a_smiles : str
+        The SMILES string of monomer A.
+    monomer_b_smiles : str
+        The SMILES string of monomer B.
+    reaction : rdkit.Chem.rdChemReactions.ChemicalReaction, optional
+        The reaction SMARTS used for joining the monomers. Defaults to '[C:1][HO:2].[HO:3][C:4]>>[C:1][O:2][C:4].[O:3]',
+        representing a condensation polymerisation.
 
-    Returns:
-    tuple: A tuple containing the sanitized polymer (rdkit.Chem.rdchem.Mol), the percentage composition of monomer A (float), and the percentage composition of monomer B (float).
+    Returns
+    -------
+    tuple
+        A tuple containing the following elements:
+        - sanitized_polymer (rdkit.Chem.rdchem.Mol): The constructed and sanitized polymer.
+        - percentage_monomer_a (float): The percentage composition of monomer A in the polymer.
+        - percentage_monomer_b (float): The percentage composition of monomer B in the polymer.
     """
     # Initialize the polymer with an iodine blocker
     polymer = Chem.MolFromSmiles('OC(=O)I')
@@ -170,11 +192,18 @@ def PDI(chains):
 
     This function takes a list of molecular chains and calculates the PDI, which is the ratio of Mw to Mn. It also calculates Mn, which is the sum of the molecular weights of the chains divided by the number of chains, and Mw, which is the sum of the product of the weight fraction and molecular weight of each chain.
 
-    Parameters:
-    chains (list): A list of molecular chains. Each chain is represented as an RDkit molecule object.
+    Parameters
+    ----------
+    chains : list
+        A list of molecular chains. Each chain is represented as an RDKit molecule object.
 
-    Returns:
-    tuple: A tuple containing the PDI (float), Mn (float), and Mw (float).
+    Returns
+    -------
+    tuple
+        A tuple containing the following elements:
+        - PDI (float): The Polydispersity Index, which is the ratio of Mw to Mn.
+        - Mn (float): The number-average molecular weight.
+        - Mw (float): The weight-average molecular weight.
     """
     # Calculate the molecular weights of the chains
     mw_list = [ExactMolWt(chain) for chain in chains]
@@ -199,23 +228,31 @@ def PDI(chains):
 
 
 
-def blockiness_gen(sequence):  
+def blockiness_gen(sequence):
     """
     Calculate the blockiness and average block length of a co-polymer sequence.
 
-    This function calculates the blockiness of a co-polymer sequence by counting the occurrences of 'GG' and 'GL' or 'LG' in the sequence. 
-    It also calculates the average block length of 'G' and 'L' in the sequence.
+    This function calculates the blockiness of a co-polymer sequence by counting the occurrences of 'GG' and 'GL' or 'LG' in the sequence.
+    It also calculates the average block length of 'A' and 'B' monomers in the sequence.
 
-    Parameters:
-    sequence (str): A string representing the co-polymer sequence. 'G' represents one type of monomer and 'L' represents another type.
+    Parameters
+    ----------
+    sequence : str
+        A string representing the co-polymer sequence. 'A' represents one type of monomer and 'B' represents another type.
 
-    Returns:
-    blockiness (float): The blockiness of the co-polymer sequence. Calculated as the ratio of 'GG' to 'GL' or 'LG'.
-    block_length_G (float): The average block length of 'G' in the sequence.
-    block_length_L (float): The average block length of 'L' in the sequence.
+    Returns
+    -------
+    tuple
+        A tuple containing the following elements:
+        - blockiness (float): The blockiness of the co-polymer sequence. Calculated as the ratio of 'BB' to 'BA' or 'AB'.
+        - block_length_A (float): The average block length of 'A' in the sequence.
+        - block_length_B (float): The average block length of 'B' in the sequence.
 
-    If the sequence does not contain both 'G' and 'L', the function returns a string indicating that the molecule is not a co-polymer.
+    Notes
+    -----
+    If the sequence does not contain both 'A' and 'B', the function returns a string indicating that the molecule is not a co-polymer.
     """
+    # Function implementation here
 
     if 'A' in sequence and 'B' in sequence: #Check if sequence is a co-polymer
         AB = sequence.count('AB')
