@@ -1,0 +1,1094 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>openff.interchange.components._packmol &mdash; swiftpol  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            swiftpol
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html#getting-started-with-swiftpol">Getting Started with Swiftpol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html">API Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html#module-swiftpol">swiftpol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html#module-swiftpol.build">swiftpol.build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../api.html#module-swiftpol.parameterize">swiftpol.parameterize</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">swiftpol</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">openff.interchange.components._packmol</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for openff.interchange.components._packmol</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A wrapper around PACKMOL. Adapted from OpenFF Evaluator v0.4.3.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Callable</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Literal</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">from</span> <span class="nn">numpy.typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span><span class="p">,</span> <span class="n">NDArray</span>
+<span class="kn">from</span> <span class="nn">openff.toolkit</span> <span class="kn">import</span> <span class="n">Molecule</span><span class="p">,</span> <span class="n">Quantity</span><span class="p">,</span> <span class="n">RDKitToolkitWrapper</span><span class="p">,</span> <span class="n">Topology</span>
+<span class="kn">from</span> <span class="nn">openff.utilities.utilities</span> <span class="kn">import</span> <span class="n">requires_package</span><span class="p">,</span> <span class="n">temporary_cd</span>
+
+<span class="kn">from</span> <span class="nn">openff.interchange.exceptions</span> <span class="kn">import</span> <span class="n">PACKMOLRuntimeError</span><span class="p">,</span> <span class="n">PACKMOLValueError</span>
+
+<span class="n">UNIT_CUBE</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;A regular square prism with image distance 1.0 and volume 1.0.</span>
+
+<span class="sd">A cubic box is very simple and easy to visualize, but wastes substantial space</span>
+<span class="sd">and computational time. A rhombic dodecahedron that provides the same separation</span>
+<span class="sd">between solutes has only about 71% the volume, and therefore requires simulation</span>
+<span class="sd">of much less solvent.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">RHOMBIC_DODECAHEDRON</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">],</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Rhombic dodecahedron with square XY plane cross section, image distance 1.0, and volume ~0.71.</span>
+
+<span class="sd">The rhombic dodecahedron is the most space-efficient triclinic box for a</span>
+<span class="sd">spherical solute, or equivalently for a solute whose rotations sweep out a</span>
+<span class="sd">sphere. Its volume is $\\frac{1}{2}\\sqrt{2}$. A square intersection with the</span>
+<span class="sd">XY plane allows the first two box vectors to be parallel to the x- and y-axes</span>
+<span class="sd">respectively, which is simple to picture and appropriate for soluble systems.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">RHOMBIC_DODECAHEDRON_XYHEX</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">3.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">3.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">6.0</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">6.0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">],</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A rhombic dodecahedron with hexagonal XY cross section, image distance 1.0, and volume ~0.71.</span>
+
+<span class="sd">The rhombic dodecahedron is the most space-efficient triclinic box for a</span>
+<span class="sd">spherical solute, or equivalently for a solute whose rotations sweep out a</span>
+<span class="sd">sphere. A hexagonal intersection with the XY plane is convenient for membrane</span>
+<span class="sd">simulations,</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">_find_packmol</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Attempt to find the path to the `packmol` binary.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str, optional</span>
+<span class="sd">        The path to the packmol binary if it could be found, otherwise</span>
+<span class="sd">        `None`.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">shutil</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="s2">&quot;packmol&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_check_add_positive_mass</span><span class="p">(</span><span class="n">mass_to_add</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">mass_to_add</span><span class="o">.</span><span class="n">m</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">PACKMOLValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Solute mass is greater than target mass; increase density or make the box bigger&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_check_box_shape_shape</span><span class="p">(</span><span class="n">box_shape</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Check the .shape of the box_shape argument.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">box_shape</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">PACKMOLValueError</span><span class="p">(</span>
+            <span class="s2">&quot;box_shape should be an array with shape (3, 3) defining a box with unit periodic image distance&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_validate_inputs</span><span class="p">(</span>
+    <span class="n">molecules</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Molecule</span><span class="p">],</span>
+    <span class="n">number_of_copies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">solute</span><span class="p">:</span> <span class="n">Topology</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">box_shape</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
+    <span class="n">box_vectors</span><span class="p">:</span> <span class="n">Quantity</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">target_density</span><span class="p">:</span> <span class="n">Quantity</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate the inputs which were passed to the main pack method.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    molecules : list of openff.toolkit.Molecule</span>
+<span class="sd">        The molecules in the system.</span>
+<span class="sd">    number_of_copies : list of int</span>
+<span class="sd">        A list of the number of copies of each molecule type, of length</span>
+<span class="sd">        equal to the length of `molecules`.</span>
+<span class="sd">    solute: Topology, optional</span>
+<span class="sd">        The OpenFF Topology to be solvated.</span>
+<span class="sd">    box_vectors : openff.units.Quantity,</span>
+<span class="sd">        The box vectors to fill in units compatible with angstroms. If `None`,</span>
+<span class="sd">        `target_density` must be provided.</span>
+<span class="sd">    target_density : openff.units.Quantity, optional</span>
+<span class="sd">        Target mass density for final system with units compatible with g / mL.</span>
+<span class="sd">         If `None`, `box_size` must be provided.</span>
+<span class="sd">    box_shape: NDArray</span>
+<span class="sd">        The shape of the simulation box, used in conjunction with the</span>
+<span class="sd">        `target_density` parameter. Should have shape (3, 3) with all positive</span>
+<span class="sd">        elements.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">box_vectors</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">target_density</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">solute</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">solute</span><span class="o">.</span><span class="n">box_vectors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">PACKMOLValueError</span><span class="p">(</span>
+            <span class="s2">&quot;One of `box_vectors`, `target_density`, or&quot;</span> <span class="o">+</span> <span class="s2">&quot; `solute.box_vectors` must be specified.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">box_vectors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">target_density</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">PACKMOLValueError</span><span class="p">(</span>
+            <span class="s2">&quot;`box_vectors` and `target_density` cannot be specified together;&quot;</span> <span class="o">+</span> <span class="s2">&quot; choose one or the other.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">box_vectors</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">box_vectors</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">PACKMOLValueError</span><span class="p">(</span>
+            <span class="s2">&quot;`box_vectors` must be a openff.units.Quantity Array with shape (3, 3)&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">box_shape</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">PACKMOLValueError</span><span class="p">(</span>
+            <span class="s2">&quot;`box_shape` must be an array with shape (3, 3) or (3,)&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">box_shape</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">PACKMOLValueError</span><span class="p">(</span><span class="s2">&quot;All vectors in `box_shape` must have a positive norm.&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">molecules</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">number_of_copies</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">PACKMOLValueError</span><span class="p">(</span>
+            <span class="s2">&quot;The length of `molecules` and `number_of_copies` must be identical.&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">solute</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">solute</span><span class="p">,</span> <span class="n">Topology</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">PACKMOLValueError</span><span class="p">(</span>
+                <span class="s2">&quot;`solute` must be a openff.toolkit.Topology&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">positions</span> <span class="o">=</span> <span class="n">solute</span><span class="o">.</span><span class="n">get_positions</span><span class="p">()</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">positions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="k">assert</span> <span class="n">positions</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">solute</span><span class="o">.</span><span class="n">n_atoms</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PACKMOLValueError</span><span class="p">(</span>
+                <span class="s2">&quot;`solute` missing some atomic positions.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_box_vectors_are_in_reduced_form</span><span class="p">(</span><span class="n">box_vectors</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return ``True`` if the box is in OpenMM reduced form; ``False`` otherwise.</span>
+
+<span class="sd">    These conditions are shared by OpenMM and GROMACS and greatly simplify</span>
+<span class="sd">    working with triclinic boxes. Any periodic system can be represented in this</span>
+<span class="sd">    form by rotating the system and lattice reduction.</span>
+<span class="sd">    See http://docs.openmm.org/latest/userguide/theory/05_other_features.html#periodic-boundary-conditions</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">box_vectors</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">box_vectors</span><span class="o">.</span><span class="n">m</span>
+    <span class="n">ax</span><span class="p">,</span> <span class="n">ay</span><span class="p">,</span> <span class="n">az</span> <span class="o">=</span> <span class="n">a</span>
+    <span class="n">bx</span><span class="p">,</span> <span class="n">by</span><span class="p">,</span> <span class="n">bz</span> <span class="o">=</span> <span class="n">b</span>
+    <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">cz</span> <span class="o">=</span> <span class="n">c</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="p">[</span><span class="n">ay</span><span class="p">,</span> <span class="n">az</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="ow">and</span> <span class="n">bz</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="ow">and</span> <span class="n">ax</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="ow">and</span> <span class="n">by</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="ow">and</span> <span class="n">cz</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="ow">and</span> <span class="n">ax</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">bx</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">ax</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">cx</span><span class="p">)</span>
+        <span class="ow">and</span> <span class="n">by</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">cy</span><span class="p">)</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_unit_vec</span><span class="p">(</span><span class="n">vec</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Quantity</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get a unit vector in the direction of ``vec``.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">vec</span> <span class="o">/</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">vec</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_compute_brick_from_box_vectors</span><span class="p">(</span><span class="n">box_vectors</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Quantity</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the rectangular brick for the given triclinic box vectors.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    box_vectors: NDArray</span>
+<span class="sd">        Array with shape (3, 3) representing the box vectors of a triclinic cell</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># This should have already been checked with a nice error message, but it is</span>
+    <span class="c1"># an important invariant so we&#39;ll check it again here</span>
+    <span class="k">assert</span> <span class="n">_box_vectors_are_in_reduced_form</span><span class="p">(</span><span class="n">box_vectors</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">diagonal</span><span class="p">(</span><span class="n">box_vectors</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_range_neg_pos</span><span class="p">(</span><span class="n">stop</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield 0, 1, -1, 2, -2... ``stop - 1``, ``-(stop - 1)``.&quot;&quot;&quot;</span>
+    <span class="k">yield</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">stop</span><span class="p">):</span>
+        <span class="k">yield</span> <span class="n">i</span>
+        <span class="k">yield</span> <span class="o">-</span><span class="n">i</span>
+
+
+<span class="k">def</span> <span class="nf">_iter_lattice_vecs</span><span class="p">(</span><span class="n">box</span><span class="p">,</span> <span class="n">max_order</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Yield linear combinations of box vectors until max_order is reached.&quot;&quot;&quot;</span>
+    <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="n">box</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">_range_neg_pos</span><span class="p">(</span><span class="n">max_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">_range_neg_pos</span><span class="p">(</span><span class="n">max_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">_range_neg_pos</span><span class="p">(</span><span class="n">max_order</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">i</span> <span class="o">*</span> <span class="n">a</span> <span class="o">+</span> <span class="n">j</span> <span class="o">*</span> <span class="n">b</span> <span class="o">+</span> <span class="n">k</span> <span class="o">*</span> <span class="n">c</span>
+
+
+<span class="k">def</span> <span class="nf">_wrap_into</span><span class="p">(</span>
+    <span class="n">points</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">,</span>
+    <span class="n">box</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">,</span>
+    <span class="n">condition</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+    <span class="n">max_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a triclinic box to a representation where all atoms satisfy a condition.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    points</span>
+<span class="sd">        The points to transform</span>
+<span class="sd">    box</span>
+<span class="sd">        The triclinic box vectors</span>
+<span class="sd">    condition</span>
+<span class="sd">        The condition that must be satisfied. This should be a function taking</span>
+<span class="sd">        an array of positions with shape (n, 3) and returning an array of</span>
+<span class="sd">        booleans with shape (n,) whose elements are ``True`` at positions that</span>
+<span class="sd">        satisfy the condition.</span>
+<span class="sd">    max_order</span>
+<span class="sd">        The maximum number of box vectors that points may be from the rectangular</span>
+<span class="sd">        box.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="n">points</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">3</span>
+    <span class="k">assert</span> <span class="n">box</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">points</span> <span class="o">=</span> <span class="n">points</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+    <span class="c1"># Iterate over linear combinations of lattice vectors</span>
+    <span class="k">for</span> <span class="n">lattice_vec</span> <span class="ow">in</span> <span class="n">_iter_lattice_vecs</span><span class="p">(</span><span class="n">box</span><span class="p">,</span> <span class="n">max_order</span><span class="p">):</span>
+        <span class="c1"># If all the points satisfy the condition, we&#39;re done</span>
+        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">condition</span><span class="p">(</span><span class="n">points</span><span class="p">)):</span>
+            <span class="k">break</span>
+
+        <span class="c1"># Otherwise, choose the points that would satisfy the condition if we</span>
+        <span class="c1"># translated them by the current linear combination of lattice vectors,</span>
+        <span class="c1"># and do so</span>
+        <span class="n">translated_points</span> <span class="o">=</span> <span class="n">points</span> <span class="o">-</span> <span class="n">lattice_vec</span>
+        <span class="n">correct_translated_points</span> <span class="o">=</span> <span class="n">condition</span><span class="p">(</span><span class="n">translated_points</span><span class="p">)</span>
+        <span class="n">points</span> <span class="o">-=</span> <span class="n">correct_translated_points</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">lattice_vec</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">PACKMOLValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Couldn&#39;t move all particles to satisfy condition in </span><span class="si">{</span><span class="n">max_order</span><span class="si">}</span><span class="s2"> steps&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">points</span>
+
+
+<span class="k">def</span> <span class="nf">_wrap_into_brick</span><span class="p">(</span><span class="n">points</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">,</span> <span class="n">box</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">,</span> <span class="n">max_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert a triclinic box to its rectangular brick representation.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    points</span>
+<span class="sd">        The points to transform</span>
+<span class="sd">    box</span>
+<span class="sd">        The triclinic box vectors</span>
+<span class="sd">    max_order</span>
+<span class="sd">        The maximum number of box vectors that points may be from the rectangular</span>
+<span class="sd">        box.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">brick</span> <span class="o">=</span> <span class="n">_compute_brick_from_box_vectors</span><span class="p">(</span><span class="n">box</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_wrap_into</span><span class="p">(</span>
+        <span class="n">points</span><span class="p">,</span>
+        <span class="n">box</span><span class="p">,</span>
+        <span class="k">lambda</span> <span class="n">points</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">points</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">points</span> <span class="o">&lt;</span> <span class="n">brick</span><span class="p">),</span>
+            <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">),</span>
+        <span class="n">max_order</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_box_from_density</span><span class="p">(</span>
+    <span class="n">molecules</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Molecule</span><span class="p">],</span>
+    <span class="n">n_copies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">target_density</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">,</span>
+    <span class="n">box_shape</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Quantity</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Approximate box size.</span>
+
+<span class="sd">    Generate an approximate box size based on the number and molecular</span>
+<span class="sd">    weight of the molecules present, and a target density for the final</span>
+<span class="sd">    solvated mixture.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    molecules : list of openff.toolkit.Molecule</span>
+<span class="sd">        The molecules in the system.</span>
+<span class="sd">    n_copies : list of int</span>
+<span class="sd">        The number of copies of each molecule.</span>
+<span class="sd">    target_density : openff.units.Quantity</span>
+<span class="sd">        The target mass density for final system. It should have units</span>
+<span class="sd">        compatible with g / mL.</span>
+<span class="sd">    box_shape: NDArray</span>
+<span class="sd">        The shape of the simulation box, used in conjunction with the</span>
+<span class="sd">        `target_density` parameter. Should have shape (3, 3) with all positive</span>
+<span class="sd">        elements.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    box_vectors: openff.units.Quantity</span>
+<span class="sd">        The unit cell box vectors. Array with shape (3, 3)</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get the desired volume in cubic working units</span>
+    <span class="n">total_mass</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">sum</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">molecule</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span> <span class="o">*</span> <span class="n">n</span> <span class="k">for</span> <span class="n">molecule</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">molecules</span><span class="p">,</span> <span class="n">n_copies</span><span class="p">))</span>
+    <span class="n">volume</span> <span class="o">=</span> <span class="n">total_mass</span> <span class="o">/</span> <span class="n">target_density</span>
+
+    <span class="k">return</span> <span class="n">_scale_box</span><span class="p">(</span><span class="n">box_shape</span><span class="p">,</span> <span class="n">volume</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_scale_box</span><span class="p">(</span><span class="n">box</span><span class="p">:</span> <span class="n">NDArray</span><span class="p">,</span> <span class="n">volume</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">,</span> <span class="n">box_scaleup_factor</span><span class="o">=</span><span class="mf">1.1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Quantity</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scale the parallelepiped spanned by ``box`` to the given volume.</span>
+
+<span class="sd">    The volume of the parallelepiped spanned by the rows of a matrix is the</span>
+<span class="sd">    determinant of that matrix, and scaling a row of a matrix by a constant c</span>
+<span class="sd">    scales the determinant by that same constant; therefore scaling all three</span>
+<span class="sd">    rows by c scales the volume by c**3.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    box</span>
+<span class="sd">        3x3 matrix whose rows are the box vectors.</span>
+<span class="sd">    volume</span>
+<span class="sd">        Desired scalar volume of the box in units of volume.</span>
+
+<span class="sd">    box_scaleup_factor</span>
+<span class="sd">        The factor, applied linearly, by which the estimated box size should be increased.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    scaled_box</span>
+<span class="sd">        3x3 matrix in angstroms.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">final_volume</span> <span class="o">=</span> <span class="n">volume</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="s2">&quot;angstrom ** 3&quot;</span><span class="p">)</span>
+
+    <span class="n">initial_volume</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">box</span><span class="p">))</span>
+    <span class="n">volume_scale_factor</span> <span class="o">=</span> <span class="n">final_volume</span> <span class="o">/</span> <span class="n">initial_volume</span>
+    <span class="n">linear_scale_factor</span> <span class="o">=</span> <span class="n">volume_scale_factor</span> <span class="o">**</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="mi">3</span><span class="p">)</span>
+
+    <span class="n">linear_scale_factor</span> <span class="o">*=</span> <span class="n">box_scaleup_factor</span>
+
+    <span class="k">return</span> <span class="n">Quantity</span><span class="p">(</span><span class="n">linear_scale_factor</span> <span class="o">*</span> <span class="n">box</span><span class="p">,</span> <span class="s2">&quot;angstrom&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_create_solute_pdb</span><span class="p">(</span>
+    <span class="n">topology</span><span class="p">:</span> <span class="n">Topology</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">box_vectors</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write out the solute topology to PDB so that packmol can read it.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">topology</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="c1"># Copy the topology so we can change it</span>
+    <span class="n">topology</span> <span class="o">=</span> <span class="n">Topology</span><span class="p">(</span><span class="n">topology</span><span class="p">)</span>
+    <span class="c1"># Wrap the positions into the brick representation so that packmol</span>
+    <span class="c1"># sees all of them</span>
+    <span class="n">topology</span><span class="o">.</span><span class="n">set_positions</span><span class="p">(</span>
+        <span class="n">_wrap_into_brick</span><span class="p">(</span>
+            <span class="n">topology</span><span class="o">.</span><span class="n">get_positions</span><span class="p">(),</span>
+            <span class="n">box_vectors</span><span class="p">,</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="c1"># Write to pdb</span>
+    <span class="n">solute_pdb_filename</span> <span class="o">=</span> <span class="s2">&quot;_PACKING_SOLUTE.pdb&quot;</span>
+    <span class="n">topology</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span>
+        <span class="n">solute_pdb_filename</span><span class="p">,</span>
+        <span class="n">file_format</span><span class="o">=</span><span class="s2">&quot;PDB&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">solute_pdb_filename</span>
+
+
+<span class="k">def</span> <span class="nf">_create_molecule_pdbs</span><span class="p">(</span><span class="n">molecules</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Molecule</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write out PDBs of the molecules so that packmol can read them.&quot;&quot;&quot;</span>
+    <span class="n">pdb_file_names</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">molecules</span><span class="p">):</span>
+        <span class="c1"># Make a copy of the molecule so we don&#39;t change the input</span>
+        <span class="n">molecule</span> <span class="o">=</span> <span class="n">Molecule</span><span class="p">(</span><span class="n">molecule</span><span class="p">)</span>
+
+        <span class="c1"># Generate conformers if they&#39;re missing</span>
+        <span class="k">if</span> <span class="n">molecule</span><span class="o">.</span><span class="n">n_conformers</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">molecule</span><span class="o">.</span><span class="n">generate_conformers</span><span class="p">(</span><span class="n">n_conformers</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># RDKitToolkitWrapper is less buggy than OpenEye for writing PDBs</span>
+        <span class="c1"># See https://github.com/openforcefield/openff-toolkit/issues/1307</span>
+        <span class="c1"># and linked issues. As long as the PDB files have the atoms in the</span>
+        <span class="c1"># right order, we&#39;ll be able to read packmol&#39;s output, since we</span>
+        <span class="c1"># just load the PDB coordinates into a topology created from its</span>
+        <span class="c1"># component molecules.</span>
+        <span class="n">pdb_file_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;_PACKING_MOLECULE</span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">.pdb&quot;</span>
+        <span class="n">pdb_file_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pdb_file_name</span><span class="p">)</span>
+
+        <span class="n">molecule</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span>
+            <span class="n">pdb_file_name</span><span class="p">,</span>
+            <span class="n">file_format</span><span class="o">=</span><span class="s2">&quot;PDB&quot;</span><span class="p">,</span>
+            <span class="n">toolkit_registry</span><span class="o">=</span><span class="n">RDKitToolkitWrapper</span><span class="p">(),</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">pdb_file_names</span>
+
+
+<span class="k">def</span> <span class="nf">_build_input_file</span><span class="p">(</span>
+    <span class="n">molecule_file_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">molecule_counts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">structure_to_solvate</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">box_size</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">,</span>
+    <span class="n">tolerance</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Construct the packmol input file.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    molecule_file_names: list of str</span>
+<span class="sd">        The paths to the molecule pdb files.</span>
+<span class="sd">    molecule_counts: list of int</span>
+<span class="sd">        The number of each molecule to add.</span>
+<span class="sd">    structure_to_solvate: str, optional</span>
+<span class="sd">        The path to the structure to solvate.</span>
+<span class="sd">    box_size: openff.units.Quantity</span>
+<span class="sd">        The lengths of each side of the box we want to fill. This is the box</span>
+<span class="sd">        size of the rectangular brick representation of the simulation box; the</span>
+<span class="sd">        packmol box will be shrunk by the tolerance.</span>
+<span class="sd">    tolerance: openff.units.Quantity</span>
+<span class="sd">        The packmol convergence tolerance.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        The path to the input file.</span>
+<span class="sd">    str</span>
+<span class="sd">        The path to the output file.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">box_size</span> <span class="o">=</span> <span class="p">(</span><span class="n">box_size</span> <span class="o">-</span> <span class="n">tolerance</span><span class="p">)</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="s2">&quot;angstrom&quot;</span><span class="p">)</span>
+    <span class="n">tolerance</span> <span class="o">=</span> <span class="n">tolerance</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="s2">&quot;angstrom&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Add the global header options.</span>
+    <span class="n">output_file_path</span> <span class="o">=</span> <span class="s2">&quot;packmol_output.pdb&quot;</span>
+    <span class="n">input_lines</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="sa">f</span><span class="s2">&quot;tolerance </span><span class="si">{</span><span class="n">tolerance</span><span class="si">:</span><span class="s2">f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;filetype pdb&quot;</span><span class="p">,</span>
+        <span class="sa">f</span><span class="s2">&quot;output </span><span class="si">{</span><span class="n">output_file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Add the section of the molecule to solvate if provided.</span>
+    <span class="k">if</span> <span class="n">structure_to_solvate</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">input_lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="sa">f</span><span class="s2">&quot;structure </span><span class="si">{</span><span class="n">structure_to_solvate</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;  number 1&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;  fixed 0. 0. 0. 0. 0. 0.&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;end structure&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Add a section for each type of molecule to add.</span>
+    <span class="k">for</span> <span class="n">file_name</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">molecule_file_names</span><span class="p">,</span> <span class="n">molecule_counts</span><span class="p">):</span>
+        <span class="n">input_lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="sa">f</span><span class="s2">&quot;structure </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;  number </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="sa">f</span><span class="s2">&quot;  inside box 0. 0. 0. </span><span class="si">{</span><span class="n">box_size</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">box_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">box_size</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;end structure&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
+
+    <span class="n">packmol_input</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">input_lines</span><span class="p">)</span>
+
+    <span class="c1"># Write packmol input</span>
+    <span class="n">packmol_file_name</span> <span class="o">=</span> <span class="s2">&quot;packmol_input.txt&quot;</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">packmol_file_name</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
+        <span class="n">file_handle</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">packmol_input</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">packmol_file_name</span><span class="p">,</span> <span class="n">output_file_path</span>
+
+
+<span class="k">def</span> <span class="nf">_center_topology_at</span><span class="p">(</span>
+    <span class="n">center_solute</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;BOX_VECS&quot;</span><span class="p">,</span> <span class="s2">&quot;ORIGIN&quot;</span><span class="p">,</span> <span class="s2">&quot;BRICK&quot;</span><span class="p">],</span>
+    <span class="n">topology</span><span class="p">:</span> <span class="n">Topology</span><span class="p">,</span>
+    <span class="n">box_vectors</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">,</span>
+    <span class="n">brick_size</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Topology</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a copy of the topology centered as requested.&quot;&quot;&quot;</span>
+    <span class="n">topology</span> <span class="o">=</span> <span class="n">Topology</span><span class="p">(</span><span class="n">topology</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">center_solute</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">center_solute</span> <span class="o">=</span> <span class="n">center_solute</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>  <span class="c1"># type: ignore[assignment]</span>
+
+    <span class="k">if</span> <span class="n">center_solute</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">topology</span>
+    <span class="k">elif</span> <span class="n">center_solute</span> <span class="ow">in</span> <span class="p">[</span><span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;BOX_VECS&quot;</span><span class="p">]:</span>
+        <span class="n">new_center</span> <span class="o">=</span> <span class="n">box_vectors</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="k">elif</span> <span class="n">center_solute</span> <span class="o">==</span> <span class="s2">&quot;ORIGIN&quot;</span><span class="p">:</span>
+        <span class="n">new_center</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">center_solute</span> <span class="o">==</span> <span class="s2">&quot;BRICK&quot;</span><span class="p">:</span>
+        <span class="n">new_center</span> <span class="o">=</span> <span class="n">brick_size</span> <span class="o">/</span> <span class="mf">2.0</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">PACKMOLValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;center_solute must be a bool, &#39;BOX_VECS&#39;, &#39;ORIGIN&#39;, or &#39;BRICK&#39;, not </span><span class="si">{</span><span class="n">center_solute</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="n">positions</span> <span class="o">=</span> <span class="n">topology</span><span class="o">.</span><span class="n">get_positions</span><span class="p">()</span>
+    <span class="n">center_of_geometry</span> <span class="o">=</span> <span class="n">positions</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span>
+    <span class="n">topology</span><span class="o">.</span><span class="n">set_positions</span><span class="p">(</span><span class="n">new_center</span> <span class="o">-</span> <span class="n">center_of_geometry</span> <span class="o">+</span> <span class="n">positions</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">topology</span>
+
+
+<span class="nd">@requires_package</span><span class="p">(</span><span class="s2">&quot;rdkit&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">pack_box</span><span class="p">(</span>
+    <span class="n">molecules</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Molecule</span><span class="p">],</span>
+    <span class="n">number_of_copies</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+    <span class="n">solute</span><span class="p">:</span> <span class="n">Topology</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">tolerance</span><span class="p">:</span> <span class="n">Quantity</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="s2">&quot;angstrom&quot;</span><span class="p">),</span>
+    <span class="n">box_vectors</span><span class="p">:</span> <span class="n">Quantity</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">target_density</span><span class="p">:</span> <span class="n">Quantity</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">box_shape</span><span class="p">:</span> <span class="n">ArrayLike</span> <span class="o">=</span> <span class="n">RHOMBIC_DODECAHEDRON</span><span class="p">,</span>
+    <span class="n">center_solute</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;BOX_VECS&quot;</span><span class="p">,</span> <span class="s2">&quot;ORIGIN&quot;</span><span class="p">,</span> <span class="s2">&quot;BRICK&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">working_directory</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">retain_working_files</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Topology</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run packmol to generate a box containing a mixture of molecules.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    molecules : list of openff.toolkit.Molecule</span>
+<span class="sd">        The molecules in the system.</span>
+<span class="sd">    number_of_copies : list of int</span>
+<span class="sd">        A list of the number of copies of each molecule type, of length</span>
+<span class="sd">        equal to the length of ``molecules``.</span>
+<span class="sd">    solute: Topology, optional</span>
+<span class="sd">        An OpenFF :py:class:`Topology &lt;openff.toolkit.Topology&gt;` to</span>
+<span class="sd">        include in the box. If ``box_vectors`` and ``target_density`` are not</span>
+<span class="sd">        specified, box vectors can be taken from ``solute.box_vectors``.</span>
+<span class="sd">    tolerance : openff.units.Quantity</span>
+<span class="sd">        The minimum spacing between molecules during packing in units of</span>
+<span class="sd">        distance. The default is large so that added waters do not disrupt the</span>
+<span class="sd">        structure of proteins; when constructing a mixture of small molecules,</span>
+<span class="sd">        values as small as 0.5 Å will converge faster and can still produce</span>
+<span class="sd">        stable simulations after energy minimisation.</span>
+<span class="sd">    box_vectors : openff.units.Quantity, optional</span>
+<span class="sd">        The box vectors to fill in units of distance. If ``None``,</span>
+<span class="sd">        ``target_density`` must be provided. Array with shape (3,3). Box vectors</span>
+<span class="sd">        must be provided in `OpenMM reduced form &lt;http://docs.openmm.org/latest/</span>
+<span class="sd">        userguide/theory/05_other_features.html#periodic-boundary-conditions&gt;`_.</span>
+<span class="sd">    target_density : openff.units.Quantity, optional</span>
+<span class="sd">        Target mass density for final system with units compatible with g / mL.</span>
+<span class="sd">        If ``None``, ``box_size`` must be provided.</span>
+<span class="sd">    box_shape: Arraylike, optional</span>
+<span class="sd">        The shape of the simulation box, used in conjunction with</span>
+<span class="sd">        the ``target_density`` parameter. Should be a dimensionless array with</span>
+<span class="sd">        shape (3,3) for a triclinic box or (3,) for a rectangular box. Shape</span>
+<span class="sd">        vectors must be provided in `OpenMM reduced form</span>
+<span class="sd">        &lt;http://docs.openmm.org/latest/userguide/theory/</span>
+<span class="sd">        05_other_features.html#periodic-boundary-conditions&gt;`_.</span>
+<span class="sd">    center_solute</span>
+<span class="sd">        How to center ``solute`` in the simulation box. If ``True``</span>
+<span class="sd">        or ``&quot;box_vecs&quot;``, the solute&#39;s center of geometry will be placed at</span>
+<span class="sd">        the center of the box&#39;s parallelopiped representation. If ``&quot;origin&quot;``,</span>
+<span class="sd">        the solute will centered at the origin. If ``&quot;brick&quot;``, the solute will</span>
+<span class="sd">        be centered in the box&#39;s rectangular brick representation. If</span>
+<span class="sd">        ``False`` (the default), the solute will not be moved.</span>
+<span class="sd">    working_directory: str, optional</span>
+<span class="sd">        The directory in which to generate the temporary working files. If</span>
+<span class="sd">        ``None``, a temporary one will be created.</span>
+<span class="sd">    retain_working_files: bool</span>
+<span class="sd">        If ``True`` all of the working files, such as individual molecule</span>
+<span class="sd">        coordinate files, will be retained.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Topology</span>
+<span class="sd">        An OpenFF ``Topology`` with the solvated system.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    PACKMOLRuntimeError</span>
+<span class="sd">        When packmol fails to execute / converge.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Returned topologies may have larger box vectors than what would be defined</span>
+<span class="sd">    by the target density.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Make sure packmol can be found.</span>
+    <span class="n">packmol_path</span> <span class="o">=</span> <span class="n">_find_packmol</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">packmol_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s2">&quot;Packmol not found, cannot run pack_box()&quot;</span><span class="p">)</span>
+
+    <span class="n">box_shape</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">box_shape</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">box_shape</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="mi">3</span><span class="p">,):</span>
+        <span class="n">box_shape</span> <span class="o">=</span> <span class="n">box_shape</span> <span class="o">*</span> <span class="n">numpy</span><span class="o">.</span><span class="n">identity</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="c1"># Validate the inputs.</span>
+    <span class="n">_validate_inputs</span><span class="p">(</span>
+        <span class="n">molecules</span><span class="p">,</span>
+        <span class="n">number_of_copies</span><span class="p">,</span>
+        <span class="n">solute</span><span class="p">,</span>
+        <span class="n">box_shape</span><span class="p">,</span>
+        <span class="n">box_vectors</span><span class="p">,</span>
+        <span class="n">target_density</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Estimate the box_size from mass density if one is not provided.</span>
+    <span class="k">if</span> <span class="n">target_density</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">box_vectors</span> <span class="o">=</span> <span class="n">_box_from_density</span><span class="p">(</span>
+            <span class="n">molecules</span><span class="p">,</span>
+            <span class="n">number_of_copies</span><span class="p">,</span>
+            <span class="n">target_density</span><span class="p">,</span>
+            <span class="n">box_shape</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="c1"># If neither box size nor density are given, take box vectors from solute</span>
+    <span class="c1"># topology</span>
+    <span class="k">if</span> <span class="n">box_vectors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">box_vectors</span> <span class="o">=</span> <span class="n">solute</span><span class="o">.</span><span class="n">box_vectors</span>  <span class="c1"># type: ignore[union-attr]</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_box_vectors_are_in_reduced_form</span><span class="p">(</span><span class="n">box_vectors</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">PACKMOLValueError</span><span class="p">(</span>
+            <span class="s2">&quot;pack_box requires box vectors to be in OpenMM reduced form.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;See http://docs.openmm.org/latest/userguide/theory/&quot;</span>
+            <span class="o">+</span> <span class="s2">&quot;05_other_features.html#periodic-boundary-conditions&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Compute the dimensions of the equivalent brick - this is what packmol will</span>
+    <span class="c1"># fill</span>
+    <span class="n">brick_size</span> <span class="o">=</span> <span class="n">_compute_brick_from_box_vectors</span><span class="p">(</span><span class="n">box_vectors</span><span class="p">)</span>
+
+    <span class="c1"># Center the solute</span>
+    <span class="k">if</span> <span class="n">center_solute</span> <span class="ow">and</span> <span class="n">solute</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">solute</span> <span class="o">=</span> <span class="n">_center_topology_at</span><span class="p">(</span>
+            <span class="n">center_solute</span><span class="p">,</span>
+            <span class="n">solute</span><span class="p">,</span>
+            <span class="n">box_vectors</span><span class="p">,</span>
+            <span class="n">brick_size</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Set up the directory to create the working files in.</span>
+    <span class="n">temporary_directory</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">working_directory</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">working_directory</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">mkdtemp</span><span class="p">()</span>
+        <span class="n">temporary_directory</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">working_directory</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">working_directory</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">temporary_cd</span><span class="p">(</span><span class="n">working_directory</span><span class="p">):</span>
+        <span class="n">solute_pdb_filename</span> <span class="o">=</span> <span class="n">_create_solute_pdb</span><span class="p">(</span>
+            <span class="n">solute</span><span class="p">,</span>
+            <span class="n">box_vectors</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Create PDB files for all of the molecules.</span>
+        <span class="n">pdb_file_names</span> <span class="o">=</span> <span class="n">_create_molecule_pdbs</span><span class="p">(</span><span class="n">molecules</span><span class="p">)</span>
+
+        <span class="c1"># Generate the input file.</span>
+        <span class="n">input_file_path</span><span class="p">,</span> <span class="n">output_file_path</span> <span class="o">=</span> <span class="n">_build_input_file</span><span class="p">(</span>
+            <span class="n">pdb_file_names</span><span class="p">,</span>
+            <span class="n">number_of_copies</span><span class="p">,</span>
+            <span class="n">solute_pdb_filename</span><span class="p">,</span>
+            <span class="n">brick_size</span><span class="p">,</span>
+            <span class="n">tolerance</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_file_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">file_handle</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span>
+                    <span class="n">packmol_path</span><span class="p">,</span>
+                    <span class="n">stdin</span><span class="o">=</span><span class="n">file_handle</span><span class="p">,</span>
+                    <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+                <span class="c1"># Custom error codes seem to start at 170</span>
+                <span class="c1"># https://github.com/m3g/packmol/blob/v20.15.1/src/exit_codes.f90#L13-L16</span>
+                <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;packmol_error.log&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">error</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span>
+
+                <span class="k">raise</span> <span class="n">PACKMOLRuntimeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;PACKMOL failed with error code </span><span class="si">{</span><span class="n">error</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s2">. Wrote file packmol_error.log in working &quot;</span>
+                    <span class="s2">&quot;directory, which might be a temporary directory. Set the argument `working_directory` to &quot;</span>
+                    <span class="s2">&quot;point this to a persistent path.&quot;</span><span class="p">,</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="nn">error</span>
+
+            <span class="n">packmol_succeeded</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;Success!&quot;</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">packmol_succeeded</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">PACKMOLRuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;PACKMOL did not raise an error code, but &#39;Success!&#39; not found in output. &quot;</span>
+                <span class="s2">&quot;Please raise an issue showing how you arrived at this error.&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+
+        <span class="n">positions</span> <span class="o">=</span> <span class="n">_load_positions</span><span class="p">(</span><span class="n">output_file_path</span><span class="p">)</span>
+
+    <span class="c1"># TODO: This currently does not run if we encountered an error in the</span>
+    <span class="c1"># context manager</span>
+    <span class="k">if</span> <span class="n">temporary_directory</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">retain_working_files</span><span class="p">:</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">working_directory</span><span class="p">)</span>
+
+    <span class="c1"># Construct the output topology</span>
+    <span class="n">added_molecules</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">mol</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">molecules</span><span class="p">,</span> <span class="n">number_of_copies</span><span class="p">):</span>
+        <span class="n">added_molecules</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">mol</span><span class="p">]</span> <span class="o">*</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">topology</span> <span class="o">=</span> <span class="n">Topology</span><span class="o">.</span><span class="n">from_molecules</span><span class="p">(</span><span class="n">added_molecules</span><span class="p">)</span>
+
+    <span class="c1"># Set the positions, skipping the positions from solute</span>
+    <span class="n">n_solute_atoms</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">positions</span><span class="p">)</span> <span class="o">-</span> <span class="n">topology</span><span class="o">.</span><span class="n">n_atoms</span>
+    <span class="n">topology</span><span class="o">.</span><span class="n">set_positions</span><span class="p">(</span><span class="n">Quantity</span><span class="p">(</span><span class="n">positions</span><span class="p">[</span><span class="n">n_solute_atoms</span><span class="p">:],</span> <span class="s2">&quot;angstrom&quot;</span><span class="p">))</span>
+
+    <span class="c1"># Add solute back in with the original, unwrapped positions</span>
+    <span class="k">if</span> <span class="n">solute</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">topology</span> <span class="o">=</span> <span class="n">solute</span> <span class="o">+</span> <span class="n">topology</span>
+
+    <span class="c1"># Set the box vectors</span>
+    <span class="n">topology</span><span class="o">.</span><span class="n">box_vectors</span> <span class="o">=</span> <span class="n">box_vectors</span>
+
+    <span class="k">return</span> <span class="n">topology</span>
+
+
+<span class="k">def</span> <span class="nf">_max_dist_between_points</span><span class="p">(</span><span class="n">points</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Quantity</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute the greatest distance between two points in the array.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">scipy.spatial</span> <span class="kn">import</span> <span class="n">ConvexHull</span><span class="p">,</span> <span class="n">distance</span>
+
+    <span class="n">points</span><span class="p">,</span> <span class="n">units</span> <span class="o">=</span> <span class="n">points</span><span class="o">.</span><span class="n">m</span><span class="p">,</span> <span class="n">points</span><span class="o">.</span><span class="n">u</span>
+
+    <span class="n">points_array</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">points_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">points_array</span><span class="o">.</span><span class="n">ndim</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">PACKMOLValueError</span><span class="p">(</span><span class="s2">&quot;Points should be an n*3 array&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">points_array</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="c1"># Maximum distance is guaranteed to be on the convex hull, which can be</span>
+        <span class="c1"># computed in O(n log n)</span>
+        <span class="c1"># See also https://stackoverflow.com/a/60955825</span>
+        <span class="n">hull</span> <span class="o">=</span> <span class="n">ConvexHull</span><span class="p">(</span><span class="n">points_array</span><span class="p">)</span>
+        <span class="n">hullpoints</span> <span class="o">=</span> <span class="n">points_array</span><span class="p">[</span><span class="n">hull</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">hullpoints</span> <span class="o">=</span> <span class="n">points_array</span>
+
+    <span class="c1"># Now compute all the distances and get the greatest distance in O(h^2)</span>
+    <span class="n">max_dist</span> <span class="o">=</span> <span class="n">distance</span><span class="o">.</span><span class="n">pdist</span><span class="p">(</span><span class="n">hullpoints</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;euclidean&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">max_dist</span> <span class="o">*</span> <span class="n">units</span>
+
+
+<span class="k">def</span> <span class="nf">_load_positions</span><span class="p">(</span><span class="n">output_file_path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NDArray</span><span class="p">:</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">[</span><span class="n">line</span><span class="p">[</span><span class="mi">31</span><span class="p">:</span><span class="mi">39</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">39</span><span class="p">:</span><span class="mi">46</span><span class="p">],</span> <span class="n">line</span><span class="p">[</span><span class="mi">47</span><span class="p">:</span><span class="mi">54</span><span class="p">]]</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">open</span><span class="p">(</span><span class="n">output_file_path</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;HETATM&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;ATOM&quot;</span><span class="p">)</span>
+            <span class="p">],</span>
+            <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">PACKMOLRuntimeError</span><span class="p">(</span>
+            <span class="s2">&quot;PACKMOL output could not be parsed by a native coordinate parser, &quot;</span>
+            <span class="s2">&quot;please raise an issue with code reproducing this error.&quot;</span><span class="p">,</span>
+        <span class="p">)</span> <span class="kn">from</span> <span class="nn">error</span>
+
+
+<span class="k">def</span> <span class="nf">solvate_topology</span><span class="p">(</span>
+    <span class="n">topology</span><span class="p">:</span> <span class="n">Topology</span><span class="p">,</span>
+    <span class="n">nacl_conc</span><span class="p">:</span> <span class="n">Quantity</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="s2">&quot;mole / liter&quot;</span><span class="p">),</span>
+    <span class="n">padding</span><span class="p">:</span> <span class="n">Quantity</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="s2">&quot;nanometer&quot;</span><span class="p">),</span>
+    <span class="n">box_shape</span><span class="p">:</span> <span class="n">NDArray</span> <span class="o">=</span> <span class="n">RHOMBIC_DODECAHEDRON</span><span class="p">,</span>
+    <span class="n">target_density</span><span class="p">:</span> <span class="n">Quantity</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="mf">0.9</span><span class="p">,</span> <span class="s2">&quot;gram / milliliter&quot;</span><span class="p">),</span>
+    <span class="n">tolerance</span><span class="p">:</span> <span class="n">Quantity</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="s2">&quot;angstrom&quot;</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Topology</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add water and ions to neutralise and solvate a topology.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    topology</span>
+<span class="sd">        The OpenFF Topology to solvate.</span>
+<span class="sd">    nacl_conc</span>
+<span class="sd">        The bulk concentration of NaCl in the solvent, in units compatible with</span>
+<span class="sd">        molarity. This is used to calculate a mass fraction for the bulk</span>
+<span class="sd">        solvent and does not represent the actual concentration in the final</span>
+<span class="sd">        box.</span>
+<span class="sd">    padding : Scalar with dimensions of length</span>
+<span class="sd">        The desired distance between the solute and the edge of the box. Ignored</span>
+<span class="sd">        if the topology already has box vectors. The usual recommendation is</span>
+<span class="sd">        that this equals or exceeds the VdW cut-off distance, so that the</span>
+<span class="sd">        solute is isolated by its periodic images by twice the cut-off.</span>
+<span class="sd">    box_shape : Array with shape (3, 3)</span>
+<span class="sd">        An array defining the box vectors of a box with the desired shape and</span>
+<span class="sd">        unit periodic image distance. This shape will be scaled to satisfy the</span>
+<span class="sd">        padding given above. Some typical shapes are provided in this module.</span>
+<span class="sd">    target_density : Scalar with dimensions of mass density</span>
+<span class="sd">        The target mass density for the packed box.</span>
+<span class="sd">    tolerance: Scalar with dimensions of distance</span>
+<span class="sd">        The minimum spacing between molecules during packing in units of</span>
+<span class="sd">        distance. The default is large so that added waters do not disrupt the</span>
+<span class="sd">        structure of proteins; when constructing a mixture of small molecules,</span>
+<span class="sd">        values as small as 0.5 Å will converge faster and can still produce</span>
+<span class="sd">        stable simulations after energy minimisation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Topology</span>
+<span class="sd">        An OpenFF ``Topology`` with the solvated system.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    PACKMOLRuntimeError</span>
+<span class="sd">        When packmol fails to execute / converge.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Returned topologies may have larger box vectors than what would be defined</span>
+<span class="sd">    by the target density.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_check_box_shape_shape</span><span class="p">(</span><span class="n">box_shape</span><span class="p">)</span>
+
+    <span class="c1"># Compute box vectors from the solute length and requested padding</span>
+    <span class="n">solute_length</span> <span class="o">=</span> <span class="n">_max_dist_between_points</span><span class="p">(</span><span class="n">topology</span><span class="o">.</span><span class="n">get_positions</span><span class="p">())</span>
+    <span class="n">image_distance</span> <span class="o">=</span> <span class="n">solute_length</span> <span class="o">+</span> <span class="n">padding</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="n">box_vectors</span> <span class="o">=</span> <span class="n">box_shape</span> <span class="o">*</span> <span class="n">image_distance</span>
+
+    <span class="c1"># Compute target masses of solvent</span>
+    <span class="n">box_volume</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">box_vectors</span><span class="o">.</span><span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">box_vectors</span><span class="o">.</span><span class="n">u</span><span class="o">**</span><span class="mi">3</span>
+    <span class="n">target_mass</span> <span class="o">=</span> <span class="n">box_volume</span> <span class="o">*</span> <span class="n">target_density</span>
+    <span class="n">solute_mass</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">sum</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">molecule</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span> <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="n">topology</span><span class="o">.</span><span class="n">molecules</span><span class="p">)</span>
+    <span class="n">solvent_mass</span> <span class="o">=</span> <span class="n">target_mass</span> <span class="o">-</span> <span class="n">solute_mass</span>
+
+    <span class="n">_check_add_positive_mass</span><span class="p">(</span><span class="n">solvent_mass</span><span class="p">)</span>
+
+    <span class="c1"># Get reference data and prepare solvent molecules</span>
+    <span class="n">water</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="s2">&quot;O&quot;</span><span class="p">)</span>
+    <span class="n">na</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="s2">&quot;[Na+]&quot;</span><span class="p">)</span>
+    <span class="n">cl</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="s2">&quot;[Cl-]&quot;</span><span class="p">)</span>
+    <span class="n">nacl_mass</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">na</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span> <span class="o">+</span> <span class="nb">sum</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">cl</span><span class="o">.</span><span class="n">atoms</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="n">water_mass</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">water</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span>
+    <span class="n">molarity_pure_water</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="mf">55.5</span><span class="p">,</span> <span class="s2">&quot;mole / liter&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Compute the number of salt &quot;molecules&quot; to add from the mass and concentration</span>
+    <span class="n">nacl_mass_fraction</span> <span class="o">=</span> <span class="p">(</span><span class="n">nacl_conc</span> <span class="o">*</span> <span class="n">nacl_mass</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">molarity_pure_water</span> <span class="o">*</span> <span class="n">water_mass</span><span class="p">)</span>
+    <span class="n">nacl_mass_to_add</span> <span class="o">=</span> <span class="n">solvent_mass</span> <span class="o">*</span> <span class="n">nacl_mass_fraction</span>
+    <span class="n">nacl_to_add</span> <span class="o">=</span> <span class="p">(</span><span class="n">nacl_mass_to_add</span> <span class="o">/</span> <span class="n">nacl_mass</span><span class="p">)</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="s2">&quot;dimensionless&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">()</span>
+
+    <span class="c1"># Compute the number of water molecules to add to make up the remaining mass</span>
+    <span class="n">water_mass_to_add</span> <span class="o">=</span> <span class="n">solvent_mass</span> <span class="o">-</span> <span class="n">nacl_mass</span>
+    <span class="n">water_to_add</span> <span class="o">=</span> <span class="p">(</span><span class="n">water_mass_to_add</span> <span class="o">/</span> <span class="n">water_mass</span><span class="p">)</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="s2">&quot;dimensionless&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">()</span>
+
+    <span class="c1"># Neutralise the system by adding and removing salt</span>
+    <span class="n">solute_charge</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">molecule</span><span class="o">.</span><span class="n">total_charge</span> <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="n">topology</span><span class="o">.</span><span class="n">molecules</span><span class="p">])</span>
+    <span class="n">na_to_add</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">nacl_to_add</span> <span class="o">-</span> <span class="n">solute_charge</span><span class="o">.</span><span class="n">m</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+    <span class="n">cl_to_add</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">nacl_to_add</span> <span class="o">+</span> <span class="n">solute_charge</span><span class="o">.</span><span class="n">m</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span>
+
+    <span class="c1"># Pack the box</span>
+    <span class="k">return</span> <span class="n">pack_box</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">water</span><span class="p">,</span> <span class="n">na</span><span class="p">,</span> <span class="n">cl</span><span class="p">],</span>
+        <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">water_to_add</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">na_to_add</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">cl_to_add</span><span class="p">)],</span>
+        <span class="n">solute</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
+        <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">,</span>
+        <span class="n">box_vectors</span><span class="o">=</span><span class="n">box_vectors</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">solvate_topology_nonwater</span><span class="p">(</span>
+    <span class="n">topology</span><span class="p">:</span> <span class="n">Topology</span><span class="p">,</span>
+    <span class="n">solvent</span><span class="p">:</span> <span class="n">Molecule</span><span class="p">,</span>
+    <span class="n">target_density</span><span class="p">:</span> <span class="n">Quantity</span><span class="p">,</span>
+    <span class="n">padding</span><span class="p">:</span> <span class="n">Quantity</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="mf">1.2</span><span class="p">,</span> <span class="s2">&quot;nanometer&quot;</span><span class="p">),</span>
+    <span class="n">box_shape</span><span class="p">:</span> <span class="n">NDArray</span> <span class="o">=</span> <span class="n">RHOMBIC_DODECAHEDRON</span><span class="p">,</span>
+    <span class="n">tolerance</span><span class="p">:</span> <span class="n">Quantity</span> <span class="o">=</span> <span class="n">Quantity</span><span class="p">(</span><span class="mf">2.0</span><span class="p">,</span> <span class="s2">&quot;angstrom&quot;</span><span class="p">),</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Topology</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Add water and ions to neutralise and solvate a topology.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    topology</span>
+<span class="sd">        The OpenFF Topology to solvate.</span>
+<span class="sd">    solvent</span>
+<span class="sd">        The OpenFF Molecule to use as the solvent.</span>
+<span class="sd">    padding : Scalar with dimensions of length</span>
+<span class="sd">        The desired distance between the solute and the edge of the box. Ignored</span>
+<span class="sd">        if the topology already has box vectors. The usual recommendation is</span>
+<span class="sd">        that this equals or exceeds the VdW cut-off distance, so that the</span>
+<span class="sd">        solute is isolated by its periodic images by twice the cut-off.</span>
+<span class="sd">    box_shape : Array with shape (3, 3)</span>
+<span class="sd">        An array defining the box vectors of a box with the desired shape and</span>
+<span class="sd">        unit periodic image distance. This shape will be scaled to satisfy the</span>
+<span class="sd">        padding given above. Some typical shapes are provided in this module.</span>
+<span class="sd">    target_density : Scalar with dimensions of mass density</span>
+<span class="sd">        The target mass density for the packed box.</span>
+<span class="sd">    tolerance: Scalar with dimensions of distance</span>
+<span class="sd">        The minimum spacing between molecules during packing in units of</span>
+<span class="sd">        distance. The default is large so that added waters do not disrupt the</span>
+<span class="sd">        structure of proteins; when constructing a mixture of small molecules,</span>
+<span class="sd">        values as small as 0.5 Å will converge faster and can still produce</span>
+<span class="sd">        stable simulations after energy minimisation.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Topology</span>
+<span class="sd">        An OpenFF ``Topology`` with the solvated system.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    PACKMOLRuntimeError</span>
+<span class="sd">        When packmol fails to execute / converge.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    Returned topologies may have larger box vectors than what would be defined</span>
+<span class="sd">    by the target density.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">_check_box_shape_shape</span><span class="p">(</span><span class="n">box_shape</span><span class="p">)</span>
+
+    <span class="c1"># Compute box vectors from the solute length and requested padding</span>
+    <span class="n">solute_length</span> <span class="o">=</span> <span class="n">_max_dist_between_points</span><span class="p">(</span><span class="n">topology</span><span class="o">.</span><span class="n">get_positions</span><span class="p">())</span>
+    <span class="n">image_distance</span> <span class="o">=</span> <span class="n">solute_length</span> <span class="o">+</span> <span class="n">padding</span> <span class="o">*</span> <span class="mi">2</span>
+    <span class="n">box_vectors</span> <span class="o">=</span> <span class="n">box_shape</span> <span class="o">*</span> <span class="n">image_distance</span>
+
+    <span class="c1"># Compute target masses of solvent</span>
+    <span class="n">box_volume</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">box_vectors</span><span class="o">.</span><span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">box_vectors</span><span class="o">.</span><span class="n">u</span><span class="o">**</span><span class="mi">3</span>
+    <span class="n">target_mass</span> <span class="o">=</span> <span class="n">box_volume</span> <span class="o">*</span> <span class="n">target_density</span>
+    <span class="n">solute_mass</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">sum</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">molecule</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span> <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="n">topology</span><span class="o">.</span><span class="n">molecules</span><span class="p">)</span>
+
+    <span class="n">solvent_mass_to_add</span> <span class="o">=</span> <span class="n">target_mass</span> <span class="o">-</span> <span class="n">solute_mass</span>
+
+    <span class="n">_check_add_positive_mass</span><span class="p">(</span><span class="n">solvent_mass_to_add</span><span class="p">)</span>
+
+    <span class="n">_solvent</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">solvent</span><span class="p">)</span>
+    <span class="n">solvent_mass</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">_solvent</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span>
+
+    <span class="n">solvent_to_add</span> <span class="o">=</span> <span class="p">(</span><span class="n">solvent_mass_to_add</span> <span class="o">/</span> <span class="n">solvent_mass</span><span class="p">)</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="s2">&quot;dimensionless&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">pack_box</span><span class="p">(</span>
+        <span class="n">molecules</span><span class="o">=</span><span class="p">[</span><span class="n">solvent</span><span class="p">],</span>
+        <span class="n">number_of_copies</span><span class="o">=</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">solvent_to_add</span><span class="p">)],</span>
+        <span class="n">solute</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
+        <span class="n">tolerance</span><span class="o">=</span><span class="n">tolerance</span><span class="p">,</span>
+        <span class="n">box_vectors</span><span class="o">=</span><span class="n">box_vectors</span><span class="p">,</span>
+        <span class="n">center_solute</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hannah Turney. Project structure based on the Computational Molecular Science Python Cookiecutter version 1.1.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

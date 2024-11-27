@@ -1,6 +1,11 @@
 ![title](Repo/logo.jpg)
 
 [![PyTest](https://github.com/matta-research-group/SwiftPol/actions/workflows/SwiftPol_tests.yml/badge.svg)](https://github.com/matta-research-group/SwiftPol/actions/workflows/SwiftPol_tests.yml)
+[![Documentation](https://img.shields.io/badge/Documentation-Online-brightgreen)](https://matta-research-group.github.io/SwiftPol)
+[![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](https://github.com/yourusername/yourrepository/blob/main/LICENSE)
+[![GitHub last commit](https://img.shields.io/github/last-commit/matta-research-group/SwiftPol)](https://github.com/matta-research-group/SwiftPol/commits/main)
+[![GitHub stars](https://img.shields.io/github/stars/matta-research-group/SwiftPol)](https://github.com/matta-research-group/SwiftPol/stargazers)
+
 
 # SwiftPol
 Tools for building polydisperse polymer systems for molecular dynamics.

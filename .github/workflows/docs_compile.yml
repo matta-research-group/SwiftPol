@@ -10,9 +10,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.11"]
     steps:
     - uses: actions/checkout@v4
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        # this might remove tools that are actually needed,
+        # if set to "true" but frees about 6 GB
+        tool-cache: false
+        
+        # all of these default to true, but feel free to set to
+        # "false" if necessary for your workflow
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: true
+        swap-storage: true
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v3
       with:
@@ -32,15 +47,22 @@ jobs:
       shell: bash -l {0}
       run: |
         source ~/.bashrc
-        conda env create -n RTD
-        conda activate RTD
+        conda env create -f Dev_tools/swiftpol.yml
+        conda activate swiftpol
         conda install sphinx sphinx_rtd_theme 
+        pip install .
 
-    - name: Run make
+    - name: Run build
       shell: bash -l {0}
       run: |
         source ~/.bashrc
-        conda env create -n RTD
-        conda activate RTD
-        cd docs
-        make html      
+        conda activate swiftpol
+        cd docs/
+        make html
+
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        publish_branch: docs
+        github_token: ${{ secrets.SWIFTPOL}}
+        publish_dir: ./docs/_build/html 

@@ -6,20 +6,27 @@ from openff.toolkit.topology import Molecule
 
 
 def charge_polymer(polymer, charge_scheme):
-
-    '''
+    """
     Calculate and return the partial charges of a polymer chain based on the specified charge scheme.
 
-    Parameters:
-    polymer: A polymer chain for which the charges are to be calculated.
-    charge_scheme: A string that specifies the charge scheme to be used. It can be either 'AM1_BCC', 'espaloma', or 'NAGL'.
+    Parameters
+    ----------
+    polymer : rdkit.Chem.rdchem.Mol
+        A polymer chain for which the charges are to be calculated.
+    charge_scheme : str
+        A string that specifies the charge scheme to be used. It can be either 'AM1_BCC', 'espaloma', or 'NAGL'.
 
-    Returns:
-    The partial charges of the polymer chain according to the specified charge scheme.
+    Returns
+    -------
+    numpy.ndarray
+        The partial charges of the polymer chain according to the specified charge scheme.
 
-    Raises:
-    AttributeError: If the charge_scheme input is not 'AM1_BCC', 'NAGL', or 'espaloma'.
-    '''
+    Raises
+    ------
+    AttributeError
+        If the charge_scheme input is not 'AM1_BCC', 'NAGL', or 'espaloma'.
+    """
+    # Function implementation here
     from openff import toolkit
     from openff.toolkit.topology import Molecule
     if charge_scheme == 'AM1_BCC':
@@ -56,20 +63,27 @@ def charge_polymer(polymer, charge_scheme):
     
 
 def charge_openff_polymer(openff_chain, charge_scheme):
-
-    '''
+    """
     Calculate and return the partial charges of a polymer chain based on the specified charge scheme.
 
-    Parameters:
-    polymer: A polymer chain for which the charges are to be calculated.
-    charge_scheme: A string that specifies the charge scheme to be used. It can be either 'AM1_BCC', 'espaloma', or 'NAGL'.
+    Parameters
+    ----------
+    polymer : rdkit.Chem.rdchem.Mol
+        A polymer chain for which the charges are to be calculated.
+    charge_scheme : str
+        A string that specifies the charge scheme to be used. It can be either 'AM1_BCC', 'espaloma', or 'NAGL'.
 
-    Returns:
-    The partial charges of the polymer chain according to the specified charge scheme.
+    Returns
+    -------
+    numpy.ndarray
+        The partial charges of the polymer chain according to the specified charge scheme.
 
-    Raises:
-    AttributeError: If the charge_scheme input is not 'AM1_BCC', 'NAGL', or 'espaloma'.
-    '''
+    Raises
+    ------
+    AttributeError
+        If the charge_scheme input is not 'AM1_BCC', 'NAGL', or 'espaloma'.
+    """
+    # Function implementation here
     from openff import toolkit
     from openff.toolkit.topology import Molecule
     if charge_scheme == 'AM1_BCC':
@@ -102,23 +116,33 @@ def charge_openff_polymer(openff_chain, charge_scheme):
 
 
 def forcefield_with_charge_handler(molecule, charge_method, forcefield = "openff-2.2.0.offxml", ensemble=False):
-    '''
-    Create a forcefield with a charge handler for a given molecule and charge method. The function can handle both individual molecules and ensembles of molecules.
+    """
+    Create a forcefield with a charge handler for a given molecule and charge method.
 
-    Parameters:
-    molecule: An RDKit molecule object or a list of RDKit molecule objects for which the forcefield is to be created.
-    charge_method: A string that specifies the charge method to be used for the molecule.
-    forcefield: A string that specifies the forcefield to be used. Default is "openff-2.2.0.offxml".
-    ensemble: A boolean that specifies whether the input molecule is an ensemble of molecules. Default is False.
+    The function can handle both individual molecules and ensembles of molecules.
 
-    Returns:
-    An OpenFF ForceField object with the specified molecule's charges added to the LibraryCharges parameter.
+    Parameters
+    ----------
+    molecule : rdkit.Chem.rdchem.Mol or list of rdkit.Chem.rdchem.Mol
+        An RDKit molecule object or a list of RDKit molecule objects for which the forcefield is to be created.
+    charge_method : str
+        A string that specifies the charge method to be used for the molecule.
+    forcefield : str, optional
+        A string that specifies the forcefield to be used. Default is "openff-2.2.0.offxml".
+    ensemble : bool, optional
+        A boolean that specifies whether the input molecule is an ensemble of molecules. Default is False.
 
-    Raises:
-    Exception: If the charge method is not supported.
-    '''
+    Returns
+    -------
+    openff.toolkit.typing.engines.smirnoff.ForceField
+        An OpenFF ForceField object with the specified molecule's charges added to the LibraryCharges parameter.
 
-    
+    Raises
+    ------
+    Exception
+        If the charge method is not supported.
+    """
+    # Function implementation here
     import numpy as np
     from openmm import unit
     from openff.toolkit.topology import Molecule
