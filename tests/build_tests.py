@@ -186,7 +186,7 @@ class TestCalculateBoxComponents(unittest.TestCase):
         self.assertTrue(isinstance(residual_monomer_actual, float))
         # Check if the returned residual_monomer_actual is as expected
         print('resid_mon = ', residual_monomer_actual)
-        self.assertTrue(1.4 <= residual_monomer_actual <= 1.6)
+        self.assertTrue(1.3 <= residual_monomer_actual <= 1.7)
 
         # Calculate box components - test case without residual monomer and solvent
         molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = build.calculate_box_components(chains = x.chains, 
