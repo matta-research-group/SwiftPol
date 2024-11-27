@@ -3,7 +3,7 @@
 [![PyTest](https://github.com/matta-research-group/SwiftPol/actions/workflows/SwiftPol_tests.yml/badge.svg)](https://github.com/matta-research-group/SwiftPol/actions/workflows/SwiftPol_tests.yml)
 [![Documentation](https://github.com/matta-research-group/SwiftPol/actions/workflows/pages/pages-build-deployment/badge.svg)](https://matta-research-group.github.io/SwiftPol)
 [![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](https://github.com/yourusername/yourrepository/blob/main/LICENSE)
-[![Coverage Status](https://coveralls.io/repos/github/matta-research-group/SwiftPol/badge.svg?branch=main)](https://coveralls.io/github/matta-research-group/SwiftPol?branch=main)
+[![Coverage Status](https://coveralls.io/repos/github/matta-research-group/SwiftPol/badge.svg)](https://coveralls.io/github/matta-research-group/SwiftPol)
 [![GitHub last commit](https://img.shields.io/github/last-commit/matta-research-group/SwiftPol)](https://github.com/matta-research-group/SwiftPol/commits/main)
 
 
