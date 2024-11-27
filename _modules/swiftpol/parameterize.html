@@ -84,20 +84,27 @@
 <div class="viewcode-block" id="charge_polymer">
 <a class="viewcode-back" href="../../api.html#swiftpol.parameterize.charge_polymer">[docs]</a>
 <span class="k">def</span> <span class="nf">charge_polymer</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">charge_scheme</span><span class="p">):</span>
-
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate and return the partial charges of a polymer chain based on the specified charge scheme.</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">    polymer: A polymer chain for which the charges are to be calculated.</span>
-<span class="sd">    charge_scheme: A string that specifies the charge scheme to be used. It can be either &#39;AM1_BCC&#39;, &#39;espaloma&#39;, or &#39;NAGL&#39;.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    polymer : rdkit.Chem.rdchem.Mol</span>
+<span class="sd">        A polymer chain for which the charges are to be calculated.</span>
+<span class="sd">    charge_scheme : str</span>
+<span class="sd">        A string that specifies the charge scheme to be used. It can be either &#39;AM1_BCC&#39;, &#39;espaloma&#39;, or &#39;NAGL&#39;.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">    The partial charges of the polymer chain according to the specified charge scheme.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        The partial charges of the polymer chain according to the specified charge scheme.</span>
 
-<span class="sd">    Raises:</span>
-<span class="sd">    AttributeError: If the charge_scheme input is not &#39;AM1_BCC&#39;, &#39;NAGL&#39;, or &#39;espaloma&#39;.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    AttributeError</span>
+<span class="sd">        If the charge_scheme input is not &#39;AM1_BCC&#39;, &#39;NAGL&#39;, or &#39;espaloma&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Function implementation here</span>
     <span class="kn">from</span> <span class="nn">openff</span> <span class="kn">import</span> <span class="n">toolkit</span>
     <span class="kn">from</span> <span class="nn">openff.toolkit.topology</span> <span class="kn">import</span> <span class="n">Molecule</span>
     <span class="k">if</span> <span class="n">charge_scheme</span> <span class="o">==</span> <span class="s1">&#39;AM1_BCC&#39;</span><span class="p">:</span>
@@ -137,20 +144,27 @@
 <div class="viewcode-block" id="charge_openff_polymer">
 <a class="viewcode-back" href="../../api.html#swiftpol.parameterize.charge_openff_polymer">[docs]</a>
 <span class="k">def</span> <span class="nf">charge_openff_polymer</span><span class="p">(</span><span class="n">openff_chain</span><span class="p">,</span> <span class="n">charge_scheme</span><span class="p">):</span>
-
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate and return the partial charges of a polymer chain based on the specified charge scheme.</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">    polymer: A polymer chain for which the charges are to be calculated.</span>
-<span class="sd">    charge_scheme: A string that specifies the charge scheme to be used. It can be either &#39;AM1_BCC&#39;, &#39;espaloma&#39;, or &#39;NAGL&#39;.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    polymer : rdkit.Chem.rdchem.Mol</span>
+<span class="sd">        A polymer chain for which the charges are to be calculated.</span>
+<span class="sd">    charge_scheme : str</span>
+<span class="sd">        A string that specifies the charge scheme to be used. It can be either &#39;AM1_BCC&#39;, &#39;espaloma&#39;, or &#39;NAGL&#39;.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">    The partial charges of the polymer chain according to the specified charge scheme.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    numpy.ndarray</span>
+<span class="sd">        The partial charges of the polymer chain according to the specified charge scheme.</span>
 
-<span class="sd">    Raises:</span>
-<span class="sd">    AttributeError: If the charge_scheme input is not &#39;AM1_BCC&#39;, &#39;NAGL&#39;, or &#39;espaloma&#39;.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    AttributeError</span>
+<span class="sd">        If the charge_scheme input is not &#39;AM1_BCC&#39;, &#39;NAGL&#39;, or &#39;espaloma&#39;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Function implementation here</span>
     <span class="kn">from</span> <span class="nn">openff</span> <span class="kn">import</span> <span class="n">toolkit</span>
     <span class="kn">from</span> <span class="nn">openff.toolkit.topology</span> <span class="kn">import</span> <span class="n">Molecule</span>
     <span class="k">if</span> <span class="n">charge_scheme</span> <span class="o">==</span> <span class="s1">&#39;AM1_BCC&#39;</span><span class="p">:</span>
@@ -186,23 +200,33 @@
 <div class="viewcode-block" id="forcefield_with_charge_handler">
 <a class="viewcode-back" href="../../api.html#swiftpol.parameterize.forcefield_with_charge_handler">[docs]</a>
 <span class="k">def</span> <span class="nf">forcefield_with_charge_handler</span><span class="p">(</span><span class="n">molecule</span><span class="p">,</span> <span class="n">charge_method</span><span class="p">,</span> <span class="n">forcefield</span> <span class="o">=</span> <span class="s2">&quot;openff-2.2.0.offxml&quot;</span><span class="p">,</span> <span class="n">ensemble</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&#39;&#39;&#39;</span>
-<span class="sd">    Create a forcefield with a charge handler for a given molecule and charge method. The function can handle both individual molecules and ensembles of molecules.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a forcefield with a charge handler for a given molecule and charge method.</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">    molecule: An RDKit molecule object or a list of RDKit molecule objects for which the forcefield is to be created.</span>
-<span class="sd">    charge_method: A string that specifies the charge method to be used for the molecule.</span>
-<span class="sd">    forcefield: A string that specifies the forcefield to be used. Default is &quot;openff-2.2.0.offxml&quot;.</span>
-<span class="sd">    ensemble: A boolean that specifies whether the input molecule is an ensemble of molecules. Default is False.</span>
+<span class="sd">    The function can handle both individual molecules and ensembles of molecules.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">    An OpenFF ForceField object with the specified molecule&#39;s charges added to the LibraryCharges parameter.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    molecule : rdkit.Chem.rdchem.Mol or list of rdkit.Chem.rdchem.Mol</span>
+<span class="sd">        An RDKit molecule object or a list of RDKit molecule objects for which the forcefield is to be created.</span>
+<span class="sd">    charge_method : str</span>
+<span class="sd">        A string that specifies the charge method to be used for the molecule.</span>
+<span class="sd">    forcefield : str, optional</span>
+<span class="sd">        A string that specifies the forcefield to be used. Default is &quot;openff-2.2.0.offxml&quot;.</span>
+<span class="sd">    ensemble : bool, optional</span>
+<span class="sd">        A boolean that specifies whether the input molecule is an ensemble of molecules. Default is False.</span>
 
-<span class="sd">    Raises:</span>
-<span class="sd">    Exception: If the charge method is not supported.</span>
-<span class="sd">    &#39;&#39;&#39;</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    openff.toolkit.typing.engines.smirnoff.ForceField</span>
+<span class="sd">        An OpenFF ForceField object with the specified molecule&#39;s charges added to the LibraryCharges parameter.</span>
 
-    
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    Exception</span>
+<span class="sd">        If the charge method is not supported.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Function implementation here</span>
     <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
     <span class="kn">from</span> <span class="nn">openmm</span> <span class="kn">import</span> <span class="n">unit</span>
     <span class="kn">from</span> <span class="nn">openff.toolkit.topology</span> <span class="kn">import</span> <span class="n">Molecule</span>
