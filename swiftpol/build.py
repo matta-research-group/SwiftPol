@@ -668,25 +668,27 @@ class polymer_system:
         Notes
         -----
         This function is adapted from the OpenFF Toolkit Packmol wrapper's solvate_topology function.
+        This function is in the development stage and may not work as expected. Please report any issues to the developers using github issues.
         """
         #Find packmol
-        try:
-            subprocess.run(["packmol"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
-        except subprocess.CalledProcessError:
-            raise RuntimeError("Packmol is not installed or cannot be found. Please install Packmol and ensure it is in your PATH.")
         import subprocess
+        result = subprocess.run(["packmol", "-h"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+        if result.returncode != 0:
+            raise RuntimeError("Packmol is not installed or cannot be found. Please install Packmol and ensure it is in your PATH.")
+        import os
         from openbabel import openbabel
-        molecules, number_of_copies, topology, box_vectors, resid_monomer_actual = calculate_box_components(chains = self.chains,
+        from swiftpol import build
+        molecules, number_of_copies, topology, box_vectors, resid_monomer_actual = build.calculate_box_components(chains = self.chains,
                                                                                                     sequence=self.sequence, 
                                                                                                     residual_monomer=resid_monomer,
                                                                                                     salt_concentration=salt_concentration,
                                                                                                     monomers = self.monomers)
         self.residual_monomer = resid_monomer_actual
         self.solvent_comp = molecules
-        self.num_copies_solvent = number_of_copies
+        self.num_copies = number_of_copies
         self.box_vectors = box_vectors
         if len(molecules) != len(number_of_copies):
-            raise ValueError("The length of 'structures' and 'num_molecules' must be the same.")
+            raise ValueError("The length of 'molecules' and 'number_of_copies' must be the same.")
 
         with open('packmol.inp', 'w') as f:
             f.write("# Packmol input file\n")
@@ -698,7 +700,7 @@ class polymer_system:
 
             x_min, x_max, y_min, y_max, z_min, z_max = box_vectors
 
-            # Iterate over the structures and number of molecules
+            # Iterate over the molecules and number of copies
             for i, mol in enumerate(molecules):
                 f.write(f"structure {mol}\n")
                 f.write(f"  number {number_of_copies[i]}\n")
@@ -712,7 +714,7 @@ class polymer_system:
         obConversion.SetInAndOutFormats("pdb", "xyz")
         mol = openbabel.OBMol()
         obConversion.ReadFile(mol, output_file_path)
-        obConversion.WriteFile(mol, 'packbox.xyz')
+        obConversion.WriteFile(mol, 'packed_output.xyz')
         xyz = open(path_xyz)
         atom_symbol, coords = ([] for i in range (2))
         for line in xyz:
@@ -720,19 +722,17 @@ class polymer_system:
             atom_symbol.append(atom)
             coords.append([float(x),float(y),float(z)])
         coords_arr = np.array(coords)
-        # Construct the output topology
-        added_molecules = []
-        molecules = [Molecule.from_file(m, file_format='pdb') for m in structures]
-        for mol, n in zip(molecules, num_molecules):
-            added_molecules.extend([mol] * n)
-        solvated_topology = Topology.from_molecules(added_molecules)
+        # Remove the files created by Packmol
+        os.remove('packmol.inp')
+        os.remove('packed_output.pdb')
+        os.remove('packed_output.xyz')
 
         # Set the positions, skipping the positions from solute
-        solvated_topology.set_positions(coords_arr * unit.angstrom)
+        topology.set_positions(coords_arr * unit.angstrom)
 
         # Set the box vectors
-        solvated_topology.box_vectors = UNIT_CUBE * box_vectors
-        return solvated_topology
+        topology.box_vectors = UNIT_CUBE * box_vectors
+        return topology
     
     
 

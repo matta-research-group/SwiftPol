@@ -161,7 +161,7 @@ class TestCalculateBoxComponents(unittest.TestCase):
                         perc_A_target=75, 
                         blockiness_target=1.0, 
                         copolymer=True,
-                        acceptance=10)
+                        acceptance=1)
         x.generate_conformers()
 
         molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = build.calculate_box_components(chains = x.chains, 
@@ -251,9 +251,12 @@ class TestPolymerSystem(unittest.TestCase):
         self.assertTrue(9 <= round(x.max_length)<= 11)
         self.assertTrue(47.5 <= x.A_actual <= 52.5)
         self.assertTrue(0.95 <= x.mean_blockiness <= 1.05)
-
-
-
+        #Test solvate
+        #from openff.units import unit
+        #solv_system = x.solvate_system(resid_monomer = 1.5, salt_concentration = 0.1 * unit.mole / unit.liter)
+        #self.assertIsNone(solv_system)
+        #self.assertTrue(1.3 <= x.residual_monomer <= 1.7)
+        #self.assertEqual(solv_system.shape, (3, 3))  
 
 # Run
 
