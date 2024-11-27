@@ -237,28 +237,45 @@ def blockiness_gen(sequence):
     else:
         return 'Molecule is not a co-polymer, no blockiness calculation performed', 0, len(sequence)
 
-def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.1 * unit.mole / unit.liter, residual_monomer = 0.00):
+def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.0 * unit.mole / unit.liter, residual_monomer = 0.00, solvated=True):
     """
-    ADAPTED FROM OPENFF TOOLKIT PACKMOL WRAPPER SOLVATE_TOPOLOGY FUNCTION
     Calculates the components required to construct a simulation box for a given set of molecular chains.
-    Considers the salt concentration and residual monomer concentration to determine the quantity of each molecule type required.
-
+    
+    This function determines the quantity of each molecule type required, considering the salt concentration
+    and residual monomer concentration. It is adapted from the OpenFF Toolkit Packmol wrapper's solvate_topology function.
+    
     Parameters:
-    chains (list): A list of molecular chains to be included in the simulation box.
-    sequence (str): A string representing the sequence of the molecular chains. 'G' and 'L' represent different types of monomers.
-    salt_concentration (float, optional): The desired salt concentration in the simulation box. Defaults to 0.1 M.
-    residual_monomer (float, optional): The desired residual monomer concentration in the simulation box. Defaults to 0.00.
-
+    -----------
+    chains : list
+        A list of molecular chains to be included in the simulation box.
+    sequence : str
+        A string representing the sequence of the molecular chains. 'G' and 'L' represent different types of monomers.
+    salt_concentration : float, optional
+        The desired salt concentration in the simulation box. Defaults to 0 M.
+    residual_monomer : float, optional
+        The desired residual monomer concentration in the simulation box. Defaults to 0.00.
+    solvated : bool, optional
+        Indicates whether the system contains water. Defaults to False.
+    
     Returns:
-    tuple: A tuple containing the following elements:
+    --------
+    tuple
+        A tuple containing the following elements:
         - molecules (list): A list of molecules to be included in the simulation box.
         - number_of_copies (list): A list indicating the quantity of each molecule to be included in the simulation box.
         - topology (openff.toolkit.topology.Topology): The topology of the simulation box.
         - box_vectors (numpy.ndarray): The vectors defining the dimensions of the simulation box.
+    
+    Notes:
+    ------
+    This function is adapted from the OpenFF Toolkit Packmol wrapper's solvate_topology function.
     """
     from openff.toolkit.topology import Molecule, Topology
     from openff.interchange.components._packmol import UNIT_CUBE, pack_box, RHOMBIC_DODECAHEDRON, solvate_topology
     from openff.interchange.components._packmol import _max_dist_between_points, _compute_brick_from_box_vectors, _center_topology_at
+    import warnings
+    if not solvated and len(chains) < 15:
+        warnings.warn('Residual monomer calculation may not be accurate for small systems. Please check the output by querying the value of residual_monomer_actual')
     #Create molecules for the purpose of mass calculation
     #Water
     water = Molecule.from_smiles('O')
@@ -284,7 +301,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     padding= 0.1 * unit.nanometer
     box_shape= UNIT_CUBE
     target_density= 1.0 * unit.gram / unit.milliliter
-    tolerance= 2.0 * unit.nanometer
+
     
     # Compute box vectors from the solute length and requested padding
     if chains[0].n_conformers == 0:
@@ -301,7 +318,10 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     # Compute the number of NaCl to add from the mass and concentration
     nacl_mass_fraction = (nacl_conc * nacl_mass) / (55.5 * unit.mole / unit.liter * water_mass)
     nacl_to_add = ((solvent_mass * nacl_mass_fraction) / nacl_mass).m_as(unit.dimensionless).round()
-    water_to_add = int(round((solvent_mass - nacl_mass) / water_mass).m_as(unit.dimensionless).round())
+    if solvated:
+        water_to_add = int(round((solvent_mass - nacl_mass) / water_mass).m_as(unit.dimensionless).round())
+    else:
+        water_to_add = 0
     
     # Neutralise the system by adding and removing salt
     solute_charge = sum([molecule.total_charge for molecule in topology.molecules])
@@ -312,7 +332,8 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     for m in topology.molecules:
         rolling_mass += sum(atom.mass for atom in m.atoms)
     rolling_mass += nacl_mass * nacl_to_add
-    rolling_mass += water_mass * water_to_add
+    if solvated:
+        rolling_mass += water_mass * water_to_add
     
     # residual monomer to add
     mass_to_add = (rolling_mass.magnitude/100-residual_monomer) * residual_monomer
@@ -361,10 +382,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
         residual_monomer_actual = ((A_to_add * A_mass.magnitude) / rolling_mass.magnitude) * 100
         molecules = [water, na, cl, A, B]
         number_of_copies=[water_to_add, na_to_add, cl_to_add, A_to_add, B_to_add]
-    
-
     return molecules, number_of_copies, topology, box_vectors, residual_monomer_actual
-
 
 
 #Class object for generic polymer system
