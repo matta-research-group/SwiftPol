@@ -715,7 +715,7 @@ class polymer_system:
         mol = openbabel.OBMol()
         obConversion.ReadFile(mol, output_file_path)
         obConversion.WriteFile(mol, 'packed_output.xyz')
-        xyz = open(path_xyz)
+        xyz = open('packed_output.xyz')
         atom_symbol, coords = ([] for i in range (2))
         for line in xyz:
             atom,x,y,z = line.split()

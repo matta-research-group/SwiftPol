@@ -31,4 +31,8 @@ from rdkit.Chem.Descriptors import ExactMolWt
 from openff.interchange import Interchange
 from openff.interchange.components._packmol import UNIT_CUBE, pack_box
 
+from swiftpol import build
+from swiftpol import parameterize
+from swiftpol import __version__
+
 
