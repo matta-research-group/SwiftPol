@@ -252,7 +252,6 @@ def blockiness_gen(sequence):
     -----
     If the sequence does not contain both 'A' and 'B', the function returns a string indicating that the molecule is not a co-polymer.
     """
-    # Function implementation here
 
     if 'A' in sequence and 'B' in sequence: #Check if sequence is a co-polymer
         AB = sequence.count('AB')
@@ -290,7 +289,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     salt_concentration : float, optional
         The desired salt concentration in the simulation box. Defaults to 0 M.
     residual_monomer : float, optional
-        The desired residual monomer concentration in the simulation box. Defaults to 0.00.
+        The desired residual monomer concentration in the simulation box. Defaults to 0.00%.
     solvated : bool, optional
         Indicates whether the system contains water. Defaults to False.
     
@@ -601,14 +600,17 @@ class polymer_system:
         """
         Generate conformers for each polymer chain in the system.
 
-        This method uses the OpenFF toolkit to generate conformers for each polymer chain in the system. 
-        It first checks if the OpenEye toolkit is licensed and available. If it is, it uses the OpenEyeToolkitWrapper 
-        to generate conformers. Otherwise, it falls back to using the RDKitToolkitWrapper. Each chain is processed 
+        This method uses the OpenFF toolkit OpenEye Wrapper to generate conformers for each polymer chain in the system.
+        It first checks if the OpenEye toolkit is licensed and available. If it is, it uses the OpenEyeToolkitWrapper
+        to generate conformers. Otherwise, it falls back to using the RDKitToolkitWrapper. Each chain is processed
         to generate a single conformer, and unique atom names are assigned to each chain.
 
-        Raises:
-        ImportError: If neither RDKit nor OpenEye toolkits are available.
+        Raises
+        ------
+        ImportError
+            If neither RDKit nor OpenEye toolkits are available.
         """
+
         from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
         # Generate conformers using OpenFF toolkit wrapper
         for chain in self.chains:
@@ -624,16 +626,19 @@ class polymer_system:
     def charge_system(self, charge_scheme):
         """
         Assign partial charges to each polymer chain in the system.
-        
-        This method uses one of AM1-BCC, Espaloma or OpenFF NAGL to assign partial charges to each polymer chain in the system.
-   
-        The method iterates over each chain in the `self.chains` list and assigns partial charges to the chain.
-        
-        Parameters:
-        chain_number (int): The number of polymer chains to assign partial charges to.
-        
-        Raises:
-        ImportError: If the selected toolkit is not available.
+
+        This method uses one of AM1-BCC, Espaloma, or OpenFF NAGL to assign partial charges to each polymer chain in the system.
+        It iterates over each chain in the `self.chains` list and assigns partial charges to the chain.
+
+        Parameters
+        ----------
+        charge_scheme : str
+            The charge assignment scheme to use. Options are 'AM1_BCC', 'espaloma', or 'openff'.
+
+        Raises
+        ------
+        ImportError
+            If the selected toolkit is not available.
         """
         from swiftpol.parameterize import charge_openff_polymer
         for chain in self.chains:
@@ -641,54 +646,94 @@ class polymer_system:
 
 
     def solvate_system(self, resid_monomer, salt_concentration):
-        '''Builds solvated system using packmol functions'''
-        from openff.interchange.components._packmol import pack_box
-        monomers = self.monomers
+        """
+        Build a solvated system using Packmol functions.
+
+        This method uses Packmol to build a solvated system by packing molecules into a simulation box. It considers the residual monomer concentration and salt concentration to determine the quantity of each molecule type required.
+
+        Parameters
+        ----------
+        resid_monomer : float
+            The desired residual monomer concentration in the simulation box, as a % of total weight.
+        salt_concentration : float
+            The desired salt concentration in the simulation box, in M (*openff.units.unit.mole/openff.units.unit.liter).
+
+        Raises
+        ------
+        ValueError
+            If the length of 'molecules' and 'number_of_copies' are not the same.
+        RuntimeError
+            If Packmol is not installed or cannot be found.
+
+        Notes
+        -----
+        This function is adapted from the OpenFF Toolkit Packmol wrapper's solvate_topology function.
+        """
+        #Find packmol
+        try:
+            subprocess.run(["packmol"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+        except subprocess.CalledProcessError:
+            raise RuntimeError("Packmol is not installed or cannot be found. Please install Packmol and ensure it is in your PATH.")
+        import subprocess
+        from openbabel import openbabel
         molecules, number_of_copies, topology, box_vectors, resid_monomer_actual = calculate_box_components(chains = self.chains,
                                                                                                     sequence=self.sequence, 
                                                                                                     residual_monomer=resid_monomer,
                                                                                                     salt_concentration=salt_concentration,
-                                                                                                    monomers = monomers)
+                                                                                                    monomers = self.monomers)
         self.residual_monomer = resid_monomer_actual
         self.solvent_comp = molecules
         self.num_copies_solvent = number_of_copies
         self.box_vectors = box_vectors
-        solvated_system = pack_box(molecules=molecules,
-                                    number_of_copies=number_of_copies,
-                                    solute = topology,
-                                    box_vectors=box_vectors,
-                                    center_solute='BRICK')
-        return solvated_system
-    
-    
+        if len(molecules) != len(number_of_copies):
+            raise ValueError("The length of 'structures' and 'num_molecules' must be the same.")
 
+        with open('packmol.inp', 'w') as f:
+            f.write("# Packmol input file\n")
+            f.write(f"tolerance 1.0\n")  # Packing tolerance in Å
+            f.write(f"filetype pdb\n\n")  # Output filetype
 
-    def build_bulk(self, resid_monomer, salt_concentration=0 * unit.mole / unit.liter):
-        """
-        Build a bulk system using packmol functions.
+            # Output file to be generated by Packmol
+            f.write(f"output packed_output.pdb\n\n")
 
-        This method constructs a bulk system by packing the polymer chains into a box using the packmol algorithm.
-        It calculates the topology from the polymer chains, determines the maximum distance between points in the 
-        solute to set the box size, and then uses the `pack_box` function to create the bulk system.
+            x_min, x_max, y_min, y_max, z_min, z_max = box_vectors
 
-        Parameters:
-        resid_monomer (str): The residual monomer to be used in the system.
-        salt_concentration (Quantity, optional): The concentration of salt to be added to the system. 
-                                                   Defaults to 0 mole/liter.
+            # Iterate over the structures and number of molecules
+            for i, mol in enumerate(molecules):
+                f.write(f"structure {mol}\n")
+                f.write(f"  number {number_of_copies[i]}\n")
+                f.write(f"  inside box {x_min} {y_min} {z_min} {x_max} {y_max} {z_max}\n")
+                f.write(f"end structure\n\n")
 
-        Returns:
-        bulk_system: The bulk system generated by packmol.
-
-        Raises:
-        ImportError: If the OpenFF Interchange toolkit is not available.
-        """
-        solute_length = max(_max_dist_between_points(self.chains[i].to_topology().get_positions()) for i in range(len(self.chains)))
-        box_vectors = UNIT_CUBE * solute_length
-        bulk_system = pack_box(molecules=self.chains,
-                                number_of_copies=[3 for i in range(len(self.chains))],
-                                box_shape=UNIT_CUBE,
-                                box_vectors=box_vectors,
-                                center_solute='BRICK')
+        subprocess.run(['packmol < packmol.inp'], check=True, shell=True)
         
-        return bulk_system
+        output_file_path = 'packed_output.pdb'
+        obConversion = openbabel.OBConversion()
+        obConversion.SetInAndOutFormats("pdb", "xyz")
+        mol = openbabel.OBMol()
+        obConversion.ReadFile(mol, output_file_path)
+        obConversion.WriteFile(mol, 'packbox.xyz')
+        xyz = open(path_xyz)
+        atom_symbol, coords = ([] for i in range (2))
+        for line in xyz:
+            atom,x,y,z = line.split()
+            atom_symbol.append(atom)
+            coords.append([float(x),float(y),float(z)])
+        coords_arr = np.array(coords)
+        # Construct the output topology
+        added_molecules = []
+        molecules = [Molecule.from_file(m, file_format='pdb') for m in structures]
+        for mol, n in zip(molecules, num_molecules):
+            added_molecules.extend([mol] * n)
+        solvated_topology = Topology.from_molecules(added_molecules)
+
+        # Set the positions, skipping the positions from solute
+        solvated_topology.set_positions(coords_arr * unit.angstrom)
+
+        # Set the box vectors
+        solvated_topology.box_vectors = UNIT_CUBE * box_vectors
+        return solvated_topology
+    
+    
+
 
