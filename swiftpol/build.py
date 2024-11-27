@@ -232,7 +232,7 @@ def blockiness_gen(sequence):
     """
     Calculate the blockiness and average block length of a co-polymer sequence.
 
-    This function calculates the blockiness of a co-polymer sequence by counting the occurrences of 'GG' and 'GL' or 'LG' in the sequence.
+    This function calculates the blockiness of a co-polymer sequence by counting the occurrences of 'BB' and 'BA' or 'AB' in the sequence.
     It also calculates the average block length of 'A' and 'B' monomers in the sequence.
 
     Parameters
