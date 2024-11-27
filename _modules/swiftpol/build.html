@@ -109,19 +109,28 @@
 <span class="c1">#Build polymer - generic</span>
 <div class="viewcode-block" id="build_polymer">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.build_polymer">[docs]</a>
-<span class="k">def</span> <span class="nf">build_polymer</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">monomer_list</span><span class="p">,</span> <span class="n">reaction</span><span class="p">,</span> <span class="n">terminal</span> <span class="o">=</span><span class="s1">&#39;hydroxyl&#39;</span><span class="p">,</span> <span class="n">chain_num</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">build_polymer</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">monomer_list</span><span class="p">,</span> <span class="n">reaction</span><span class="p">,</span> <span class="n">terminal</span><span class="o">=</span><span class="s1">&#39;hydroxyl&#39;</span><span class="p">,</span> <span class="n">chain_number</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructs a polymer from a given sequence of monomers.</span>
-<span class="sd">    </span>
-<span class="sd">    Parameters:</span>
-<span class="sd">    sequence (str): A string representing the sequence of monomers (e.g., &#39;ABAB&#39;).</span>
-<span class="sd">    monomer_list (list): A list of SMILES strings representing the monomers.</span>
-<span class="sd">    reaction (rdkit.Chem.rdChemReactions.ChemicalReaction): An RDKit reaction object used to link monomers.</span>
-<span class="sd">    terminal (str, optional): The terminal group to be added to the polymer. Options are &#39;hydroxyl&#39;, &#39;carboxyl&#39;, or &#39;ester&#39;. Default is &#39;hydroxyl&#39;.</span>
-<span class="sd">    chain_number (int, optional): The number of polymer chains to construct. Default is 1. Input used for ensemble build.</span>
-<span class="sd">    </span>
-<span class="sd">    Returns:</span>
-<span class="sd">    rdkit.Chem.rdchem.Mol: The constructed polymer as an RDKit molecule object.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sequence : str</span>
+<span class="sd">        A string representing the sequence of monomers (e.g., &#39;ABAB&#39;).</span>
+<span class="sd">    monomer_list : list</span>
+<span class="sd">        A list of SMILES strings representing the monomers.</span>
+<span class="sd">    reaction : rdkit.Chem.rdChemReactions.ChemicalReaction</span>
+<span class="sd">        An RDKit reaction object used to link monomers.</span>
+<span class="sd">    terminal : str, optional</span>
+<span class="sd">        The terminal group to be added to the polymer. Options are &#39;hydroxyl&#39;, &#39;carboxyl&#39;, or &#39;ester&#39;.</span>
+<span class="sd">        Default is &#39;hydroxyl&#39;.</span>
+<span class="sd">    chain_number : int, optional</span>
+<span class="sd">        The number of polymer chains to construct. Default is 1. Input used for ensemble build.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rdkit.Chem.rdchem.Mol</span>
+<span class="sd">        The constructed polymer as an RDKit molecule object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">RDLogger</span> 
     <span class="n">RDLogger</span><span class="o">.</span><span class="n">DisableLog</span><span class="p">(</span><span class="s1">&#39;rdApp.*&#39;</span><span class="p">)</span>   
@@ -203,20 +212,33 @@
 <span class="k">def</span> <span class="nf">build_linear_copolymer</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> 
                            <span class="n">monomer_a_smiles</span><span class="p">,</span> 
                            <span class="n">monomer_b_smiles</span><span class="p">,</span>
-                           <span class="n">reaction</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">ReactionFromSmarts</span><span class="p">(</span><span class="s1">&#39;[C:1][HO:2].[HO:3][C:4]&gt;&gt;[C:1][O:2][C:4].[O:3]&#39;</span><span class="p">)):</span>
+                           <span class="n">reaction</span><span class="o">=</span><span class="n">AllChem</span><span class="o">.</span><span class="n">ReactionFromSmarts</span><span class="p">(</span><span class="s1">&#39;[C:1][HO:2].[HO:3][C:4]&gt;&gt;[C:1][O:2][C:4].[O:3]&#39;</span><span class="p">)):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructs a linear co-polymer from the provided sequence of monomers.</span>
 
-<span class="sd">    This function takes a sequence of monomers represented as &#39;A&#39; and &#39;B&#39;, and the SMILES strings of two monomers. It constructs a co-polymer based on the sequence, using the provided reaction SMARTS for joining the monomers. The function returns the sanitized polymer and the percentage composition of each monomer in the polymer.</span>
+<span class="sd">    This function takes a sequence of monomers represented as &#39;A&#39; and &#39;B&#39;, and the SMILES strings of two monomers.</span>
+<span class="sd">    It constructs a co-polymer based on the sequence, using the provided reaction SMARTS for joining the monomers.</span>
+<span class="sd">    The function returns the sanitized polymer and the percentage composition of each monomer in the polymer.</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">    sequence (str): A string representing the sequence of monomers. &#39;A&#39; represents monomer_a and &#39;B&#39; represents monomer_b.</span>
-<span class="sd">    monomer_a_smiles (str): The SMILES string of monomer A.</span>
-<span class="sd">    monomer_b_smiles (str): The SMILES string of monomer B.</span>
-<span class="sd">    reaction (rdkit.Chem.rdChemReactions.ChemicalReaction, optional): The reaction SMARTS used for joining the monomers. Defaults to &#39;[C:1][HO:2].[HO:3][C:4]&gt;&gt;[C:1][O:2][C:4].[O:3]&#39;, representing a condensation polymerisation.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sequence : str</span>
+<span class="sd">        A string representing the sequence of monomers. &#39;A&#39; represents monomer_a and &#39;B&#39; represents monomer_b.</span>
+<span class="sd">    monomer_a_smiles : str</span>
+<span class="sd">        The SMILES string of monomer A.</span>
+<span class="sd">    monomer_b_smiles : str</span>
+<span class="sd">        The SMILES string of monomer B.</span>
+<span class="sd">    reaction : rdkit.Chem.rdChemReactions.ChemicalReaction, optional</span>
+<span class="sd">        The reaction SMARTS used for joining the monomers. Defaults to &#39;[C:1][HO:2].[HO:3][C:4]&gt;&gt;[C:1][O:2][C:4].[O:3]&#39;,</span>
+<span class="sd">        representing a condensation polymerisation.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">    tuple: A tuple containing the sanitized polymer (rdkit.Chem.rdchem.Mol), the percentage composition of monomer A (float), and the percentage composition of monomer B (float).</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        A tuple containing the following elements:</span>
+<span class="sd">        - sanitized_polymer (rdkit.Chem.rdchem.Mol): The constructed and sanitized polymer.</span>
+<span class="sd">        - percentage_monomer_a (float): The percentage composition of monomer A in the polymer.</span>
+<span class="sd">        - percentage_monomer_b (float): The percentage composition of monomer B in the polymer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Initialize the polymer with an iodine blocker</span>
     <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="s1">&#39;OC(=O)I&#39;</span><span class="p">)</span>
@@ -254,11 +276,18 @@
 
 <span class="sd">    This function takes a list of molecular chains and calculates the PDI, which is the ratio of Mw to Mn. It also calculates Mn, which is the sum of the molecular weights of the chains divided by the number of chains, and Mw, which is the sum of the product of the weight fraction and molecular weight of each chain.</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">    chains (list): A list of molecular chains. Each chain is represented as an RDkit molecule object.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    chains : list</span>
+<span class="sd">        A list of molecular chains. Each chain is represented as an RDKit molecule object.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">    tuple: A tuple containing the PDI (float), Mn (float), and Mw (float).</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        A tuple containing the following elements:</span>
+<span class="sd">        - PDI (float): The Polydispersity Index, which is the ratio of Mw to Mn.</span>
+<span class="sd">        - Mn (float): The number-average molecular weight.</span>
+<span class="sd">        - Mw (float): The weight-average molecular weight.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Calculate the molecular weights of the chains</span>
     <span class="n">mw_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">ExactMolWt</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span> <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains</span><span class="p">]</span>
@@ -286,23 +315,31 @@
 
 <div class="viewcode-block" id="blockiness_gen">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.blockiness_gen">[docs]</a>
-<span class="k">def</span> <span class="nf">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">):</span>  
+<span class="k">def</span> <span class="nf">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the blockiness and average block length of a co-polymer sequence.</span>
 
-<span class="sd">    This function calculates the blockiness of a co-polymer sequence by counting the occurrences of &#39;GG&#39; and &#39;GL&#39; or &#39;LG&#39; in the sequence. </span>
-<span class="sd">    It also calculates the average block length of &#39;G&#39; and &#39;L&#39; in the sequence.</span>
+<span class="sd">    This function calculates the blockiness of a co-polymer sequence by counting the occurrences of &#39;GG&#39; and &#39;GL&#39; or &#39;LG&#39; in the sequence.</span>
+<span class="sd">    It also calculates the average block length of &#39;A&#39; and &#39;B&#39; monomers in the sequence.</span>
 
-<span class="sd">    Parameters:</span>
-<span class="sd">    sequence (str): A string representing the co-polymer sequence. &#39;G&#39; represents one type of monomer and &#39;L&#39; represents another type.</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    sequence : str</span>
+<span class="sd">        A string representing the co-polymer sequence. &#39;A&#39; represents one type of monomer and &#39;B&#39; represents another type.</span>
 
-<span class="sd">    Returns:</span>
-<span class="sd">    blockiness (float): The blockiness of the co-polymer sequence. Calculated as the ratio of &#39;GG&#39; to &#39;GL&#39; or &#39;LG&#39;.</span>
-<span class="sd">    block_length_G (float): The average block length of &#39;G&#39; in the sequence.</span>
-<span class="sd">    block_length_L (float): The average block length of &#39;L&#39; in the sequence.</span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple</span>
+<span class="sd">        A tuple containing the following elements:</span>
+<span class="sd">        - blockiness (float): The blockiness of the co-polymer sequence. Calculated as the ratio of &#39;BB&#39; to &#39;BA&#39; or &#39;AB&#39;.</span>
+<span class="sd">        - block_length_A (float): The average block length of &#39;A&#39; in the sequence.</span>
+<span class="sd">        - block_length_B (float): The average block length of &#39;B&#39; in the sequence.</span>
 
-<span class="sd">    If the sequence does not contain both &#39;G&#39; and &#39;L&#39;, the function returns a string indicating that the molecule is not a co-polymer.</span>
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    If the sequence does not contain both &#39;A&#39; and &#39;B&#39;, the function returns a string indicating that the molecule is not a co-polymer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Function implementation here</span>
 
     <span class="k">if</span> <span class="s1">&#39;A&#39;</span> <span class="ow">in</span> <span class="n">sequence</span> <span class="ow">and</span> <span class="s1">&#39;B&#39;</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span> <span class="c1">#Check if sequence is a co-polymer</span>
         <span class="n">AB</span> <span class="o">=</span> <span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;AB&#39;</span><span class="p">)</span>
