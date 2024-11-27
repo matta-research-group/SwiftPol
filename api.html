@@ -59,7 +59,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.generate_conformers"><code class="docutils literal notranslate"><span class="pre">polymer_system.generate_conformers()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.charge_system"><code class="docutils literal notranslate"><span class="pre">polymer_system.charge_system()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.solvate_system"><code class="docutils literal notranslate"><span class="pre">polymer_system.solvate_system()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.build_bulk"><code class="docutils literal notranslate"><span class="pre">polymer_system.build_bulk()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -217,7 +216,7 @@ and residual monomer concentration. It is adapted from the OpenFF Toolkit Packmo
 </dd>
 <dt>salt_concentration<span class="classifier">float, optional</span></dt><dd><p>The desired salt concentration in the simulation box. Defaults to 0 M.</p>
 </dd>
-<dt>residual_monomer<span class="classifier">float, optional</span></dt><dd><p>The desired residual monomer concentration in the simulation box. Defaults to 0.00.</p>
+<dt>residual_monomer<span class="classifier">float, optional</span></dt><dd><p>The desired residual monomer concentration in the simulation box. Defaults to 0.00%.</p>
 </dd>
 <dt>solvated<span class="classifier">bool, optional</span></dt><dd><p>Indicates whether the system contains water. Defaults to False.</p>
 </dd>
@@ -291,49 +290,54 @@ and residual monomer concentration. It is adapted from the OpenFF Toolkit Packmo
 <dt class="sig sig-object py" id="swiftpol.build.polymer_system.generate_conformers">
 <span class="sig-name descname"><span class="pre">generate_conformers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.generate_conformers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.generate_conformers" title="Link to this definition"></a></dt>
 <dd><p>Generate conformers for each polymer chain in the system.</p>
-<p>This method uses the OpenFF toolkit to generate conformers for each polymer chain in the system.
+<p>This method uses the OpenFF toolkit OpenEye Wrapper to generate conformers for each polymer chain in the system.
 It first checks if the OpenEye toolkit is licensed and available. If it is, it uses the OpenEyeToolkitWrapper
 to generate conformers. Otherwise, it falls back to using the RDKitToolkitWrapper. Each chain is processed
 to generate a single conformer, and unique atom names are assigned to each chain.</p>
-<p>Raises:
-ImportError: If neither RDKit nor OpenEye toolkits are available.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ImportError</strong> – If neither RDKit nor OpenEye toolkits are available.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="swiftpol.build.polymer_system.charge_system">
 <span class="sig-name descname"><span class="pre">charge_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">charge_scheme</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.charge_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.charge_system" title="Link to this definition"></a></dt>
 <dd><p>Assign partial charges to each polymer chain in the system.</p>
-<p>This method uses one of AM1-BCC, Espaloma or OpenFF NAGL to assign partial charges to each polymer chain in the system.</p>
-<p>The method iterates over each chain in the <cite>self.chains</cite> list and assigns partial charges to the chain.</p>
-<p>Parameters:
-chain_number (int): The number of polymer chains to assign partial charges to.</p>
-<p>Raises:
-ImportError: If the selected toolkit is not available.</p>
+<p>This method uses one of AM1-BCC, Espaloma, or OpenFF NAGL to assign partial charges to each polymer chain in the system.
+It iterates over each chain in the <cite>self.chains</cite> list and assigns partial charges to the chain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>charge_scheme</strong> (<em>str</em>) – The charge assignment scheme to use. Options are ‘AM1_BCC’, ‘espaloma’, or ‘openff’.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ImportError</strong> – If the selected toolkit is not available.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="swiftpol.build.polymer_system.solvate_system">
 <span class="sig-name descname"><span class="pre">solvate_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resid_monomer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salt_concentration</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.solvate_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.solvate_system" title="Link to this definition"></a></dt>
-<dd><p>Builds solvated system using packmol functions</p>
-</dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="swiftpol.build.polymer_system.build_bulk">
-<span class="sig-name descname"><span class="pre">build_bulk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resid_monomer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salt_concentration=&lt;Quantity(0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'mole</span> <span class="pre">/</span> <span class="pre">liter')&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.build_bulk"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.build_bulk" title="Link to this definition"></a></dt>
-<dd><p>Build a bulk system using packmol functions.</p>
-<p>This method constructs a bulk system by packing the polymer chains into a box using the packmol algorithm.
-It calculates the topology from the polymer chains, determines the maximum distance between points in the
-solute to set the box size, and then uses the <cite>pack_box</cite> function to create the bulk system.</p>
-<p>Parameters:
-resid_monomer (str): The residual monomer to be used in the system.
-salt_concentration (Quantity, optional): The concentration of salt to be added to the system.</p>
-<blockquote>
-<div><p>Defaults to 0 mole/liter.</p>
-</div></blockquote>
-<p>Returns:
-bulk_system: The bulk system generated by packmol.</p>
-<p>Raises:
-ImportError: If the OpenFF Interchange toolkit is not available.</p>
+<dd><p>Build a solvated system using Packmol functions.</p>
+<p>This method uses Packmol to build a solvated system by packing molecules into a simulation box. It considers the residual monomer concentration and salt concentration to determine the quantity of each molecule type required.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resid_monomer</strong> (<em>float</em>) – The desired residual monomer concentration in the simulation box, as a % of total weight.</p></li>
+<li><p><strong>salt_concentration</strong> (<em>float</em>) – The desired salt concentration in the simulation box, in M (<a href="#id2"><span class="problematic" id="id3">*</span></a>openff.units.unit.mole/openff.units.unit.liter).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the length of ‘molecules’ and ‘number_of_copies’ are not the same.</p></li>
+<li><p><strong>RuntimeError</strong> – If Packmol is not installed or cannot be found.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function is adapted from the OpenFF Toolkit Packmol wrapper’s solvate_topology function.</p>
 </dd></dl>
 
 </dd></dl>
