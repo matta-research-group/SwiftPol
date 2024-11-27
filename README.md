@@ -1,10 +1,9 @@
 ![title](Repo/logo.jpg)
 
 [![PyTest](https://github.com/matta-research-group/SwiftPol/actions/workflows/SwiftPol_tests.yml/badge.svg)](https://github.com/matta-research-group/SwiftPol/actions/workflows/SwiftPol_tests.yml)
-
+[![Documentation](https://github.com/matta-research-group/SwiftPol/actions/workflows/pages/pages-build-deployment/badge.svg)](https://matta-research-group.github.io/SwiftPol)
 [![GitHub last commit](https://img.shields.io/github/last-commit/matta-research-group/SwiftPol)](https://github.com/matta-research-group/SwiftPol/commits/main)
 
-[![Documentation](https://github.com/matta-research-group/SwiftPol/actions/workflows/pages/pages-build-deployment/badge.svg)](https://matta-research-group.github.io/SwiftPol)
 
 
 # SwiftPol
