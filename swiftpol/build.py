@@ -31,7 +31,7 @@ from openff.interchange import Interchange
 
 
 #Build polymer - generic
-def build_polymer(sequence, monomer_list, reaction, terminal='hydroxyl', chain_number=1):
+def build_polymer(sequence, monomer_list, reaction, terminal='hydroxyl', chain_num=1):
     """
     Constructs a polymer from a given sequence of monomers.
 
