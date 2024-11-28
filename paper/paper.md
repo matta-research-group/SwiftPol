@@ -121,7 +121,7 @@ We determined whether SwiftPol can build polymer ensembles and chains with sizes
 
 We presented SwiftPol, an open-source Python package for building polydisperse *in silico* polymer ensembles. SwiftPol recreates core characteristics of bulk polymer materials like polydispersity, enabling the simulation of representative systems that capture key components of polymer physics. We have shown that building longer chains and larger systems, exceeding what would be appropriate for atomistic MD simulations, will not create a time bottleneck in the MD workflow. SwiftPol is a robust and scalable tool for the guided generation of polydisperse polymer mixtures, which can be easily integrated into existing open-source MD software, such as the OpenFF toolkit.
 
-In future releases, we will expand SwiftPol to include options to control tacticity, and offer a broader selection of solvation buffers.
+In future releases, we will expand SwiftPol to include options to control tacticity, provide in-package integration into widely-established packing software and offer a broader selection of solvation buffers.
 
 # Defining Polymer Properties 
 
