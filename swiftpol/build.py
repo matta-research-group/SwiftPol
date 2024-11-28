@@ -633,7 +633,7 @@ class polymer_system:
         Parameters
         ----------
         charge_scheme : str
-            The charge assignment scheme to use. Options are 'AM1_BCC', 'espaloma', or 'openff'.
+            The charge assignment scheme to use. Options are 'AM1_BCC', 'espaloma', or 'NAGL'.
 
         Raises
         ------
