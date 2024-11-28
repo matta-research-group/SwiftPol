@@ -36,16 +36,19 @@
 
 @article{davel_parameterization_2024,
 	title = {Parameterization of {General} {Organic} {Polymers} within the {Open} {Force} {Field} {Framework}},
+	volume = {64},
 	issn = {1549-9596},
 	url = {https://doi.org/10.1021/acs.jcim.3c01691},
 	doi = {10.1021/acs.jcim.3c01691},
 	abstract = {Polymer and chemically modified biopolymer systems present unique challenges to traditional molecular simulation preparation workflows. First, typical polymer and biomolecular input formats, such as Protein Data Bank (PDB) files, lack adequate chemical information needed for the parameterization of new chemistries. Second, polymers are typically too large for accurate partial charge generation methods. In this work, we employ direct chemical perception through the Open Force Field toolkit to create a flexible polymer simulation workflow for organic polymers, encompassing everything from biopolymers to soft materials. We propose and test a new input specification for monomer information that can, along with a 3D conformational geometry, parametrize and simulate most soft-material systems within the same workflow used for smaller ligands. The monomer format encompasses a subset of the SMIRKS substructure query language to uniquely identify chemical information and repeating charges in underspecified systems through matching atomic connectivity. This workflow is combined with several different approaches for automatic partial-charge generation for larger systems. As an initial proof of concept, a variety of diverse polymeric systems were parametrized with the Open Force Field toolkit, including functionalized proteins, DNA, homopolymers, cross-linked systems, and sugars. Additionally, shape properties and radial distribution functions were computed from molecular dynamics simulations of poly(ethylene glycol), polyacrylamide, and poly(N-isopropylacrylamide) homopolymers in aqueous solution and compared to previous simulation results in order to demonstrate a start-to-finish workflow for simulation and property prediction. We expect that these tools will greatly expedite the day-to-day computational research of soft-matter simulations and create a robust atomic-scale polymer specification in conjunction with existing polymer structural notations.},
+	number = {4},
 	urldate = {2024-02-02},
 	journal = {Journal of Chemical Information and Modeling},
 	author = {Davel, Connor M. and Bernat, Timotej and Wagner, Jeffrey R. and Shirts, Michael R.},
 	month = feb,
 	year = {2024},
 	note = {Publisher: American Chemical Society},
+	pages = {1390--1305},
 	file = {Davel et al. - 2024 - Parameterization of General Organic Polymers withi.pdf:/Users/hannahturney/Zotero/storage/GH485PTA/Davel et al. - 2024 - Parameterization of General Organic Polymers withi.pdf:application/pdf},
 }
 
@@ -363,7 +366,7 @@ Fix misnamed test
 	author = {Ochi, Masanori and Wan, Bo and Bao, Quanying and Burgess, Diane J.},
 	month = apr,
 	year = {2021},
-	keywords = {Glass transition temperature, Leuprolide, Microspheres, PLGA, Release characteristics},
+	keywords = {PLGA, Microspheres, Glass transition temperature, Leuprolide, Release characteristics},
 	pages = {120450},
 	file = {ScienceDirect Snapshot:/Users/hannahturney/Zotero/storage/RU4HBZJ4/S0378517321002556.html:text/html},
 }
@@ -392,7 +395,7 @@ Fix misnamed test
 	month = jan,
 	year = {2007},
 	pmid = {17201411},
-	keywords = {Binding Sites, Crystallography, X-Ray, Ligands, Molecular Conformation, Molecular Structure, Protein Binding, Proteins, Quantitative Structure-Activity Relationship, ROC Curve},
+	keywords = {Proteins, Binding Sites, Crystallography, X-Ray, Ligands, Molecular Conformation, Molecular Structure, Protein Binding, Quantitative Structure-Activity Relationship, ROC Curve},
 	pages = {74--82},
 }
 
@@ -419,7 +422,24 @@ Fix misnamed test
 	author = {Triandafilidi, Vasilii and Rottler, Jörg and Hatzikiriakos, Savvas G.},
 	year = {2016},
 	note = {\_eprint: https://onlinelibrary.wiley.com/doi/pdf/10.1002/polb.24142},
-	keywords = {crystallization, molecular dynamics, nucleation},
+	keywords = {molecular dynamics, crystallization, nucleation},
 	pages = {2318--2326},
 	file = {Full Text PDF:/Users/hannahturney/Zotero/storage/W339VU6C/Triandafilidi et al. - 2016 - Molecular dynamics simulations of monodispersebidisperse polymer melt crystallization.pdf:application/pdf;Snapshot:/Users/hannahturney/Zotero/storage/S56M6I9A/polb.html:text/html},
+}
+
+@article{martinez_packmol_2009,
+	title = {{PACKMOL}: a package for building initial configurations for molecular dynamics simulations},
+	volume = {30},
+	issn = {1096-987X},
+	shorttitle = {{PACKMOL}},
+	doi = {10.1002/jcc.21224},
+	abstract = {Adequate initial configurations for molecular dynamics simulations consist of arrangements of molecules distributed in space in such a way to approximately represent the system's overall structure. In order that the simulations are not disrupted by large van der Waals repulsive interactions, atoms from different molecules must keep safe pairwise distances. Obtaining such a molecular arrangement can be considered a packing problem: Each type molecule must satisfy spatial constraints related to the geometry of the system, and the distance between atoms of different molecules must be greater than some specified tolerance. We have developed a code able to pack millions of atoms, grouped in arbitrarily complex molecules, inside a variety of three-dimensional regions. The regions may be intersections of spheres, ellipses, cylinders, planes, or boxes. The user must provide only the structure of one molecule of each type and the geometrical constraints that each type of molecule must satisfy. Building complex mixtures, interfaces, solvating biomolecules in water, other solvents, or mixtures of solvents, is straightforward. In addition, different atoms belonging to the same molecule may also be restricted to different spatial regions, in such a way that more ordered molecular arrangements can be built, as micelles, lipid double-layers, etc. The packing time for state-of-the-art molecular dynamics systems varies from a few seconds to a few minutes in a personal computer. The input files are simple and currently compatible with PDB, Tinker, Molden, or Moldy coordinate files. The package is distributed as free software and can be downloaded from http://www.ime.unicamp.br/{\textasciitilde}martinez/packmol/.},
+	language = {eng},
+	number = {13},
+	journal = {Journal of Computational Chemistry},
+	author = {Martínez, L. and Andrade, R. and Birgin, E. G. and Martínez, J. M.},
+	month = oct,
+	year = {2009},
+	pmid = {19229944},
+	pages = {2157--2164},
 }

@@ -47,13 +47,13 @@ SwiftPol takes as an input the simplified molecular-input line-entry system (SMI
 
 As depicted in \autoref{Figure 1}, SwiftPol generates an initial polymer chain with a chain length drawn from a normal distribution centered around the specified target length, along with a terminal group that corresponds to the chosen input. In the case of a block copolymer, a probability function is used to determine the ratio of monomers in the chain and the chain is passed to a second function which tests whether the values for blockiness and % monomer are within 10% of the input variable by default. The +/- 10% acceptance margin introduces polydispersity into the ensemble by ensuring a certain level of non-uniformity between polymer chains, without straying too far from the input value. The acceptance margin can be adjusted by the user to control the level of polydispersity in the SwiftPol ensemble.
 
-If all tests are passed, the chain is appended to the Python polymer ensemble build object, and the associated properties of the chain are calculated and added as ensemble attributes. Otherwise, the chain is discarded, and the process is repeated. Once the ensemble size is satisfied, average properties are calculated using built-in SwiftPol functions. 
+If all tests are passed, the chain is appended to the Python polymer ensemble build object, and the associated properties of the chain are calculated and added as ensemble attributes. Otherwise, the chain is discarded, and the process is repeated. Once the ensemble size is satisfied, average properties are calculated using built-in SwiftPol functions [@martinez_packmol_2009].
 
 ![Flowchart showing the process of building a polymer ensemble using SwiftPol. Created in BioRender. Matta, M. (2024) https://BioRender.com/o66z317.\label{Figure 1}](Fig_1_Swiftpol.png) 
 
 This approach allows for the generation of a polydisperse chain ensemble, meaning each chain displays different properties but the ensemble matches the target properties and distribution, as is observed in experimental polymer samples. 
 
-SwiftPol also contains functions to generate conformers using RDkit or OpenEye (license-dependent), pack periodic boxes using packmol, and assign force field parameters to the polydisperse ensembles using the openff-interchange infrastructure [@hawkins_comparison_2007]. 
+SwiftPol also contains functions to generate conformers using RDkit or OpenEye (license-dependent), and assign force field parameters to the polydisperse ensembles using the openff-interchange infrastructure [@hawkins_comparison_2007]. The user can export the chain ensemble to existing tools such as packmol to generate initial configurations for molecular dynamics.
 
 # Application: building a poly(lactide-co-glycolide) ensemble
 
