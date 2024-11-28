@@ -537,7 +537,7 @@ class polymer_system:
         #First round of building - copolymer
         if copolymer==True:
             for n in range(num_chains):
-                length_actual = np.random.normal(length_target, 0.5)
+                length_actual = np.random.normal(length_target, 2)
                 sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                 blockiness = blockiness_gen(sequence)[0]
                 if spec(sequence, blockiness)==True:
@@ -554,7 +554,7 @@ class polymer_system:
                     out_of_spec +=1
                 #Second round of building
                 while out_of_spec >0:
-                    length_actual = np.random.normal(length_target, 0.5)
+                    length_actual = np.random.normal(length_target, 2)
                     sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                     blockiness = blockiness_gen(sequence)[0]
                     if spec(sequence, blockiness)==True:
@@ -577,7 +577,7 @@ class polymer_system:
                 self.A_actual = mean(perc_A_actual)
         else:
             for n in range(num_chains):
-                length_actual = np.random.normal(length_target, 0.5)
+                length_actual = np.random.normal(length_target, 2)
                 sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                 pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
                 lengths.append(int(length_actual))
