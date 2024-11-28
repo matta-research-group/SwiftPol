@@ -36,19 +36,31 @@ from swiftpol import build
 def build_PLGA_ring(sequence, 
                     reaction = AllChem.ReactionFromSmarts('[I:1][O:2].[I:3][C:4]>>[C:4][O:2].[I:3][I:1]'),
                     terminal='hydroxyl'):
-    ''' Build a PLGA co-polymer of specified sequence and return the sanitized polymer, specify monomer joining scheme using reaction SMARTS
-    takes a list of up to 2 monomers to create a co-polymer.
-    This function takes the cyclic esters lactide and glycolide as constituent monomers
-    Inputs:
-    reaction = Reaction SMARTS rdkit chemical reaction object specifying the joining of 2 iodinated compounds into an ester
-    sequence = string with sequence (L for Lactide, G for glycolic acid). For this function, sequence must be assembled as blocks of 2 monomers
-        e.g. LLGGLLGG
-    monomer input is a RDkit.Chem Mol.object, not a SMILES string and must contain I-I bridging the point of esterification
-    Outputs:
-    PLGA macromolecule as RDkit.Chem.Mol
-    Lactide ratio %
-    Glycolide ratio %
-    '''
+    """
+    Build a PLGA co-polymer of a specified diblock sequence and return the sanitized polymer.
+
+    This function takes a list of up to 2 monomers to create a co-polymer. It uses the cyclic esters lactide and glycolide as constituent monomers.
+    The function joins monomers using the specified reaction SMARTS and returns the constructed PLGA macromolecule along with the percentage composition of lactide and glycolide.
+
+    Parameters
+    ----------
+    sequence : str
+        A string representing the sequence of monomers. 'L' represents lactide and 'G' represents glycolic acid.
+        The sequence must be assembled as blocks of 2 monomers (e.g., 'LLGGLLGG').
+    monomer_list : list
+        A list of RDKit.Chem.Mol objects representing the monomers. Each monomer must contain I-I bridging the point of esterification.
+    reaction : rdkit.Chem.rdChemReactions.ChemicalReaction
+        An RDKit reaction object specifying the joining of 2 iodinated compounds into an ester.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the following elements:
+        - plga_macromolecule (rdkit.Chem.rdchem.Mol): The constructed and sanitized PLGA macromolecule.
+        - lactide_ratio (float): The percentage composition of lactide in the polymer.
+        - glycolide_ratio (float): The percentage composition of glycolide in the polymer.
+    """
+    # Function implementation here
     ring_smiles = ['O1C(=O)C[I+][I+]OC(=O)C1', 'C[C@@H]1[I+][I+]OC(=O)[C@H](C)OC1=O', 'C[C@@H]1O[I+][I+]C(=O)[C@@H](C)OC1=O', 'C[C@H]1O[I+][I+]C(=O)[C@H](C)OC1=O'] 
     GG_i = Chem.MolFromSmiles(ring_smiles[0])
     LL_1 = Chem.MolFromSmiles(ring_smiles[1])
@@ -94,17 +106,24 @@ def blockiness_PLGA(sequence):
     """
     Calculate the blockiness and average block length of a PLGA sequence.
 
-    This function calculates the blockiness of a PLGA sequence by counting the occurrences of 'GG' and 'GL' or 'LG' in the sequence. 
+    This function calculates the blockiness of a PLGA sequence by counting the occurrences of 'GG' and 'GL' or 'LG' in the sequence.
     It also calculates the average block length of 'G' and 'L' in the sequence.
 
-    Parameters:
-    sequence (str): A string representing the PLGA sequence. 'G' represents one type of monomer and 'L' represents another type.
+    Parameters
+    ----------
+    sequence : str
+        A string representing the PLGA sequence. 'G' represents one type of monomer and 'L' represents another type.
 
-    Returns:
-    blockiness (float): The blockiness of the PLGA sequence. Calculated as the ratio of 'GG' to 'GL' or 'LG'.
-    block_length_G (float): The average block length of 'G' in the sequence.
-    block_length_L (float): The average block length of 'L' in the sequence.
+    Returns
+    -------
+    tuple
+        A tuple containing the following elements:
+        - blockiness (float): The blockiness of the PLGA sequence. Calculated as the ratio of 'GG' to 'GL' or 'LG'.
+        - block_length_G (float): The average block length of 'G' in the sequence.
+        - block_length_L (float): The average block length of 'L' in the sequence.
 
+    Notes
+    -----
     If the sequence does not contain both 'G' and 'L', the function returns a string indicating that the molecule is not a co-polymer.
     """
 
@@ -130,23 +149,36 @@ def blockiness_PLGA(sequence):
 
 def calculate_box_components_PLGA(chains, sequence, monomers = ['OC(=O)CO', 'C[C@@H](C(=O)[OH])O'], salt_concentration = 0.1 * unit.mole / unit.liter, residual_monomer = 0.00):
     """
-    ADAPTED FROM OPENFF TOOLKIT PACKMOL WRAPPER SOLVATE_TOPOLOGY FUNCTION
-    Calculates the components required to construct a simulation box for a given set of molecular chains.
-    Considers the salt concentration and residual monomer concentration to determine the quantity of each molecule type required.
+    Calculate the components required to construct a simulation box for a given set of molecular chains.
 
-    Parameters:
-    chains (list): A list of molecular chains to be included in the simulation box.
-    sequence (str): A string representing the sequence of the molecular chains. 'G' and 'L' represent different types of monomers.
-    salt_concentration (float, optional): The desired salt concentration in the simulation box. Defaults to 0.1 M.
-    residual_monomer (float, optional): The desired residual monomer concentration in the simulation box. Defaults to 0.05.
+    This function considers the salt concentration and residual monomer concentration to determine the quantity of each molecule type required.
+    It is adapted from the OpenFF Toolkit Packmol wrapper's solvate_topology function.
 
-    Returns:
-    tuple: A tuple containing the following elements:
+    Parameters
+    ----------
+    chains : list
+        A list of molecular chains to be included in the simulation box.
+    sequence : str
+        A string representing the sequence of the molecular chains. 'G' and 'L' represent different types of monomers.
+    salt_concentration : float, optional
+        The desired salt concentration in the simulation box. Defaults to 0.1 M.
+    residual_monomer : float, optional
+        The desired residual monomer concentration in the simulation box. Defaults to 0.05.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the following elements:
         - molecules (list): A list of molecules to be included in the simulation box.
         - number_of_copies (list): A list indicating the quantity of each molecule to be included in the simulation box.
         - topology (openff.toolkit.topology.Topology): The topology of the simulation box.
         - box_vectors (numpy.ndarray): The vectors defining the dimensions of the simulation box.
+
+    Notes
+    -----
+    This function is adapted from the OpenFF Toolkit Packmol wrapper's solvate_topology function.
     """
+    # Function implementation here
     from openff.toolkit.topology import Molecule, Topology
     from openff.interchange.components._packmol import UNIT_CUBE, pack_box, RHOMBIC_DODECAHEDRON, solvate_topology
     from openff.interchange.components._packmol import _max_dist_between_points, _compute_brick_from_box_vectors, _center_topology_at

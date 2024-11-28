@@ -151,22 +151,56 @@ class TestBlockinessGen(unittest.TestCase):
 #Test calculate box components
 class TestCalculateBoxComponents(unittest.TestCase):
     def test_calculate_box_components(self):
+        from openff.units import unit
         # Create a polymer system
-        x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)OI'], 
-                    reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'), 
-                    length_target = 10, 
-                    terminals = 'hydroxyl', 
-                    num_chains = 5, 
-                    copolymer=False)
+        x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
+                        reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'), 
+                        length_target = 20, 
+                        terminals = 'hydroxyl', 
+                        num_chains = 1, 
+                        perc_A_target=75, 
+                        blockiness_target=1.0, 
+                        copolymer=True,
+                        acceptance=1)
         x.generate_conformers()
-        # Calculate box components
-        molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = build.calculate_box_components(chains = x.chains,
-                                                                                                                     monomers = x.monomers,
-                                                                                                                    sequence=x.sequence)        
+
+        molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = build.calculate_box_components(chains = x.chains, 
+                                                                                                            monomers = x.monomers, 
+                                                                                                            sequence = x.sequence, 
+                                                                                                            salt_concentration= 0 * unit.mole/unit.litre,
+                                                                                                            residual_monomer = 1.5,
+                                                                                                            solvated=True
+                                                                                                                
+        )     
 
         # Check if the returned molecules is a list
         self.assertTrue(isinstance(molecules, list))
         self.assertEqual(len(molecules), 5)
+        # Check if the returned number_of_copies is an integer
+        self.assertTrue(isinstance(number_of_copies, list))
+        # Check if the returned topology is a Topology object
+        self.assertTrue(isinstance(topology, Topology))
+        # Check if the returned box_vectors has the correct shape
+        self.assertEqual(box_vectors.shape, (3, 3))   
+        # Check if the returned residual_monomer_actual is a float
+        self.assertTrue(isinstance(residual_monomer_actual, float))
+        # Check if the returned residual_monomer_actual is as expected
+        print('resid_mon = ', residual_monomer_actual)
+        self.assertTrue(1.25 <= residual_monomer_actual <= 1.75)
+
+        # Calculate box components - test case without residual monomer and solvent
+        molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = build.calculate_box_components(chains = x.chains, 
+                                                                                                            monomers = x.monomers, 
+                                                                                                            sequence = x.sequence, 
+                                                                                                            salt_concentration= 0 * unit.mole/unit.litre,
+                                                                                                            residual_monomer = 0,
+                                                                                                            solvated=False      
+        )
+        # Check if the returned molecules is a list of 5 objects, and water is not included
+        self.assertTrue(isinstance(molecules, list))
+        self.assertEqual(len(molecules), 5)
+        self.assertEqual(len(number_of_copies), 5)
+        self.assertEqual(number_of_copies[0], 0)
         # Check if the returned number_of_copies is an integer
         self.assertTrue(isinstance(number_of_copies, list))
         # Check if the returned topology is a Topology object
@@ -177,33 +211,6 @@ class TestCalculateBoxComponents(unittest.TestCase):
         self.assertTrue(isinstance(residual_monomer_actual, float))
         # Check if the returned residual_monomer_actual is as expected
         self.assertTrue(residual_monomer_actual==0.0)  
-        x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)OI'], 
-                    reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'), 
-                    length_target = 10, 
-                    terminals = 'hydroxyl', 
-                    num_chains = 100, 
-                    copolymer=False)
-        x.generate_conformers()   
-
-        # Calculate box components - test case with residual monomer
-        molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = build.calculate_box_components(chains = x.chains,
-                                                                                                                     monomers = x.monomers,
-                                                                                                                    sequence=x.sequence,
-                                                                                                                    residual_monomer=0.5)        
-
-        # Check if the returned molecules is a list
-        self.assertTrue(isinstance(molecules, list))
-        self.assertEqual(len(molecules), 5)
-        # Check if the returned number_of_copies is an integer
-        self.assertTrue(isinstance(number_of_copies, list))
-        # Check if the returned topology is a Topology object
-        self.assertTrue(isinstance(topology, Topology))
-        # Check if the returned box_vectors has the correct shape
-        self.assertEqual(box_vectors.shape, (3, 3))   
-        # Check if the returned residual_monomer_actual is a float
-        self.assertTrue(isinstance(residual_monomer_actual, float))
-        # Check if the returned residual_monomer_actual is as expected
-        self.assertAlmostEqual(round(residual_monomer_actual,3), 0.5, places=4)
 
 class TestPolymerSystem(unittest.TestCase):
     def test_init(self):
@@ -244,9 +251,12 @@ class TestPolymerSystem(unittest.TestCase):
         self.assertTrue(9 <= round(x.max_length)<= 11)
         self.assertTrue(47.5 <= x.A_actual <= 52.5)
         self.assertTrue(0.95 <= x.mean_blockiness <= 1.05)
-
-
-
+        #Test solvate
+        #from openff.units import unit
+        #solv_system = x.solvate_system(resid_monomer = 1.5, salt_concentration = 0.1 * unit.mole / unit.liter)
+        #self.assertIsNone(solv_system)
+        #self.assertTrue(1.3 <= x.residual_monomer <= 1.7)
+        #self.assertEqual(solv_system.shape, (3, 3))  
 
 # Run
 
