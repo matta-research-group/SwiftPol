@@ -384,13 +384,15 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     
     if 'A' in sequence and 'B' in sequence:
         A_rd = Chem.MolFromSmiles(monomers[0])
+        A_rd = Chem.AddHs(A_rd)
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName('A' + str(1))
         info.SetResidueNumber(1)
         [atom.SetMonomerInfo(info)  for  atom  in  A_rd.GetAtoms()]
         A = Molecule.from_rdkit(A_rd)
         A_mass = sum([atom.mass for atom in A.atoms])
-        B_rd = Chem.MolFromSmiles(monomers[0])
+        B_rd = Chem.MolFromSmiles(monomers[1])
+        B_rd = Chem.AddHs(B_rd)
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName('B' + str(1))
         info.SetResidueNumber(1)
@@ -409,6 +411,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     
     elif 'A' in sequence and 'B' not in sequence:
         A_rd = Chem.MolFromSmiles(monomers[0])
+        A_rd = Chem.AddHs(A_rd)
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName('A' + str(1))
         info.SetResidueNumber(1)
