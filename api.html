@@ -58,6 +58,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.__init__"><code class="docutils literal notranslate"><span class="pre">polymer_system.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.generate_conformers"><code class="docutils literal notranslate"><span class="pre">polymer_system.generate_conformers()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.charge_system"><code class="docutils literal notranslate"><span class="pre">polymer_system.charge_system()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.export_to_csv"><code class="docutils literal notranslate"><span class="pre">polymer_system.export_to_csv()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -316,6 +317,17 @@ It iterates over each chain in the <cite>self.chains</cite> list and assigns par
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system.export_to_csv">
+<span class="sig-name descname"><span class="pre">export_to_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.export_to_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.export_to_csv" title="Link to this definition"></a></dt>
+<dd><p>Export all the instances in polymer_system.__init__() into a pandas DataFrame and save it as a CSV file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – The name of the CSV file to save the data.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </section>
@@ -347,23 +359,30 @@ It iterates over each chain in the <cite>self.chains</cite> list and assigns par
 
 <dl class="py function">
 <dt class="sig sig-object py" id="swiftpol.parameterize.charge_openff_polymer">
-<span class="sig-prename descclassname"><span class="pre">swiftpol.parameterize.</span></span><span class="sig-name descname"><span class="pre">charge_openff_polymer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">openff_chain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge_scheme</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/parameterize.html#charge_openff_polymer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.parameterize.charge_openff_polymer" title="Link to this definition"></a></dt>
-<dd><p>Calculate and return the partial charges of a polymer chain based on the specified charge scheme.</p>
+<span class="sig-prename descclassname"><span class="pre">swiftpol.parameterize.</span></span><span class="sig-name descname"><span class="pre">charge_openff_polymer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">openff_chain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge_scheme</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/parameterize.html#charge_openff_polymer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.parameterize.charge_openff_polymer" title="Link to this definition"></a></dt>
+<dd><p>Assign partial charges to a polymer chain based on the specified charge scheme.</p>
+<p>This function assigns partial charges to a polymer chain using one of the following charge schemes:
+‘AM1_BCC’, ‘NAGL’, or ‘espaloma’. It can optionally overwrite existing charges.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>polymer</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – A polymer chain for which the charges are to be calculated.</p></li>
-<li><p><strong>charge_scheme</strong> (<em>str</em>) – A string that specifies the charge scheme to be used. It can be either ‘AM1_BCC’, ‘espaloma’, or ‘NAGL’.</p></li>
+<li><p><strong>openff_chain</strong> (<em>openff.toolkit.topology.Molecule</em>) – The original polymer chain to which partial charges will be assigned.</p></li>
+<li><p><strong>charge_scheme</strong> (<em>str</em>) – The charge scheme to use for assigning partial charges. Options are ‘AM1_BCC’, ‘NAGL’, or ‘espaloma’.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool, optional</em>) – Whether to overwrite existing partial charges. Default is True.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The partial charges of the polymer chain according to the specified charge scheme.</p>
+<dd class="field-even"><p>The partial charges assigned to the polymer chain.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>numpy.ndarray</p>
+<dd class="field-odd"><p>openff.toolkit.topology.molecule.PartialChargeArray</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>AttributeError</strong> – If the charge_scheme input is not ‘AM1_BCC’, ‘NAGL’, or ‘espaloma’.</p>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ModuleNotFoundError</strong> – If the installed version of openff-toolkit is below what is required to use NAGL.</p></li>
+<li><p><strong>ImportError</strong> – If the required package for the specified charge scheme is not installed.</p></li>
+<li><p><strong>AttributeError</strong> – If the charge_scheme input is not ‘AM1_BCC’, ‘NAGL’, or ‘espaloma’.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>

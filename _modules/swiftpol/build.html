@@ -83,6 +83,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">from</span> <span class="nn">openeye</span> <span class="kn">import</span> <span class="n">oechem</span>
 
@@ -537,7 +538,6 @@
     <span class="kn">from</span> <span class="nn">swiftpol.build</span> <span class="kn">import</span> <span class="n">build_polymer</span><span class="p">,</span> <span class="n">PDI</span><span class="p">,</span> <span class="n">blockiness_gen</span><span class="p">,</span> <span class="n">calculate_box_components</span>
     <span class="kn">from</span> <span class="nn">openff.units</span> <span class="kn">import</span> <span class="n">unit</span>
     <span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">AllChem</span>
-    <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <div class="viewcode-block" id="polymer_system.__init__">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.__init__">[docs]</a>
@@ -683,6 +683,12 @@
                 <span class="n">chain</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
                 <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
                 <span class="n">perc_A_actual</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">B_block_length</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">A_block_length</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">blockiness_list</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">mean_blockiness</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">perc_A_actual</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">A_actual</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chains</span> <span class="o">=</span> <span class="n">chains</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">)):</span>
@@ -697,6 +703,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">lengths</span> <span class="o">=</span> <span class="n">lengths</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_length</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
+        
 
 
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;System built!, size =&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_chains</span><span class="p">)</span></div>
@@ -754,6 +761,40 @@
         <span class="kn">from</span> <span class="nn">swiftpol.parameterize</span> <span class="kn">import</span> <span class="n">charge_openff_polymer</span>
         <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
             <span class="n">chain</span><span class="o">.</span><span class="n">partial_charges</span> <span class="o">=</span> <span class="n">charge_openff_polymer</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">charge_scheme</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="polymer_system.export_to_csv">
+<a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.export_to_csv">[docs]</a>
+    <span class="k">def</span> <span class="nf">export_to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Export all the instances in polymer_system.__init__() into a pandas DataFrame and save it as a CSV file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            The name of the CSV file to save the data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;monomers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">monomers</span><span class="p">],</span>
+            <span class="s1">&#39;length_target&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">length_target</span><span class="p">],</span>
+            <span class="s1">&#39;terminals&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">terminals</span><span class="p">],</span>
+            <span class="s1">&#39;num_chains&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">num_chains</span><span class="p">],</span>
+            <span class="s1">&#39;chains&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">],</span>
+            <span class="s1">&#39;chain_rdkit&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">chain_rdkit</span><span class="p">],</span>
+            <span class="s1">&#39;mol_weight_average&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mol_weight_average</span><span class="p">],</span>
+            <span class="s1">&#39;PDI&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">PDI</span><span class="p">],</span>
+            <span class="s1">&#39;Mn&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Mn</span><span class="p">],</span>
+            <span class="s1">&#39;Mw&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Mw</span><span class="p">],</span>
+            <span class="s1">&#39;sequence&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">],</span>
+            <span class="s1">&#39;B_block_length&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">B_block_length</span><span class="p">],</span>
+            <span class="s1">&#39;A_block_length&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">A_block_length</span><span class="p">],</span>
+            <span class="s1">&#39;blockiness_list&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">blockiness_list</span><span class="p">],</span>
+            <span class="s1">&#39;mean_blockiness&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mean_blockiness</span><span class="p">],</span>
+            <span class="s1">&#39;perc_A_actual&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">perc_A_actual</span><span class="p">],</span>
+            <span class="s1">&#39;A_actual&#39;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">A_actual</span><span class="p">]</span>
+        <span class="p">}</span>
+
+        <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 </div>
 
 
