@@ -7,6 +7,7 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import time
 from openeye import oechem
 
@@ -444,7 +445,6 @@ class polymer_system:
     from swiftpol.build import build_polymer, PDI, blockiness_gen, calculate_box_components
     from openff.units import unit
     from rdkit.Chem import AllChem
-    import numpy as np
 
     def __init__(self, monomer_list, reaction, length_target, num_chains, terminals='standard', perc_A_target=100, blockiness_target=1.0, copolymer=False, acceptance = 10):
         """
@@ -588,6 +588,12 @@ class polymer_system:
                 chain = Molecule.from_rdkit(pol)
                 chains.append(chain)
                 perc_A_actual.append((sequence.count('A')/len(sequence))*100)
+            self.B_block_length = None
+            self.A_block_length = None
+            self.blockiness_list = None
+            self.mean_blockiness = None
+            self.perc_A_actual = None
+            self.A_actual = None
         self.sequence = sequence
         self.chains = chains
         for i in range(len(self.chains)):
@@ -602,6 +608,7 @@ class polymer_system:
         self.lengths = lengths
         self.min_length = min(lengths)
         self.max_length = max(lengths)
+        
 
 
         print('System built!, size =', self.num_chains)
@@ -653,4 +660,35 @@ class polymer_system:
         from swiftpol.parameterize import charge_openff_polymer
         for chain in self.chains:
             chain.partial_charges = charge_openff_polymer(chain, charge_scheme)
+    def export_to_csv(self, filename):
+        """
+        Export all the instances in polymer_system.__init__() into a pandas DataFrame and save it as a CSV file.
+
+        Parameters
+        ----------
+        filename : str
+            The name of the CSV file to save the data.
+        """
+        data = {
+            'monomers': [self.monomers],
+            'length_target': [self.length_target],
+            'terminals': [self.terminals],
+            'num_chains': [self.num_chains],
+            'chains': [self.chains],
+            'chain_rdkit': [self.chain_rdkit],
+            'mol_weight_average': [self.mol_weight_average],
+            'PDI': [self.PDI],
+            'Mn': [self.Mn],
+            'Mw': [self.Mw],
+            'sequence': [self.sequence],
+            'B_block_length': [self.B_block_length],
+            'A_block_length': [self.A_block_length],
+            'blockiness_list': [self.blockiness_list],
+            'mean_blockiness': [self.mean_blockiness],
+            'perc_A_actual': [self.perc_A_actual],
+            'A_actual': [self.A_actual]
+        }
+
+        df = pd.DataFrame(data)
+        df.to_csv(filename, index=False)
 

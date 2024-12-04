@@ -258,6 +258,10 @@ class TestPolymerSystem(unittest.TestCase):
         #self.assertTrue(1.3 <= x.residual_monomer <= 1.7)
         #self.assertEqual(solv_system.shape, (3, 3))  
 
+        #Test metadata export
+        x.export_to_csv('polymer_system_data.csv')
+        self.assertTrue(os.path.isfile('polymer_system_data.csv'))
+        os.remove('polymer_system_data.csv')
 # Run
 
 if __name__ == '__main__':
