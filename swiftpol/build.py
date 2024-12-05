@@ -608,10 +608,13 @@ class polymer_system:
         self.lengths = lengths
         self.min_length = min(lengths)
         self.max_length = max(lengths)
-        
-
-
         print('System built!, size =', self.num_chains)
+        
+    def __repr__(self):
+                
+        description = (f"SwiftPol ensemble of size {self.num_chains}, "
+                       f"average chain length = {self.length_average}-mers, PDI = {self.PDI}")
+        return description
 
     def generate_conformers(self):
         """
