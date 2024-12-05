@@ -703,11 +703,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">lengths</span> <span class="o">=</span> <span class="n">lengths</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_length</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
-        
-
-
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;System built!, size =&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_chains</span><span class="p">)</span></div>
 
+        
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+                
+        <span class="n">description</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SwiftPol ensemble of size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_chains</span><span class="si">}</span><span class="s2">, &quot;</span>
+                       <span class="sa">f</span><span class="s2">&quot;average chain length = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">length_average</span><span class="si">}</span><span class="s2">-mers, PDI = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PDI</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">description</span>
 
 <div class="viewcode-block" id="polymer_system.generate_conformers">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.generate_conformers">[docs]</a>
