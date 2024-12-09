@@ -677,8 +677,6 @@ class polymer_system:
             'length_target': [self.length_target],
             'terminals': [self.terminals],
             'num_chains': [self.num_chains],
-            'chains': [self.chains],
-            'chain_rdkit': [self.chain_rdkit],
             'mol_weight_average': [self.mol_weight_average],
             'PDI': [self.PDI],
             'Mn': [self.Mn],
