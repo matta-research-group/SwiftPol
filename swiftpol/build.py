@@ -391,6 +391,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
         info.SetResidueNumber(1)
         [atom.SetMonomerInfo(info)  for  atom  in  A_rd.GetAtoms()]
         A = Molecule.from_rdkit(A_rd)
+        A.name = 'A_residual'
         A_mass = sum([atom.mass for atom in A.atoms])
         B_rd = Chem.MolFromSmiles(monomers[1])
         B_rd = Chem.AddHs(B_rd)
@@ -400,6 +401,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
         [atom.SetMonomerInfo(info)  for  atom  in  B_rd.GetAtoms()]
         B = Molecule.from_rdkit(B_rd)
         B_mass = sum([atom.mass for atom in B.atoms])
+        B.name = 'B_residual'
         for r in range(0,100):
             if (r * A_mass.magnitude) + (r * B_mass.magnitude) <= mass_to_add:
                 A_to_add = r
@@ -419,7 +421,9 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
         [atom.SetMonomerInfo(info)  for  atom  in  A_rd.GetAtoms()]
         A = Molecule.from_rdkit(A_rd)
         A_mass = sum([atom.mass for atom in A.atoms])
+        A.name = 'A_residual'
         B = Molecule.from_smiles('C')
+        B.name = 'B_residual'
         for r in range(0,100):
             if r * A_mass.magnitude <= mass_to_add:
                 A_to_add = r
