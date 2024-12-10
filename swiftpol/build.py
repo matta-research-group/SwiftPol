@@ -529,6 +529,8 @@ class polymer_system:
 
         num_chains (int): The number of polymer chains to be generated.
 
+        stereoisomerism_input (tuple, optional): A tuple containing the monomer, instance fraction, and SMILES string of the stereoisomer to be introduced. Default is None.
+
         terminals (str, optional): The type of terminal groups to be used. Default is 'standard'.
 
         perc_A_target (float, optional): The target percentage of monomer A in the copolymer. Default is 100.
