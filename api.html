@@ -56,7 +56,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#swiftpol.build.introduce_stereoisomers"><code class="docutils literal notranslate"><span class="pre">introduce_stereoisomers()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#swiftpol-build-polymer-system">swiftpol.build.polymer_system</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#swiftpol.build.polymer_system"><code class="docutils literal notranslate"><span class="pre">polymer_system</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.introduce_stereoisomers"><code class="docutils literal notranslate"><span class="pre">polymer_system.introduce_stereoisomers()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.__init__"><code class="docutils literal notranslate"><span class="pre">polymer_system.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.generate_conformers"><code class="docutils literal notranslate"><span class="pre">polymer_system.generate_conformers()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.charge_system"><code class="docutils literal notranslate"><span class="pre">polymer_system.charge_system()</span></code></a></li>
@@ -270,29 +269,6 @@ are made in pairs of ‘A’ monomers to ensure stereoisomerism.</p>
 <dt class="sig sig-object py" id="swiftpol.build.polymer_system">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">swiftpol.build.</span></span><span class="sig-name descname"><span class="pre">polymer_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monomer_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_chains</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stereoisomerism_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perc_A_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blockiness_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copolymer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acceptance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<dl class="py method">
-<dt class="sig sig-object py" id="swiftpol.build.polymer_system.introduce_stereoisomers">
-<span class="sig-name descname"><span class="pre">introduce_stereoisomers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#swiftpol.build.polymer_system.introduce_stereoisomers" title="Link to this definition"></a></dt>
-<dd><p>Introduce stereoisomers into a polymer sequence by replacing a specified percentage of ‘A’ monomers with ‘S’.</p>
-<p>This function replaces a specified percentage of ‘A’ monomers with ‘S’ in the given sequence. The replacements
-are made in pairs of ‘A’ monomers to ensure stereoisomerism.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>stereo_monomer</strong> (<em>str</em>) – The monomer to be replaced with its stereoisomer (e.g., ‘A’).</p></li>
-<li><p><strong>instance</strong> (<em>float</em>) – The fraction of ‘A’ monomers to be replaced with ‘S’ (e.g., 0.5 for 50%).</p></li>
-<li><p><strong>seq</strong> (<em>str</em>) – The original polymer sequence.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>The modified sequence with stereoisomers introduced.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>str</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="swiftpol.build.polymer_system.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monomer_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_chains</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stereoisomerism_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perc_A_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blockiness_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copolymer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acceptance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.__init__" title="Link to this definition"></a></dt>
