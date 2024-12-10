@@ -143,9 +143,20 @@ class TestBlockinessGen(unittest.TestCase):
         self.assertAlmostEqual(block_length_B, 1.0, places=2)
         
         #Test case - PLA sequence
-        sequence_A = 'LLLLLLLL'
+        sequence_A = 'AAAAAAAA'
         blockiness_A, block_length_A_2, block_length_B_2 = build.blockiness_gen(sequence_A)
         self.assertTrue(isinstance(blockiness_A, str))
+
+        #Test case - blockinesss wrt 'B', non-zero
+        sequence = 'AABBAABBAABB'
+        blockiness, block_length_A, block_length_B = build.blockiness_gen(sequence, 'B')
+        self.assertAlmostEqual(blockiness, 1.0, places=2)
+
+        #Test case - blockinesss wrt 'A', non-zero
+        sequence = 'AABBAABBAABB'
+        blockiness, block_length_A, block_length_B = build.blockiness_gen(sequence, 'A')
+        self.assertAlmostEqual(blockiness, 1.5, places=2)
+
 
         
 #Test calculate box components
@@ -159,7 +170,7 @@ class TestCalculateBoxComponents(unittest.TestCase):
                         terminals = 'hydroxyl', 
                         num_chains = 1, 
                         perc_A_target=75, 
-                        blockiness_target=1.0, 
+                        blockiness_target=[1.0, 'A'], 
                         copolymer=True,
                         acceptance=1)
         x.generate_conformers()
@@ -243,7 +254,7 @@ class TestPolymerSystem(unittest.TestCase):
                                 reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'),
                                 length_target=10,
                                 num_chains = 5,
-                                blockiness_target=1.0,
+                                blockiness_target=[1.0, 'B'],
                                 perc_A_target=50, 
                                 copolymer=True,
                                 acceptance=5)
@@ -263,7 +274,7 @@ class TestPolymerSystem(unittest.TestCase):
                                 reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'),
                                 length_target=10,
                                 num_chains = 5,
-                                blockiness_target=1.0,
+                                blockiness_target=[1.0, 'B'],
                                 perc_A_target=50, 
                                 copolymer=True,
                                 acceptance=5,

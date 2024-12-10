@@ -246,7 +246,7 @@ def PDI(chains):
 
 
 
-def blockiness_gen(sequence):
+def blockiness_gen(sequence, wrt='A'):
     """
     Calculate the blockiness and average block length of a co-polymer sequence.
 
@@ -270,26 +270,53 @@ def blockiness_gen(sequence):
     -----
     If the sequence does not contain both 'A' and 'B', the function returns a string indicating that the molecule is not a co-polymer.
     """
+    if wrt == 'A':
+        assert 'A' in sequence, "Sequence does not contain monomer A, cannot calculate blockiness with reference to A"
+        if 'A' in sequence and 'B' in sequence: #Check if sequence is a co-polymer
+            AB = sequence.count('AB')
+            BB = sequence.count('BB')
+            BA = sequence.count('BA')
+            AA = sequence.count('AA')
+            if 'BA' in sequence:
+                blockiness = AA/BA
+            else:
+                blockiness = AA/AB
+            #Calculate block length B
+            block_list_B = [x for x in sequence.split('A') if x!='']
+            block_length_B = mean([len(b) for b in block_list_B])
+            #Calculate block length A
+            block_list_A = [x for x in sequence.split('B') if x!='']
+            block_length_A = mean([len(b) for b in block_list_A])
+            return blockiness, block_length_B, block_length_A
 
-    if 'A' in sequence and 'B' in sequence: #Check if sequence is a co-polymer
-        AB = sequence.count('AB')
-        BB = sequence.count('BB')
-        BA = sequence.count('BA')
-        AA = sequence.count('AA')
-        if 'BA' in sequence:
-            blockiness = BB/BA
         else:
-            blockiness = BB/AB
-        #Calculate block length B
-        block_list_B = [x for x in sequence.split('A') if x!='']
-        block_length_B = mean([len(b) for b in block_list_B])
-        #Calculate block length A
-        block_list_A = [x for x in sequence.split('B') if x!='']
-        block_length_A = mean([len(b) for b in block_list_A])
-        return blockiness, block_length_B, block_length_A
+            return 'Molecule is not a co-polymer, no blockiness calculation performed', 0, len(sequence)
+    
+    elif wrt == 'B':
+        assert 'B' in sequence, "Sequence does not contain monomer B, cannot calculate blockiness with reference to B"
+        if 'A' in sequence and 'B' in sequence:
+            AB = sequence.count('AB')
+            BB = sequence.count('BB')
+            BA = sequence.count('BA')
+            AA = sequence.count('AA')
+            if 'AB' in sequence:
+                blockiness = BB/AB
+            else:
+                blockiness = BB/BA
+            #Calculate block length A
+            block_list_A = [x for x in sequence.split('B') if x!='']
+            block_length_A = mean([len(b) for b in block_list_A])
+            #Calculate block length B
+            block_list_B = [x for x in sequence.split('A') if x!='']
+            block_length_B = mean([len(b) for b in block_list_B])
+            return blockiness, block_length_A, block_length_B
+
+        else:  
+            return 'Molecule is not a co-polymer, no blockiness calculation performed', 0, len(sequence)
+    
 
     else:
-        return 'Molecule is not a co-polymer, no blockiness calculation performed', 0, len(sequence)
+        raise ValueError("wrt parameter must be 'A' or 'B'")
 
 def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.0 * unit.mole / unit.liter, residual_monomer = 0.00, solvated=True):
     """
@@ -511,7 +538,7 @@ class polymer_system:
                  stereoisomerism_input=None,
                  terminals='standard', 
                  perc_A_target=100, 
-                 blockiness_target=1.0, 
+                 blockiness_target=[1.0, 'A'], 
                  copolymer=False, 
                  acceptance = 10
                  ):
@@ -535,7 +562,7 @@ class polymer_system:
 
         perc_A_target (float, optional): The target percentage of monomer A in the copolymer. Default is 100.
 
-        blockiness_target (float, optional): The target blockiness of the copolymer. Default is 1.0.
+        blockiness_target (float, optional): The target blockiness of the copolymer, and indication of method calculation. Default is 1.0, with reference to 'A' monomer linkages.
 
         copolymer (bool, optional): Flag to indicate if the system is a copolymer. Default is False.
 
@@ -590,13 +617,13 @@ class polymer_system:
         self.terminals = terminals
         perc_A_actual = []
         if copolymer==True:
-            self.blockiness_target = blockiness_target
+            self.blockiness_target = blockiness_target[0]
             self.A_target = perc_A_target
             def spec(sequence, blockiness): #Define limits of A percentage and blockiness from input
                 acceptance_dec = acceptance/100
                 actual_A = (sequence.count('A')/len(sequence))*100
-                blockiness = blockiness_gen(sequence)[0]
-                return actual_A > perc_A_target*(1-acceptance_dec) and actual_A < perc_A_target*(1+acceptance_dec) and blockiness>blockiness_target*(1-acceptance_dec) and blockiness<blockiness_target*(1+acceptance_dec)
+                blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
+                return actual_A > perc_A_target*(1-acceptance_dec) and actual_A < perc_A_target*(1+acceptance_dec) and blockiness>blockiness_target[0]*(1-acceptance_dec) and blockiness<blockiness_target[0]*(1+acceptance_dec)
             
             blockiness_list = []
             out_of_spec = 0
@@ -615,7 +642,7 @@ class polymer_system:
             for n in range(num_chains):
                 length_actual = np.random.normal(length_target, 0.5)
                 sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
-                blockiness = blockiness_gen(sequence)[0]
+                blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
                 if spec(sequence, blockiness)==True:
                     if stereoisomerism_input is not None:
                         sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence)
@@ -628,15 +655,15 @@ class polymer_system:
                     chains.append(chain)
                     perc_A_actual.append((sequence.count('A')/len(sequence))*100)
                     blockiness_list.append(blockiness)
-                    BBL.append(blockiness_gen(sequence)[1])
-                    ABL.append(blockiness_gen(sequence)[2])
+                    BBL.append(blockiness_gen(sequence, blockiness_target[1])[1])
+                    ABL.append(blockiness_gen(sequence, blockiness_target[1])[2])
                 else:
                     out_of_spec +=1
                 #Second round of building
                 while out_of_spec >0:
                     length_actual = np.random.normal(length_target, 0.5)
                     sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
-                    blockiness = blockiness_gen(sequence)[0]
+                    blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
                     if spec(sequence, blockiness)==True:
                         if stereoisomerism_input is not None:
                             sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence) 
@@ -649,8 +676,8 @@ class polymer_system:
                         chains.append(chain)
                         perc_A_actual.append((sequence.count('A')/len(sequence))*100)
                         blockiness_list.append(blockiness)
-                        BBL.append(blockiness_gen(sequence)[1])
-                        ABL.append(blockiness_gen(sequence)[2])
+                        BBL.append(blockiness_gen(sequence, blockiness_target[1])[1])
+                        ABL.append(blockiness_gen(sequence, blockiness_target[1])[2])
                         out_of_spec-=1
 
                 self.B_block_length = mean(BBL)
