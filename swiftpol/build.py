@@ -457,7 +457,7 @@ def introduce_stereoisomers(stereo_monomer, instance, seq):
     stereo_monomer : str
         The monomer to be replaced with its stereoisomer (e.g., 'A').
     instance : float
-        The fraction of 'A' monomers to be replaced with 'S' (e.g., 0.5 for 50%).
+        The fraction of 'stereo_monomer' monomers to be replaced with stereoisomer (e.g., 0.5 for 50%).
     seq : str
         The original polymer sequence.
 
@@ -529,7 +529,7 @@ class polymer_system:
 
         num_chains (int): The number of polymer chains to be generated.
 
-        stereoisomerism_input (tuple, optional): A tuple containing the monomer, instance fraction, and SMILES string of the stereoisomer to be introduced. Default is None.
+        stereoisomerism_input (tuple, optional): A tuple containing the monomer, instance fraction (e.g. 0.5 for 50% stereoisomer), and SMILES string of the stereoisomer to be introduced. Default is None.
 
         terminals (str, optional): The type of terminal groups to be used. Default is 'standard'.
 
