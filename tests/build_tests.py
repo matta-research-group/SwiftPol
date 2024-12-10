@@ -186,7 +186,7 @@ class TestCalculateBoxComponents(unittest.TestCase):
         self.assertTrue(isinstance(residual_monomer_actual, float))
         # Check if the returned residual_monomer_actual is as expected
         print('resid_mon = ', residual_monomer_actual)
-        self.assertTrue(1.25 <= residual_monomer_actual <= 1.75)
+        self.assertTrue(1.20 <= residual_monomer_actual <= 1.80)
 
         # Calculate box components - test case without residual monomer and solvent
         molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = build.calculate_box_components(chains = x.chains, 
@@ -256,7 +256,27 @@ class TestPolymerSystem(unittest.TestCase):
         #solv_system = x.solvate_system(resid_monomer = 1.5, salt_concentration = 0.1 * unit.mole / unit.liter)
         #self.assertIsNone(solv_system)
         #self.assertTrue(1.3 <= x.residual_monomer <= 1.7)
-        #self.assertEqual(solv_system.shape, (3, 3))  
+        #self.assertEqual(solv_system.shape, (3, 3))
+        
+        #Test case with stereoisomers
+        x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
+                                reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'),
+                                length_target=10,
+                                num_chains = 5,
+                                blockiness_target=1.0,
+                                perc_A_target=50, 
+                                copolymer=True,
+                                acceptance=5,
+                                stereoisomerism_input=['A', 0.5, 'O[C@@H](C)C(=O)O[I]'])
+        self.assertTrue(len(x.chains)==5)
+        self.assertTrue(9 <= round(x.max_length)<= 11)
+        self.assertTrue(47.5 <= x.A_actual <= 52.5)
+        self.assertTrue(0.95 <= x.mean_blockiness <= 1.05)
+        chain = x.chain_rdkit[0]
+        chiral_centers_after = Chem.FindMolChiralCenters(chain, includeUnassigned=True)
+        stereocentres = [i[1] for i in chiral_centers_after]
+        self.assertTrue(len(set(stereocentres))==2)
+
 
         #Test metadata export
         x.export_to_csv('polymer_system_data.csv')

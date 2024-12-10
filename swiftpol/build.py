@@ -93,6 +93,16 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydroxyl', chain_n
             [atom.SetMonomerInfo(info)  for  atom  in  B.GetAtoms()]
             polymer = reaction.RunReactants((polymer, B))[0][0]
             Chem.SanitizeMol(polymer)
+        
+        elif sequence[i] == 'S':
+            S = Chem.MolFromSmiles(monomers['S'])
+            S = Chem.AddHs(S)
+            info = Chem.AtomPDBResidueInfo()
+            info.SetResidueName(str(chain_num) + 'S' + str(i+1))
+            info.SetResidueNumber(i+1)
+            [atom.SetMonomerInfo(info)  for  atom  in  S.GetAtoms()]
+            polymer = reaction.RunReactants((polymer, S))[0][0]
+            Chem.SanitizeMol(polymer)
     
     if terminal == 'hydroxyl':
         hydrogen = Chem.MolFromSmiles('[H]')
@@ -435,6 +445,49 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
         number_of_copies=[water_to_add, na_to_add, cl_to_add, A_to_add, B_to_add]
     return molecules, number_of_copies, topology, box_vectors, residual_monomer_actual
 
+def introduce_stereoisomers(stereo_monomer, instance, seq):
+    """
+    Introduce stereoisomers into a polymer sequence by replacing a specified percentage of 'A' monomers with 'S'.
+
+    This function replaces a specified percentage of 'A' monomers with 'S' in the given sequence. The replacements
+    are made in pairs of 'A' monomers to ensure stereoisomerism.
+
+    Parameters
+    ----------
+    stereo_monomer : str
+        The monomer to be replaced with its stereoisomer (e.g., 'A').
+    instance : float
+        The fraction of 'A' monomers to be replaced with 'S' (e.g., 0.5 for 50%).
+    seq : str
+        The original polymer sequence.
+
+    Returns
+    -------
+    str
+        The modified sequence with stereoisomers introduced.
+
+    """
+    assert stereo_monomer in seq, f"Monomer {stereo_monomer} not found in sequence"
+    assert instance <= 1 and instance > 0, "Instance must be a fraction between 0 and 1"
+    assert instance > 0, "Instance must be greater than 0"
+    assert type(stereo_monomer) == str, "Monomer must be a string"
+    num_replacements = round(seq.count(stereo_monomer) * instance)
+    seq_list = list(seq)
+
+    # Initialize a counter for replacements
+    replacement_count = 0
+    i = 0
+    while i < len(seq_list) - 1:
+        if seq_list[i] == 'A' and seq_list[i + 1] == 'A':
+            seq_list[i + 1] = 'S'
+            replacement_count += 1
+            if replacement_count >= num_replacements:
+                break
+            i += 1
+        i += 1
+    
+    modified_seq = ''.join(seq_list)
+    return modified_seq
 
 #Class object for generic polymer system
 
@@ -446,11 +499,22 @@ class polymer_system:
     from rdkit.Chem.Descriptors import ExactMolWt
     from openff.interchange import Interchange
     from openff.interchange.components._packmol import UNIT_CUBE, pack_box
-    from swiftpol.build import build_polymer, PDI, blockiness_gen, calculate_box_components
+    from swiftpol.build import build_polymer, PDI, blockiness_gen, calculate_box_components, introduce_stereoisomers
     from openff.units import unit
     from rdkit.Chem import AllChem
 
-    def __init__(self, monomer_list, reaction, length_target, num_chains, terminals='standard', perc_A_target=100, blockiness_target=1.0, copolymer=False, acceptance = 10):
+    def __init__(self, 
+                 monomer_list, 
+                 reaction, 
+                 length_target, 
+                 num_chains, 
+                 stereoisomerism_input=None,
+                 terminals='standard', 
+                 perc_A_target=100, 
+                 blockiness_target=1.0, 
+                 copolymer=False, 
+                 acceptance = 10
+                 ):
         """
         Initialize the polymer system and build the polymer chains.
 
@@ -541,6 +605,9 @@ class polymer_system:
         lengths = []
         
         self.monomers = [mono.replace("[I]", "") for mono in monomer_list]
+        if stereoisomerism_input is not None:
+            stereo_monomer, instance, new_smiles = stereoisomerism_input
+            monomer_list.append(new_smiles)
         #First round of building - copolymer
         if copolymer==True:
             for n in range(num_chains):
@@ -548,7 +615,11 @@ class polymer_system:
                 sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                 blockiness = blockiness_gen(sequence)[0]
                 if spec(sequence, blockiness)==True:
-                    pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                    if stereoisomerism_input is not None:
+                        sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence)
+                        pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                    else:
+                        pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
                     lengths.append(int(length_actual))
                     chains_rdkit.append(pol)
                     chain = Molecule.from_rdkit(pol)
@@ -565,7 +636,11 @@ class polymer_system:
                     sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                     blockiness = blockiness_gen(sequence)[0]
                     if spec(sequence, blockiness)==True:
-                        pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                        if stereoisomerism_input is not None:
+                            sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence) 
+                            pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                        else:
+                            pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)                   
                         lengths.append(int(length_actual))
                         chains_rdkit.append(pol)
                         chain = Molecule.from_rdkit(pol)
@@ -586,7 +661,11 @@ class polymer_system:
             for n in range(num_chains):
                 length_actual = np.random.normal(length_target, 0.5)
                 sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
-                pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                if stereoisomerism_input is not None:
+                    sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence) 
+                    pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                else:
+                    pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)                   
                 lengths.append(int(length_actual))
                 chains_rdkit.append(pol)
                 chain = Molecule.from_rdkit(pol)
