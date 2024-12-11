@@ -619,6 +619,7 @@ class polymer_system:
         if copolymer==True:
             self.blockiness_target = blockiness_target[0]
             self.A_target = perc_A_target
+            
             def spec(sequence): #Define limits of A percentage and blockiness from input
                 acceptance_dec = acceptance/100
                 actual_A = (sequence.count('A')/len(sequence))*100
@@ -642,6 +643,7 @@ class polymer_system:
             for n in range(num_chains):
                 length_actual = np.random.normal(length_target, 0.5)
                 sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
+                blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
                 if spec(sequence)==True:
                     if stereoisomerism_input is not None:
                         sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence)
