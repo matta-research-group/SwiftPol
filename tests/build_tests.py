@@ -274,7 +274,7 @@ class TestPolymerSystem(unittest.TestCase):
                                 reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'),
                                 length_target=10,
                                 num_chains = 5,
-                                blockiness_target=[1.0, 'B'],
+                                blockiness_target=[1.0, 'A'],
                                 perc_A_target=50, 
                                 copolymer=True,
                                 acceptance=5,
