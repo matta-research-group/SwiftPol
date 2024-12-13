@@ -121,12 +121,13 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydroxyl', chain_n
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), carboxyl)[0]
     elif terminal == 'ester':
         carbon = Chem.MolFromSmiles('[CH3]')
+        carbon = Chem.AddHs(carbon)
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName(str(chain_num) + sequence[0] + str(1))
         info.SetResidueNumber(1)
         [atom.SetMonomerInfo(info)  for  atom  in  carbon.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), carbon)[0]
-        Chem.AddHs(polymer)
+        #Chem.AddHs(polymer)
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), Chem.MolFromSmiles('C'))[0]
     else:
         hydrogen = Chem.MolFromSmiles('[H]')
