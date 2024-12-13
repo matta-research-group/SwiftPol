@@ -41,6 +41,32 @@ class TestBuildPolymer(unittest.TestCase):
         self.assertIsNotNone(polymer)
         for atom in polymer.GetAtoms():
             assert atom.GetPDBResidueInfo() is not None
+        
+        #Test ester terminals
+        sequence = 'AABBAABB'
+        monomer_list = ['OC(=O)COI', 'C[C@@H](C(=O)[OH])OI']
+        reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]')
+        # Test the function
+        polymer = build.build_polymer(sequence = sequence, 
+                                        monomer_list=monomer_list, 
+                                        reaction = reaction,
+                                        terminal ='ester')
+        self.assertIsNotNone(polymer)
+        for atom in polymer.GetAtoms():
+            assert atom.GetPDBResidueInfo() is not None
+        
+        #Test carboxyl terminals
+        sequence = 'AABBAABB'
+        monomer_list = ['OC(=O)COI', 'C[C@@H](C(=O)[OH])OI']
+        reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]')
+        # Test the function
+        polymer = build.build_polymer(sequence = sequence, 
+                                        monomer_list=monomer_list, 
+                                        reaction = reaction,
+                                        terminal ='carboxyl')
+        self.assertIsNotNone(polymer)
+        for atom in polymer.GetAtoms():
+            assert atom.GetPDBResidueInfo() is not None
 
 
 
@@ -86,6 +112,9 @@ class TestBuildPolymer(unittest.TestCase):
                                         reaction = reaction,
                                         terminal = terminal)
         self.assertIsNotNone(polymer)
+
+        
+
 
 
 
