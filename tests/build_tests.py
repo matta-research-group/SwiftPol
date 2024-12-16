@@ -281,14 +281,14 @@ class TestPolymerSystem(unittest.TestCase):
         #Test case - Copolymer with 5% acceptance margin
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
                                 reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'),
-                                length_target=10,
+                                length_target=50,
                                 num_chains = 5,
                                 blockiness_target=[1.0, 'B'],
                                 perc_A_target=50, 
                                 copolymer=True,
                                 acceptance=5)
         self.assertTrue(len(x.chains)==5)
-        self.assertTrue(9 <= round(x.max_length)<= 11)
+        self.assertTrue(45 <= round(x.max_length)<= 55)
         self.assertTrue(47.5 <= x.A_actual <= 52.5)
         self.assertTrue(0.95 <= x.mean_blockiness <= 1.05)
         #Test solvate
