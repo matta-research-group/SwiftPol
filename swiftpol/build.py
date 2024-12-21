@@ -272,7 +272,7 @@ def blockiness_gen(sequence, wrt='A'):
     If the sequence does not contain both 'A' and 'B', the function returns a string indicating that the molecule is not a co-polymer.
     """
     if wrt == 'A':
-        assert 'A' in sequence, "Sequence does not contain monomer A, cannot calculate blockiness with reference to A"
+    
         if 'A' in sequence and 'B' in sequence: #Check if sequence is a co-polymer
             AB = sequence.count('AB')
             BB = sequence.count('BB')
@@ -294,7 +294,7 @@ def blockiness_gen(sequence, wrt='A'):
             return 'Molecule is not a co-polymer, no blockiness calculation performed', 0, len(sequence)
     
     elif wrt == 'B':
-        assert 'B' in sequence, "Sequence does not contain monomer B, cannot calculate blockiness with reference to B"
+       
         if 'A' in sequence and 'B' in sequence:
             AB = sequence.count('AB')
             BB = sequence.count('BB')
