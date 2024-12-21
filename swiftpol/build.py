@@ -807,15 +807,51 @@ class polymer_system:
         df = pd.DataFrame(data)
         df.to_csv(filename, index=False)
 
-    def pack_solvated_system(salt_concentration = 0.0 * unit.mole / unit.liter, residual_monomer = 0.00):
+    def pack_solvated_system(salt_concentration=0.0 * unit.mole / unit.liter, residual_monomer=0.00):
+        """
+        Pack a solvated system using Packmol functions, and the OpenFF Packmol wrapper.
+    
+        This method uses Packmol to build a solvated system by packing molecules into a simulation box.
+        It considers the salt concentration and residual monomer concentration to determine the quantity of each molecule type required.
+    
+        Parameters
+        ----------
+        salt_concentration : openff.units.Quantity, optional
+            The desired salt concentration in the simulation box. Default is 0.0 M.
+        residual_monomer : float, optional
+            The desired residual monomer concentration in the simulation box. Default is 0.00.
+    
+        Returns
+        -------
+        openff.toolkit.topology.topology.Topology
+            An Interchange object representing the packed solvated system.
+
+        Notes
+        -----
+        This function uses the OpenFF Interchange Packmol wrapper to pack the molecules into the simulation box.
+        It removes any molecules with zero copies before packing, to avoid packmol errors.
+        Assigns % residual monomer value to ensemble under self.residual_monomer_actual
+
+        Raises
+        ------
+        ValueError
+            If the length of 'molecules' and 'number_of_copies' are not the same.
+        """
         from openff.interchange.components._packmol import pack_box, UNIT_CUBE
         from swiftpol.build import calculate_box_components
-        molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = calculate_box_components(self.chains, self.monomers, self.sequence, salt_concentration, residual_monomer)
+    
+        molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = calculate_box_components(
+            self.chains, self.monomers, self.sequence, salt_concentration, residual_monomer
+        )
         molecules = [molecules[i] for i in range(len(number_of_copies)) if number_of_copies[i] != 0]
         number_of_copies = [num for num in number_of_copies if num != 0]
         self.residual_monomer_actual = residual_monomer_actual
-        return pack_box(molecules = molecules,
-                   number_of_copies = number_of_copies,
-                   solute = topology,
-                   box_vectors=box_vectors,
-                   box_shape=UNIT_CUBE)
+    
+        return pack_box(
+            molecules=molecules,
+            number_of_copies=number_of_copies,
+            solute=topology,
+            box_vectors=box_vectors,
+            box_shape=UNIT_CUBE
+        )
+
