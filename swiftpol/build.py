@@ -842,7 +842,7 @@ class polymer_system:
         molecules = [molecules[i] for i in range(len(number_of_copies)) if number_of_copies[i] != 0]
         number_of_copies = [num for num in number_of_copies if num != 0]
         self.residual_monomer_actual = residual_monomer_actual
-        if len(topology.molecules == 1):
+        if len(topology.molecules) == 1:
             return pack_box(molecules=molecules,
                 number_of_copies=number_of_copies,
                 solute=topology,
