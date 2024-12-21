@@ -324,7 +324,9 @@ class TestPolymerSystem(unittest.TestCase):
         os.remove('polymer_system_data.csv')
 
         #Test packmol packing
-        x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
+        solvated_x = x.pack_solvated_system()
+        self.assertIsNotNone(solvated_x)
+        y = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
                                 reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'),
                                 length_target=10,
                                 num_chains = 1,
@@ -333,9 +335,9 @@ class TestPolymerSystem(unittest.TestCase):
                                 copolymer=True,
                                 acceptance=10,
                                 stereoisomerism_input=['A', 0.5, 'O[C@@H](C)C(=O)O[I]'])
-        x.generate_conformers()
-        solvated_x = x.pack_solvated_system()
-        self.assertIsNotNone(solvated_x)
+        y.generate_conformers()
+        solvated_y = y.pack_solvated_system()
+        self.assertIsNotNone(solvated_y)
 # Run
 
 if __name__ == '__main__':

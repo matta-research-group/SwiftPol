@@ -832,10 +832,6 @@ class polymer_system:
         It removes any molecules with zero copies before packing, to avoid packmol errors.
         Assigns % residual monomer value to ensemble under self.residual_monomer_actual
 
-        Raises
-        ------
-        ValueError
-            If the length of 'molecules' and 'number_of_copies' are not the same.
         """
         from openff.interchange.components._packmol import pack_box, UNIT_CUBE
         from swiftpol.build import calculate_box_components
@@ -846,12 +842,20 @@ class polymer_system:
         molecules = [molecules[i] for i in range(len(number_of_copies)) if number_of_copies[i] != 0]
         number_of_copies = [num for num in number_of_copies if num != 0]
         self.residual_monomer_actual = residual_monomer_actual
-    
-        return pack_box(
-            molecules=molecules,
-            number_of_copies=number_of_copies,
-            solute=topology,
-            box_vectors=box_vectors,
-            box_shape=UNIT_CUBE
-        )
+        if len(topology.molecules == 1):
+            return pack_box(molecules=molecules,
+                number_of_copies=number_of_copies,
+                solute=topology,
+                box_vectors=box_vectors,
+                box_shape=UNIT_CUBE,
+                center_solute = 'BRICK')
+        else:
+            molecules += sys.chains
+            number_of_copies+= [1 for i in range(len(sys.chains))]
+            return pack_box(molecules = molecules,
+                number_of_copies = number_of_copies,
+                box_vectors=box_vectors,
+                box_shape=UNIT_CUBE,
+                working_directory = os.getcwd(),
+                retain_working_files = True)
 
