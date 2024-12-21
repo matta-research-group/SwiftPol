@@ -807,7 +807,7 @@ class polymer_system:
         df = pd.DataFrame(data)
         df.to_csv(filename, index=False)
 
-    def pack_solvated_system(salt_concentration=0.0 * unit.mole / unit.liter, residual_monomer=0.00):
+    def pack_solvated_system(self, salt_concentration=0.0 * unit.mole / unit.liter, residual_monomer=0.00):
         """
         Pack a solvated system using Packmol functions, and the OpenFF Packmol wrapper.
     
