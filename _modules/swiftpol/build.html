@@ -952,22 +952,18 @@
         <span class="n">molecules</span> <span class="o">=</span> <span class="p">[</span><span class="n">molecules</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">number_of_copies</span><span class="p">))</span> <span class="k">if</span> <span class="n">number_of_copies</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
         <span class="n">number_of_copies</span> <span class="o">=</span> <span class="p">[</span><span class="n">num</span> <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">number_of_copies</span> <span class="k">if</span> <span class="n">num</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">residual_monomer_actual</span> <span class="o">=</span> <span class="n">residual_monomer_actual</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">topology</span><span class="o">.</span><span class="n">molecules</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">topology</span><span class="o">.</span><span class="n">n_molecules</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">pack_box</span><span class="p">(</span><span class="n">molecules</span><span class="o">=</span><span class="n">molecules</span><span class="p">,</span>
-                <span class="n">number_of_copies</span><span class="o">=</span><span class="n">number_of_copies</span><span class="p">,</span>
-                <span class="n">solute</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
-                <span class="n">box_vectors</span><span class="o">=</span><span class="n">box_vectors</span><span class="p">,</span>
-                <span class="n">box_shape</span><span class="o">=</span><span class="n">UNIT_CUBE</span><span class="p">,</span>
-                <span class="n">center_solute</span> <span class="o">=</span> <span class="s1">&#39;BRICK&#39;</span><span class="p">)</span>
+                            <span class="n">number_of_copies</span><span class="o">=</span><span class="n">number_of_copies</span><span class="p">,</span>
+                            <span class="n">solute</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
+                            <span class="n">box_vectors</span><span class="o">=</span><span class="n">box_vectors</span><span class="p">,</span>
+                            <span class="n">box_shape</span><span class="o">=</span><span class="n">UNIT_CUBE</span><span class="p">,</span>
+                            <span class="n">center_solute</span> <span class="o">=</span> <span class="s1">&#39;BRICK&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">molecules</span> <span class="o">+=</span> <span class="n">sys</span><span class="o">.</span><span class="n">chains</span>
-            <span class="n">number_of_copies</span><span class="o">+=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">chains</span><span class="p">))]</span>
-            <span class="k">return</span> <span class="n">pack_box</span><span class="p">(</span><span class="n">molecules</span> <span class="o">=</span> <span class="n">molecules</span><span class="p">,</span>
-                <span class="n">number_of_copies</span> <span class="o">=</span> <span class="n">number_of_copies</span><span class="p">,</span>
-                <span class="n">box_vectors</span><span class="o">=</span><span class="n">box_vectors</span><span class="p">,</span>
-                <span class="n">box_shape</span><span class="o">=</span><span class="n">UNIT_CUBE</span><span class="p">,</span>
-                <span class="n">working_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
-                <span class="n">retain_working_files</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span></div>
+            <span class="k">return</span> <span class="n">pack_box</span><span class="p">(</span><span class="n">molecules</span> <span class="o">=</span> <span class="n">molecules</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">,</span>
+                            <span class="n">number_of_copies</span> <span class="o">=</span> <span class="n">number_of_copies</span><span class="o">+</span><span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">))],</span>
+                            <span class="n">box_vectors</span> <span class="o">=</span> <span class="n">box_vectors</span><span class="p">,</span>
+                            <span class="n">tolerance</span> <span class="o">=</span> <span class="mi">1</span><span class="o">*</span><span class="n">unit</span><span class="o">.</span><span class="n">angstrom</span><span class="p">)</span></div>
 </div>
 
 
