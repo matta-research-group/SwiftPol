@@ -842,20 +842,16 @@ class polymer_system:
         molecules = [molecules[i] for i in range(len(number_of_copies)) if number_of_copies[i] != 0]
         number_of_copies = [num for num in number_of_copies if num != 0]
         self.residual_monomer_actual = residual_monomer_actual
-        if len(topology.molecules) == 1:
+        if topology.n_molecules == 1:
             return pack_box(molecules=molecules,
-                number_of_copies=number_of_copies,
-                solute=topology,
-                box_vectors=box_vectors,
-                box_shape=UNIT_CUBE,
-                center_solute = 'BRICK')
+                            number_of_copies=number_of_copies,
+                            solute=topology,
+                            box_vectors=box_vectors,
+                            box_shape=UNIT_CUBE,
+                            center_solute = 'BRICK')
         else:
-            molecules += sys.chains
-            number_of_copies+= [1 for i in range(len(sys.chains))]
-            return pack_box(molecules = molecules,
-                number_of_copies = number_of_copies,
-                box_vectors=box_vectors,
-                box_shape=UNIT_CUBE,
-                working_directory = os.getcwd(),
-                retain_working_files = True)
+            return pack_box(molecules = molecules + self.chains,
+                            number_of_copies = number_of_copies+[1 for i in range(len(self.chains))],
+                            box_vectors = box_vectors,
+                            tolerance = 1*unit.angstrom)
 
