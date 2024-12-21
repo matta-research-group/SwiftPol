@@ -942,10 +942,6 @@
 <span class="sd">        It removes any molecules with zero copies before packing, to avoid packmol errors.</span>
 <span class="sd">        Assigns % residual monomer value to ensemble under self.residual_monomer_actual</span>
 
-<span class="sd">        Raises</span>
-<span class="sd">        ------</span>
-<span class="sd">        ValueError</span>
-<span class="sd">            If the length of &#39;molecules&#39; and &#39;number_of_copies&#39; are not the same.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span> <span class="nn">openff.interchange.components._packmol</span> <span class="kn">import</span> <span class="n">pack_box</span><span class="p">,</span> <span class="n">UNIT_CUBE</span>
         <span class="kn">from</span> <span class="nn">swiftpol.build</span> <span class="kn">import</span> <span class="n">calculate_box_components</span>
@@ -956,14 +952,22 @@
         <span class="n">molecules</span> <span class="o">=</span> <span class="p">[</span><span class="n">molecules</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">number_of_copies</span><span class="p">))</span> <span class="k">if</span> <span class="n">number_of_copies</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
         <span class="n">number_of_copies</span> <span class="o">=</span> <span class="p">[</span><span class="n">num</span> <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">number_of_copies</span> <span class="k">if</span> <span class="n">num</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">residual_monomer_actual</span> <span class="o">=</span> <span class="n">residual_monomer_actual</span>
-    
-        <span class="k">return</span> <span class="n">pack_box</span><span class="p">(</span>
-            <span class="n">molecules</span><span class="o">=</span><span class="n">molecules</span><span class="p">,</span>
-            <span class="n">number_of_copies</span><span class="o">=</span><span class="n">number_of_copies</span><span class="p">,</span>
-            <span class="n">solute</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
-            <span class="n">box_vectors</span><span class="o">=</span><span class="n">box_vectors</span><span class="p">,</span>
-            <span class="n">box_shape</span><span class="o">=</span><span class="n">UNIT_CUBE</span>
-        <span class="p">)</span></div>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">topology</span><span class="o">.</span><span class="n">molecules</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">pack_box</span><span class="p">(</span><span class="n">molecules</span><span class="o">=</span><span class="n">molecules</span><span class="p">,</span>
+                <span class="n">number_of_copies</span><span class="o">=</span><span class="n">number_of_copies</span><span class="p">,</span>
+                <span class="n">solute</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
+                <span class="n">box_vectors</span><span class="o">=</span><span class="n">box_vectors</span><span class="p">,</span>
+                <span class="n">box_shape</span><span class="o">=</span><span class="n">UNIT_CUBE</span><span class="p">,</span>
+                <span class="n">center_solute</span> <span class="o">=</span> <span class="s1">&#39;BRICK&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">molecules</span> <span class="o">+=</span> <span class="n">sys</span><span class="o">.</span><span class="n">chains</span>
+            <span class="n">number_of_copies</span><span class="o">+=</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">chains</span><span class="p">))]</span>
+            <span class="k">return</span> <span class="n">pack_box</span><span class="p">(</span><span class="n">molecules</span> <span class="o">=</span> <span class="n">molecules</span><span class="p">,</span>
+                <span class="n">number_of_copies</span> <span class="o">=</span> <span class="n">number_of_copies</span><span class="p">,</span>
+                <span class="n">box_vectors</span><span class="o">=</span><span class="n">box_vectors</span><span class="p">,</span>
+                <span class="n">box_shape</span><span class="o">=</span><span class="n">UNIT_CUBE</span><span class="p">,</span>
+                <span class="n">working_directory</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span>
+                <span class="n">retain_working_files</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span></div>
 </div>
 
 
