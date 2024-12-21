@@ -324,6 +324,7 @@ class TestPolymerSystem(unittest.TestCase):
         os.remove('polymer_system_data.csv')
 
         #Test packmol packing
+        x.generate_conformers()
         solvated_x = x.pack_solvated_system()
         self.assertIsNotNone(solvated_x)
         y = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
