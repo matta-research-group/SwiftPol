@@ -62,6 +62,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.export_to_csv"><code class="docutils literal notranslate"><span class="pre">polymer_system.export_to_csv()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.pack_solvated_system"><code class="docutils literal notranslate"><span class="pre">polymer_system.pack_solvated_system()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.generate_polyply_files"><code class="docutils literal notranslate"><span class="pre">polymer_system.generate_polyply_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.calculate_residuals"><code class="docutils literal notranslate"><span class="pre">polymer_system.calculate_residuals()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -385,7 +386,7 @@ Assigns % residual monomer value to ensemble under self.residual_monomer_actual<
 <dt class="sig sig-object py" id="swiftpol.build.polymer_system.generate_polyply_files">
 <span class="sig-name descname"><span class="pre">generate_polyply_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">salt_concentration=&lt;Quantity(0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'mole</span> <span class="pre">/</span> <span class="pre">liter')&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_monomer=0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.generate_polyply_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.generate_polyply_files" title="Link to this definition"></a></dt>
 <dd><p>Generate input files for Polyply from the system.</p>
-<p>This method generates the input files required for [Polyply](<a class="reference external" href="https://github.com/marrink-lab/polyply_1.0/">https://github.com/marrink-lab/polyply_1.0/</a>) from the system.</p>
+<p>This method generates the input files required for Polyply (<a class="reference external" href="https://github.com/marrink-lab/polyply_1.0/">https://github.com/marrink-lab/polyply_1.0/</a>) from the system.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -402,6 +403,42 @@ Assigns % residual monomer value to ensemble under self.residual_monomer_actual<
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>UserWarning</strong> – If partial charges are not assigned to the system, processing large systems may raise errors from OpenFF-Interchange.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system.calculate_residuals">
+<span class="sig-name descname"><span class="pre">calculate_residuals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residual_monomer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_oligomer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.calculate_residuals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.calculate_residuals" title="Link to this definition"></a></dt>
+<dd><p>Generate residual monomer and oligomer molecules, and molecule counts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>residual_monomer</strong> (<em>float</em>) – The desired residual monomer concentration in the simulation box. Default is 0.00.</p></li>
+<li><p><strong>residual_oligomer</strong> (<em>float</em>) – The desired residual oligomer concentration in the simulation box. Default is 0.00.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>tuple</em></p></li>
+<li><p><em>A tuple containing the following elements</em> –</p>
+<ul>
+<li><p>A list of OpenFF Molecule objects representing the residual monomer and oligomer molecules.</p></li>
+<li><p>A list of molecule counts, corresponding with the molecule list</p></li>
+<li><p>Actual value for % residual monomer</p></li>
+<li><p>Actual value for % residual oligomer</p></li>
+</ul>
+</li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>EXPERIMENTAL CAPABILITY. Proceed with caution</p>
+<p>This function works independently of, and is unrelated to, the build.calculate_box_components function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>UserWarning</strong> – </p>
 </dd>
 </dl>
 </dd></dl>
