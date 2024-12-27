@@ -1018,11 +1018,11 @@ class polymer_system:
         oligomers = []
         if 'A' in sequence and 'B' in sequence:
             for i in range(1000):
-                oligo_seq = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(sys.length_target * 0.5)), p=[sys.A_target/100,1-(sys.A_target/100)]))
-                monomer_list = [mono+'[I]' for mono in sys.monomers]
+                oligo_seq = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(self.length_target * 0.5)), p=[self.A_target/100,1-(self.A_target/100)]))
+                monomer_list = [mono+'[I]' for mono in self.monomers]
                 oligomer_rd = build.build_polymer(oligo_seq, 
                             monomer_list=monomer_list, 
-                            reaction=AllChem.ReactionFromSmarts(sys.reaction))
+                            reaction=AllChem.ReactionFromSmarts(self.reaction))
                 oligomer_rd = Chem.AddHs(oligomer_rd)
                 info = Chem.AtomPDBResidueInfo()
                 info.SetResidueName('O' + str(i+1))
@@ -1048,11 +1048,11 @@ class polymer_system:
 
         elif 'A' in sequence and 'B' not in sequence:
             for i in range(1000):
-                oligo_seq = reduce(lambda x, y: x + y, np.random.choice(['A'], size=(int(sys.length_target * 0.5)), p=[sys.A_target/100,1-(sys.A_target/100)]))
-                monomer_list = [mono+'[I]' for mono in sys.monomers]
+                oligo_seq = reduce(lambda x, y: x + y, np.random.choice(['A'], size=(int(self.length_target * 0.5)), p=[self.A_target/100,1-(self.A_target/100)]))
+                monomer_list = [mono+'[I]' for mono in self.monomers]
                 oligomer_rd = build.build_polymer(oligo_seq, 
                             monomer_list=monomer_list, 
-                            reaction=AllChem.ReactionFromSmarts(sys.reaction))
+                            reaction=AllChem.ReactionFromSmarts(self.reaction))
                 oligomer_rd = Chem.AddHs(oligomer_rd)
                 info = Chem.AtomPDBResidueInfo()
                 info.SetResidueName('O' + str(i+1))
