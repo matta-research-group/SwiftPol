@@ -194,7 +194,7 @@ class TestCalculateBoxComponents(unittest.TestCase):
         from openff.units import unit
         # Create a polymer system
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
-                        reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'), 
+                        reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
                         length_target = 20, 
                         terminals = 'hydroxyl', 
                         num_chains = 1, 
@@ -256,7 +256,7 @@ class TestPolymerSystem(unittest.TestCase):
     def test_init(self):
 
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]'], 
-                    reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'), 
+                    reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
                     length_target = 10, 
                     terminals = 'hydroxyl', 
                     num_chains = 5, 
@@ -280,7 +280,7 @@ class TestPolymerSystem(unittest.TestCase):
             assert chain.name is not None
         #Test case - Copolymer with 5% acceptance margin
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
-                                reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'),
+                                reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]',
                                 length_target=50,
                                 num_chains = 5,
                                 blockiness_target=[1.0, 'B'],
@@ -300,7 +300,7 @@ class TestPolymerSystem(unittest.TestCase):
         
         #Test case with stereoisomers
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
-                                reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'),
+                                reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]',
                                 length_target=10,
                                 num_chains = 5,
                                 blockiness_target=[1.0, 'A'],
@@ -328,7 +328,7 @@ class TestPolymerSystem(unittest.TestCase):
         solvated_x = x.pack_solvated_system()
         self.assertIsNotNone(solvated_x)
         y = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
-                                reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'),
+                                reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]',
                                 length_target=10,
                                 num_chains = 1,
                                 blockiness_target=[1.0, 'A'],

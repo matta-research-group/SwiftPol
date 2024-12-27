@@ -356,8 +356,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     from openff.interchange.components._packmol import UNIT_CUBE, pack_box, RHOMBIC_DODECAHEDRON, solvate_topology
     from openff.interchange.components._packmol import _max_dist_between_points, _compute_brick_from_box_vectors, _center_topology_at
     import warnings
-    if not solvated and len(chains) < 15:
-        warnings.warn('Residual monomer calculation may not be accurate for small systems. Please check the output by querying the value of residual_monomer_actual')
+
     #Create molecules for the purpose of mass calculation
     #Water
     water = Molecule.from_smiles('O')
@@ -414,12 +413,11 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     for m in topology.molecules:
         rolling_mass += sum(atom.mass for atom in m.atoms)
     rolling_mass += nacl_mass * nacl_to_add
-    if solvated:
-        rolling_mass += water_mass * water_to_add
-    
-    # residual monomer to add
+
+    # Calculate residual monomer to add
     mass_to_add = (rolling_mass.magnitude/100-residual_monomer) * residual_monomer
-    
+    if mass_to_add < 90:
+        warnings.warn('Residual monomer calculation may not be accurate for small systems, as the residual monomer mass can be lower than the weight of a single monomer. Please check the output by querying the value of residual_monomer_actual')
     
     if 'A' in sequence and 'B' in sequence:
         A_rd = Chem.MolFromSmiles(monomers[0])
@@ -636,6 +634,8 @@ class polymer_system:
         lengths = []
         
         self.monomers = [mono.replace("[I]", "") for mono in monomer_list]
+        self.reaction = reaction
+        reaction = AllChem.ReactionFromSmarts(reaction)
         if stereoisomerism_input is not None:
             stereo_monomer, instance, new_smiles = stereoisomerism_input
             monomer_list.append(new_smiles)
@@ -859,7 +859,7 @@ class polymer_system:
         """
         Generate input files for Polyply from the system.
 
-        This method generates the input files required for [Polyply](https://github.com/marrink-lab/polyply_1.0/) from the system.
+        This method generates the input files required for Polyply (https://github.com/marrink-lab/polyply_1.0/) from the system.
 
         Parameters
         ----------
@@ -919,3 +919,163 @@ class polymer_system:
             return_tuple += (pdb_file,)
 
         return return_tuple
+
+    def calculate_residuals(self, residual_monomer = 0, residual_oligomer = 0):
+        """
+        Generate residual monomer and oligomer molecules, and molecule counts.
+
+        Parameters
+        ----------
+        residual_monomer : float
+            The desired residual monomer concentration in the simulation box. Default is 0.00.
+        residual_oligomer : float
+            The desired residual oligomer concentration in the simulation box. Default is 0.00.
+            
+        Returns
+        -------
+        tuple
+        A tuple containing the following elements:
+            - A list of OpenFF Molecule objects representing the residual monomer and oligomer molecules.
+            - A list of molecule counts, corresponding with the molecule list
+            - Actual value for % residual monomer
+            - Actual value for % residual oligomer
+
+        Notes
+        -----
+        EXPERIMENTAL CAPABILITY. Proceed with caution
+
+        This function works independently of, and is unrelated to, the build.calculate_box_components function.
+        
+        Raises
+        ------
+        UserWarning
+
+        """
+        from functools import reduce
+        import numpy as np
+        from openff.toolkit import Topology, Molecule
+        from rdkit import Chem
+        import warnings
+        topology = Topology.from_molecules(self.chains)
+        rolling_mass=0
+        monomers = self.monomers
+        sequence = self.sequence
+        for m in topology.molecules:
+            rolling_mass += sum(atom.mass for atom in m.atoms)
+        if rolling_mass.magnitude < 1000:
+            warnings.warn('Residual monomer/oligomer calculation may not be accurate for small systems, as the residual mass can be close to or lower than the weight of a single monomer. Please check the output by querying the value of residual_monomer_actual')
+        number_of_copies = []
+        # residual to add
+        monomer_to_add = (rolling_mass.magnitude/100 - residual_monomer - residual_oligomer) * residual_monomer
+        oligo_to_add = (rolling_mass.magnitude/100 - residual_monomer - residual_oligomer) * residual_oligomer
+        if 'A' in sequence and 'B' in sequence:
+            A_rd = Chem.MolFromSmiles(monomers[0])
+            A_rd = Chem.AddHs(A_rd)
+            info = Chem.AtomPDBResidueInfo()
+            info.SetResidueName('A' + str(1))
+            info.SetResidueNumber(1)
+            [atom.SetMonomerInfo(info)  for  atom  in  A_rd.GetAtoms()]
+            A = Molecule.from_rdkit(A_rd)
+            A.name = 'A_residual'
+            A_mass = sum([atom.mass for atom in A.atoms])
+            B_rd = Chem.MolFromSmiles(monomers[1])
+            B_rd = Chem.AddHs(B_rd)
+            info = Chem.AtomPDBResidueInfo()
+            info.SetResidueName('B' + str(1))
+            info.SetResidueNumber(1)
+            [atom.SetMonomerInfo(info)  for  atom  in  B_rd.GetAtoms()]
+            B = Molecule.from_rdkit(B_rd)
+            B_mass = sum([atom.mass for atom in B.atoms])
+            B.name = 'B_residual'
+            for r in range(1,100):
+                if (r * A_mass.magnitude) + (r * B_mass.magnitude) >= monomer_to_add:
+                    mon_count = r
+                    break
+            A_to_add = mon_count
+            B_to_add = mon_count
+
+        elif 'A' in sequence and 'B' not in sequence:
+            A_rd = Chem.MolFromSmiles(monomers[0])
+            A_rd = Chem.AddHs(A_rd)
+            info = Chem.AtomPDBResidueInfo()
+            info.SetResidueName('A' + str(1))
+            info.SetResidueNumber(1)
+            [atom.SetMonomerInfo(info)  for  atom  in  A_rd.GetAtoms()]
+            A = Molecule.from_rdkit(A_rd)
+            A_mass = sum([atom.mass for atom in A.atoms])
+            A.name = 'A_residual'
+            B = Molecule.from_smiles('C')
+            B.name = 'B_residual'
+            for r in range(1,100):
+                if (r * A_mass.magnitude) >= monomer_to_add:
+                    mon_count = r
+                    break
+
+            A_to_add = mon_count
+            B_to_add = 0
+        
+       
+        oligomers = []
+        if 'A' in sequence and 'B' in sequence:
+            for i in range(1000):
+                oligo_seq = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(sys.length_target * 0.5)), p=[sys.A_target/100,1-(sys.A_target/100)]))
+                monomer_list = [mono+'[I]' for mono in sys.monomers]
+                oligomer_rd = build.build_polymer(oligo_seq, 
+                            monomer_list=monomer_list, 
+                            reaction=AllChem.ReactionFromSmarts(sys.reaction))
+                oligomer_rd = Chem.AddHs(oligomer_rd)
+                info = Chem.AtomPDBResidueInfo()
+                info.SetResidueName('O' + str(i+1))
+                info.SetResidueNumber(1)
+                [atom.SetMonomerInfo(info)  for  atom  in  oligomer_rd.GetAtoms()]
+                oligomer = Molecule.from_rdkit(oligomer_rd)
+                oligo_mass = 0
+                for i in oligomers:
+                    oligo_mass += sum(atom.mass.magnitude for atom in i.atoms)
+                if float(oligo_mass) <= oligo_to_add:
+                    oligomers.append(oligomer)
+                else:
+                    break
+            monomer_mass = (A_to_add * A_mass.magnitude) + (B_to_add * B_mass.magnitude)
+            oligomer_mass = 0
+            for i in oligomers:
+                oligomer_mass += sum(atom.mass for atom in i.atoms)
+            residual_monomer_actual = (monomer_mass / (rolling_mass.magnitude + monomer_mass + oligomer_mass.magnitude)) * 100
+            residual_oligomer_actual = (oligomer_mass.magnitude / (rolling_mass.magnitude + monomer_mass + oligomer_mass.magnitude)) * 100
+            
+            molecules = [A, B] + oligomers
+            number_of_copies = [A_to_add, B_to_add] + [1 for c in range(len(oligomers))]
+
+        elif 'A' in sequence and 'B' not in sequence:
+            for i in range(1000):
+                oligo_seq = reduce(lambda x, y: x + y, np.random.choice(['A'], size=(int(sys.length_target * 0.5)), p=[sys.A_target/100,1-(sys.A_target/100)]))
+                monomer_list = [mono+'[I]' for mono in sys.monomers]
+                oligomer_rd = build.build_polymer(oligo_seq, 
+                            monomer_list=monomer_list, 
+                            reaction=AllChem.ReactionFromSmarts(sys.reaction))
+                oligomer_rd = Chem.AddHs(oligomer_rd)
+                info = Chem.AtomPDBResidueInfo()
+                info.SetResidueName('O' + str(i+1))
+                info.SetResidueNumber(1)
+                [atom.SetMonomerInfo(info)  for  atom  in  oligomer_rd.GetAtoms()]
+                oligomer = Molecule.from_rdkit(oligomer_rd)
+                oligomer.name = 'oligo' + str(i+1)
+                oligo_mass = 0
+                for i in oligomers:
+                    oligo_mass += sum(atom.mass for atom in i.atoms)
+                if oligo_mass.magnitude <= oligo_to_add:
+                    oligomers.append(oligomer)
+                else:
+                    break
+
+            monomer_mass = (A_to_add * A_mass.magnitude) + (B_to_add * B_mass.magnitude)
+            oligomer_mass = 0
+            for i in oligomers:
+                oligomer_mass += sum(atom.mass for atom in i.atoms)
+            residual_monomer_actual = (monomer_mass / (rolling_mass.magnitude + monomer_mass + oligomer_mass.magnitude)) * 100
+            residual_oligomer_actual = (oligomer_mass.magnitude / (rolling_mass.magnitude + monomer_mass + oligomer_mass.magnitude)) * 100
+            
+            molecules = [A, B] + oligomers
+            number_of_copies = [A_to_add, B_to_add] + [1 for c in range(len(oligomers))]
+    
+        return molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual
