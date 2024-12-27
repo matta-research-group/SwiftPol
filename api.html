@@ -61,6 +61,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.charge_system"><code class="docutils literal notranslate"><span class="pre">polymer_system.charge_system()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.export_to_csv"><code class="docutils literal notranslate"><span class="pre">polymer_system.export_to_csv()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.pack_solvated_system"><code class="docutils literal notranslate"><span class="pre">polymer_system.pack_solvated_system()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.generate_polyply_files"><code class="docutils literal notranslate"><span class="pre">polymer_system.generate_polyply_files()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -378,6 +379,31 @@ It considers the salt concentration and residual monomer concentration to determ
 <p>This function uses the OpenFF Interchange Packmol wrapper to pack the molecules into the simulation box.
 It removes any molecules with zero copies before packing, to avoid packmol errors.
 Assigns % residual monomer value to ensemble under self.residual_monomer_actual</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system.generate_polyply_files">
+<span class="sig-name descname"><span class="pre">generate_polyply_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">salt_concentration=&lt;Quantity(0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'mole</span> <span class="pre">/</span> <span class="pre">liter')&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_monomer=0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.generate_polyply_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.generate_polyply_files" title="Link to this definition"></a></dt>
+<dd><p>Generate input files for Polyply from the system.</p>
+<p>This method generates the input files required for [Polyply](<a class="reference external" href="https://github.com/marrink-lab/polyply_1.0/">https://github.com/marrink-lab/polyply_1.0/</a>) from the system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>salt_concentration</strong> (<em>openff.units.Quantity, optional</em>) – The desired salt concentration in the simulation box. Default is 0.0 M.</p></li>
+<li><p><strong>residual_monomer</strong> (<em>float, optional</em>) – The desired residual monomer concentration in the simulation box. Default is 0.00.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Output paths for .gro, .top and .pdb files generates for polyply and gromacs insert-molecules input</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function uses OpenFF Interchange to generate the input files for Polyply.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>UserWarning</strong> – If partial charges are not assigned to the system, processing large systems may raise errors from OpenFF-Interchange.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

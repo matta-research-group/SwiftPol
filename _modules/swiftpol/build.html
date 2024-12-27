@@ -964,8 +964,75 @@
                             <span class="n">number_of_copies</span> <span class="o">=</span> <span class="n">number_of_copies</span><span class="o">+</span><span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">))],</span>
                             <span class="n">box_vectors</span> <span class="o">=</span> <span class="n">box_vectors</span><span class="p">,</span>
                             <span class="n">tolerance</span> <span class="o">=</span> <span class="mi">1</span><span class="o">*</span><span class="n">unit</span><span class="o">.</span><span class="n">angstrom</span><span class="p">)</span></div>
-</div>
 
+
+<div class="viewcode-block" id="polymer_system.generate_polyply_files">
+<a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.generate_polyply_files">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_polyply_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">salt_concentration</span><span class="o">=</span><span class="mf">0.0</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">mole</span> <span class="o">/</span> <span class="n">unit</span><span class="o">.</span><span class="n">liter</span><span class="p">,</span> <span class="n">residual_monomer</span><span class="o">=</span><span class="mf">0.00</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Generate input files for Polyply from the system.</span>
+
+<span class="sd">        This method generates the input files required for [Polyply](https://github.com/marrink-lab/polyply_1.0/) from the system.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        salt_concentration : openff.units.Quantity, optional</span>
+<span class="sd">            The desired salt concentration in the simulation box. Default is 0.0 M.</span>
+<span class="sd">        residual_monomer : float, optional</span>
+<span class="sd">            The desired residual monomer concentration in the simulation box. Default is 0.00.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Output paths for .gro, .top and .pdb files generates for polyply and gromacs insert-molecules input</span>
+
+<span class="sd">        Notes</span>
+<span class="sd">        -----</span>
+<span class="sd">        This function uses OpenFF Interchange to generate the input files for Polyply.</span>
+<span class="sd">        </span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        UserWarning</span>
+<span class="sd">            If partial charges are not assigned to the system, processing large systems may raise errors from OpenFF-Interchange.</span>
+<span class="sd">        </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="kn">from</span> <span class="nn">swiftpol.build</span> <span class="kn">import</span> <span class="n">calculate_box_components</span>
+        <span class="kn">from</span> <span class="nn">openff.interchange</span> <span class="kn">import</span> <span class="n">Interchange</span>
+        <span class="kn">from</span> <span class="nn">openff.toolkit</span> <span class="kn">import</span> <span class="n">ForceField</span>
+        <span class="kn">import</span> <span class="nn">warnings</span>
+
+        <span class="n">molecules</span><span class="p">,</span> <span class="n">number_of_copies</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">box_vectors</span><span class="p">,</span> <span class="n">residual_monomer_actual</span> <span class="o">=</span> <span class="n">calculate_box_components</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">monomers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="n">salt_concentration</span><span class="p">,</span> <span class="n">residual_monomer</span><span class="p">,</span> <span class="n">solvated</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+        <span class="n">molecules</span> <span class="o">=</span> <span class="p">[</span><span class="n">molecules</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">number_of_copies</span><span class="p">))</span> <span class="k">if</span> <span class="n">number_of_copies</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">number_of_copies</span> <span class="o">=</span> <span class="p">[</span><span class="n">num</span> <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">number_of_copies</span> <span class="k">if</span> <span class="n">num</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">mol_pdb_files_dest</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">molecules</span><span class="p">:</span>
+            <span class="n">string_i</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">molecules</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="o">+</span> <span class="s1">&#39;.pdb&#39;</span>
+            <span class="n">mol_pdb_files_dest</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">string_i</span><span class="p">)</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">generate_conformers</span><span class="p">(</span><span class="n">n_conformers</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">string_i</span><span class="p">,</span> <span class="n">file_format</span><span class="o">=</span><span class="s1">&#39;pdb&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">residual_monomer_actual</span> <span class="o">=</span> <span class="n">residual_monomer_actual</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">partial_charges</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Partial charges may not be assigned to the system. Processing large systems may raise errors from OpenFF-Interchange&#39;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+            <span class="n">interchange</span> <span class="o">=</span> <span class="n">Interchange</span><span class="o">.</span><span class="n">from_smirnoff</span><span class="p">(</span>
+                <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
+                <span class="n">force_field</span><span class="o">=</span><span class="n">ForceField</span><span class="p">(</span><span class="s2">&quot;openff-2.2.0.offxml&quot;</span><span class="p">),</span>
+                <span class="n">box</span><span class="o">=</span><span class="n">box_vectors</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">interchange</span> <span class="o">=</span> <span class="n">Interchange</span><span class="o">.</span><span class="n">from_smirnoff</span><span class="p">(</span>
+                <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
+                <span class="n">force_field</span><span class="o">=</span><span class="n">ForceField</span><span class="p">(</span><span class="s2">&quot;openff-2.2.0.offxml&quot;</span><span class="p">),</span>
+                <span class="n">charge_from_molecules</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">],</span>
+                <span class="n">box</span><span class="o">=</span><span class="n">box_vectors</span>
+            <span class="p">)</span>
+        <span class="n">interchange</span><span class="o">.</span><span class="n">to_gromacs</span><span class="p">(</span><span class="s1">&#39;swiftpol_output&#39;</span><span class="p">)</span>
+        <span class="n">return_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;swiftpol_output.gro&#39;</span><span class="p">,</span> <span class="s1">&#39;swiftpol_output.top&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">pdb_file</span> <span class="ow">in</span> <span class="n">mol_pdb_files_dest</span><span class="p">:</span>
+            <span class="n">return_tuple</span> <span class="o">+=</span> <span class="p">(</span><span class="n">pdb_file</span><span class="p">,)</span>
+
+        <span class="k">return</span> <span class="n">return_tuple</span></div>
+</div>
 
 </pre></div>
 
