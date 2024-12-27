@@ -855,3 +855,67 @@ class polymer_system:
                             box_vectors = box_vectors,
                             tolerance = 1*unit.angstrom)
 
+    def generate_polyply_files(self, salt_concentration=0.0 * unit.mole / unit.liter, residual_monomer=0.00):
+        """
+        Generate input files for Polyply from the system.
+
+        This method generates the input files required for [Polyply](https://github.com/marrink-lab/polyply_1.0/) from the system.
+
+        Parameters
+        ----------
+        salt_concentration : openff.units.Quantity, optional
+            The desired salt concentration in the simulation box. Default is 0.0 M.
+        residual_monomer : float, optional
+            The desired residual monomer concentration in the simulation box. Default is 0.00.
+
+        Returns
+        -------
+        Output paths for .gro, .top and .pdb files generates for polyply and gromacs insert-molecules input
+
+        Notes
+        -----
+        This function uses OpenFF Interchange to generate the input files for Polyply.
+        
+        Raises
+        ------
+        UserWarning
+            If partial charges are not assigned to the system, processing large systems may raise errors from OpenFF-Interchange.
+        
+        """
+        from swiftpol.build import calculate_box_components
+        from openff.interchange import Interchange
+        from openff.toolkit import ForceField
+        import warnings
+
+        molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = calculate_box_components(
+            self.chains, self.monomers, self.sequence, salt_concentration, residual_monomer, solvated=False
+        )
+        molecules = [molecules[i] for i in range(len(number_of_copies)) if number_of_copies[i] != 0]
+        number_of_copies = [num for num in number_of_copies if num != 0]
+        mol_pdb_files_dest = []
+        for i in molecules:
+            string_i = str(molecules.index(i)) + '.pdb'
+            mol_pdb_files_dest.append(string_i)
+            i.generate_conformers(n_conformers=1)
+            i.to_file(string_i, file_format='pdb')
+        self.residual_monomer_actual = residual_monomer_actual
+        if self.chains[0].partial_charges is None:
+            warnings.warn('Partial charges may not be assigned to the system. Processing large systems may raise errors from OpenFF-Interchange', UserWarning)
+            interchange = Interchange.from_smirnoff(
+                topology=topology,
+                force_field=ForceField("openff-2.2.0.offxml"),
+                box=box_vectors
+            )
+        else:
+            interchange = Interchange.from_smirnoff(
+                topology=topology,
+                force_field=ForceField("openff-2.2.0.offxml"),
+                charge_from_molecules=[i for i in self.chains],
+                box=box_vectors
+            )
+        interchange.to_gromacs('swiftpol_output')
+        return_tuple = ('swiftpol_output.gro', 'swiftpol_output.top')
+        for pdb_file in mol_pdb_files_dest:
+            return_tuple += (pdb_file,)
+
+        return return_tuple
