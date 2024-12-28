@@ -347,7 +347,7 @@ class TestPolymerSystem(unittest.TestCase):
         for i in files:
             self.assertTrue(os.path.isfile(i))
             os.remove(i)
-
+        os.remove('swiftpol_output_pointenergy.mdp')
         #Test residual calculation
         sys = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
                    reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
