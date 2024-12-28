@@ -952,6 +952,7 @@ class polymer_system:
 
         """
         from functools import reduce
+        from swiftpol import build
         import numpy as np
         from openff.toolkit import Topology, Molecule
         from rdkit import Chem
