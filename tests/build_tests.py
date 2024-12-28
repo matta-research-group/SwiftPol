@@ -348,6 +348,24 @@ class TestPolymerSystem(unittest.TestCase):
             self.assertTrue(os.path.isfile(i))
             os.remove(i)
 
+        #Test residual calculation
+        sys = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
+                   reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
+                   length_target = 50, 
+                   terminals = 'hydroxyl', 
+                   num_chains = 50, 
+                   perc_A_target=75, 
+                   copolymer=True,
+                   acceptance=10,
+                   stereoisomerism_input=['A',0.5, 'O[C@@H](C)C(=O)O[I]'])
+        sys.charge_system('NAGL')
+        molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual = sys.calculate_residuals(residual_monomer=5, residual_oligomer=15)
+        self.assertTrue(residual_monomer_actual>=4 and residual_monomer_actual<=6)
+        self.assertTrue(residual_oligomer_actual>=12 and residual_oligomer_actual<=18)
+        self.assertIsNotNone(molecules)
+        self.assertIsNotNone(number_of_copies)
+        self.assertTrue(len(molecules)==len(number_of_copies))
+
 # Run
 
 if __name__ == '__main__':
