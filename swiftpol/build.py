@@ -1031,9 +1031,10 @@ class polymer_system:
                 [atom.SetMonomerInfo(info)  for  atom  in  oligomer_rd.GetAtoms()]
                 oligomer = Molecule.from_rdkit(oligomer_rd)
                 oligo_mass = 0
-                for i in oligomers:
-                    oligo_mass += sum(atom.mass.magnitude for atom in i.atoms)
-                if float(oligo_mass) <= oligo_to_add:
+                oligomers_new = oligomers + [oligomer]
+                for i in oligomers_new:
+                    oligo_mass += sum(atom.mass for atom in i.atoms)
+                if oligo_mass.magnitude <= oligo_to_add:
                     oligomers.append(oligomer)
                 else:
                     break
@@ -1062,7 +1063,8 @@ class polymer_system:
                 oligomer = Molecule.from_rdkit(oligomer_rd)
                 oligomer.name = 'oligo' + str(i+1)
                 oligo_mass = 0
-                for i in oligomers:
+                oligomers_new = oligomers + [oligomer]
+                for i in oligomers_new:
                     oligo_mass += sum(atom.mass for atom in i.atoms)
                 if oligo_mass.magnitude <= oligo_to_add:
                     oligomers.append(oligomer)
