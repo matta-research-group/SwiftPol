@@ -23,8 +23,7 @@ from openff.toolkit.utils import get_data_file_path
 from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, AmberToolsToolkitWrapper
 from openff.units import unit
 from pandas import read_csv
-import espaloma_charge as espcharge
-from espaloma_charge.openff_wrapper import EspalomaChargeToolkitWrapper
+
 
 from openff.interchange import Interchange
 from openff.interchange.components._packmol import UNIT_CUBE, pack_box, _max_dist_between_points
