@@ -9,7 +9,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import time
-from openeye import oechem
+try:
+    from openeye import oechem
+    oechem_imported = True
+except:
+    import warnings
+    warnings.warn("OpenEye is not installed. You will not be able to use OpenEye Toolkits for conformer generation.")
 
 import openmm
 from openff.toolkit.topology import Molecule, Topology
@@ -749,8 +754,10 @@ class polymer_system:
         # Generate conformers using OpenFF toolkit wrapper
         for chain in self.chains:
             num = self.chains.index(chain)
-            if oechem.OEChemIsLicensed():
-                object = OpenEyeToolkitWrapper()
+            
+            if oechem_imported:
+                if oechem.OEChemIsLicensed():
+                    object = OpenEyeToolkitWrapper()
             else:
                 object = RDKitToolkitWrapper()
             object.generate_conformers(molecule=chain, n_conformers=1)
