@@ -754,12 +754,10 @@ class polymer_system:
         # Generate conformers using OpenFF toolkit wrapper
         for chain in self.chains:
             num = self.chains.index(chain)
-            
+            object = RDKitToolkitWrapper()
             if oechem_imported:
                 if oechem.OEChemIsLicensed():
                     object = OpenEyeToolkitWrapper()
-            else:
-                object = RDKitToolkitWrapper()
             object.generate_conformers(molecule=chain, n_conformers=1)
             chain.generate_unique_atom_names()
             self.chains[num] = chain
