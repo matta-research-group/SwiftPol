@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>swiftpol.build &mdash; swiftpol  documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
 
   
@@ -75,42 +75,47 @@
              
   <h1>Source code for swiftpol.build</h1><div class="highlight"><pre>
 <span></span><span class="c1">#Init</span>
-<span class="kn">import</span> <span class="nn">rdkit</span>
-<span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
-<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">AllChem</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">random</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">openeye</span> <span class="kn">import</span> <span class="n">oechem</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">rdkit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rdkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">Chem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem</span><span class="w"> </span><span class="kn">import</span> <span class="n">AllChem</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openeye</span><span class="w"> </span><span class="kn">import</span> <span class="n">oechem</span>
+    <span class="n">oechem_imported</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;OpenEye is not installed. You will not be able to use OpenEye Toolkits for conformer generation.&quot;</span><span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">openmm</span>
-<span class="kn">from</span> <span class="nn">openff.toolkit.topology</span> <span class="kn">import</span> <span class="n">Molecule</span><span class="p">,</span> <span class="n">Topology</span>
-<span class="kn">from</span> <span class="nn">openff.toolkit.typing.engines.smirnoff</span> <span class="kn">import</span> <span class="n">ForceField</span>
-<span class="kn">from</span> <span class="nn">openff.toolkit.utils</span> <span class="kn">import</span> <span class="n">get_data_file_path</span>
-<span class="kn">from</span> <span class="nn">openff.toolkit.utils.toolkits</span> <span class="kn">import</span> <span class="n">RDKitToolkitWrapper</span><span class="p">,</span> <span class="n">AmberToolsToolkitWrapper</span>
-<span class="kn">from</span> <span class="nn">openff.units</span> <span class="kn">import</span> <span class="n">unit</span>
-<span class="kn">from</span> <span class="nn">pandas</span> <span class="kn">import</span> <span class="n">read_csv</span>
-<span class="kn">import</span> <span class="nn">espaloma_charge</span> <span class="k">as</span> <span class="nn">espcharge</span>
-<span class="kn">from</span> <span class="nn">espaloma_charge.openff_wrapper</span> <span class="kn">import</span> <span class="n">EspalomaChargeToolkitWrapper</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">openmm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit.topology</span><span class="w"> </span><span class="kn">import</span> <span class="n">Molecule</span><span class="p">,</span> <span class="n">Topology</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit.typing.engines.smirnoff</span><span class="w"> </span><span class="kn">import</span> <span class="n">ForceField</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_data_file_path</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit.utils.toolkits</span><span class="w"> </span><span class="kn">import</span> <span class="n">RDKitToolkitWrapper</span><span class="p">,</span> <span class="n">AmberToolsToolkitWrapper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openff.units</span><span class="w"> </span><span class="kn">import</span> <span class="n">unit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_csv</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">espaloma_charge</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">espcharge</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">espaloma_charge.openff_wrapper</span><span class="w"> </span><span class="kn">import</span> <span class="n">EspalomaChargeToolkitWrapper</span>
 
-<span class="kn">from</span> <span class="nn">openff.interchange</span> <span class="kn">import</span> <span class="n">Interchange</span>
-<span class="kn">from</span> <span class="nn">openff.interchange.components._packmol</span> <span class="kn">import</span> <span class="n">UNIT_CUBE</span><span class="p">,</span> <span class="n">pack_box</span><span class="p">,</span> <span class="n">_max_dist_between_points</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange</span><span class="w"> </span><span class="kn">import</span> <span class="n">Interchange</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange.components._packmol</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNIT_CUBE</span><span class="p">,</span> <span class="n">pack_box</span><span class="p">,</span> <span class="n">_max_dist_between_points</span>
 
 
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
-<span class="kn">from</span> <span class="nn">statistics</span> <span class="kn">import</span> <span class="n">mean</span>
-<span class="kn">from</span> <span class="nn">rdkit.Chem.Descriptors</span> <span class="kn">import</span> <span class="n">ExactMolWt</span>
-<span class="kn">from</span> <span class="nn">openff.interchange</span> <span class="kn">import</span> <span class="n">Interchange</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">reduce</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">statistics</span><span class="w"> </span><span class="kn">import</span> <span class="n">mean</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem.Descriptors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExactMolWt</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange</span><span class="w"> </span><span class="kn">import</span> <span class="n">Interchange</span>
 
 
 <span class="c1">#Build polymer - generic</span>
 <div class="viewcode-block" id="build_polymer">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.build_polymer">[docs]</a>
-<span class="k">def</span> <span class="nf">build_polymer</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">monomer_list</span><span class="p">,</span> <span class="n">reaction</span><span class="p">,</span> <span class="n">terminal</span><span class="o">=</span><span class="s1">&#39;hydroxyl&#39;</span><span class="p">,</span> <span class="n">chain_num</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_polymer</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">monomer_list</span><span class="p">,</span> <span class="n">reaction</span><span class="p">,</span> <span class="n">terminal</span><span class="o">=</span><span class="s1">&#39;hydroxyl&#39;</span><span class="p">,</span> <span class="n">chain_num</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructs a polymer from a given sequence of monomers.</span>
 
@@ -133,7 +138,7 @@
 <span class="sd">    rdkit.Chem.rdchem.Mol</span>
 <span class="sd">        The constructed polymer as an RDKit molecule object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">RDLogger</span> 
+    <span class="kn">from</span><span class="w"> </span><span class="nn">rdkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">RDLogger</span> 
     <span class="n">RDLogger</span><span class="o">.</span><span class="n">DisableLog</span><span class="p">(</span><span class="s1">&#39;rdApp.*&#39;</span><span class="p">)</span>   
     <span class="n">monomers</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">sequence</span><span class="p">))):</span>
@@ -228,7 +233,7 @@
 
 <div class="viewcode-block" id="build_linear_copolymer">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.build_linear_copolymer">[docs]</a>
-<span class="k">def</span> <span class="nf">build_linear_copolymer</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> 
+<span class="k">def</span><span class="w"> </span><span class="nf">build_linear_copolymer</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> 
                            <span class="n">monomer_a_smiles</span><span class="p">,</span> 
                            <span class="n">monomer_b_smiles</span><span class="p">,</span>
                            <span class="n">reaction</span><span class="o">=</span><span class="n">AllChem</span><span class="o">.</span><span class="n">ReactionFromSmarts</span><span class="p">(</span><span class="s1">&#39;[C:1][HO:2].[HO:3][C:4]&gt;&gt;[C:1][O:2][C:4].[O:3]&#39;</span><span class="p">)):</span>
@@ -289,7 +294,7 @@
 
 <div class="viewcode-block" id="PDI">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.PDI">[docs]</a>
-<span class="k">def</span> <span class="nf">PDI</span><span class="p">(</span><span class="n">chains</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">PDI</span><span class="p">(</span><span class="n">chains</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the Polydispersity Index (PDI), number-average molecular weight (Mn), and weight-average molecular weight (Mw) of a list of chains.</span>
 
@@ -334,7 +339,7 @@
 
 <div class="viewcode-block" id="blockiness_gen">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.blockiness_gen">[docs]</a>
-<span class="k">def</span> <span class="nf">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">wrt</span><span class="o">=</span><span class="s1">&#39;A&#39;</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">wrt</span><span class="o">=</span><span class="s1">&#39;A&#39;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the blockiness and average block length of a co-polymer sequence.</span>
 
@@ -409,7 +414,7 @@
 
 <div class="viewcode-block" id="calculate_box_components">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.calculate_box_components">[docs]</a>
-<span class="k">def</span> <span class="nf">calculate_box_components</span><span class="p">(</span><span class="n">chains</span><span class="p">,</span> <span class="n">monomers</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">salt_concentration</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">mole</span> <span class="o">/</span> <span class="n">unit</span><span class="o">.</span><span class="n">liter</span><span class="p">,</span> <span class="n">residual_monomer</span> <span class="o">=</span> <span class="mf">0.00</span><span class="p">,</span> <span class="n">solvated</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">calculate_box_components</span><span class="p">(</span><span class="n">chains</span><span class="p">,</span> <span class="n">monomers</span><span class="p">,</span> <span class="n">sequence</span><span class="p">,</span> <span class="n">salt_concentration</span> <span class="o">=</span> <span class="mf">0.0</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">mole</span> <span class="o">/</span> <span class="n">unit</span><span class="o">.</span><span class="n">liter</span><span class="p">,</span> <span class="n">residual_monomer</span> <span class="o">=</span> <span class="mf">0.00</span><span class="p">,</span> <span class="n">solvated</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculates the components required to construct a simulation box for a given set of molecular chains.</span>
 <span class="sd">    </span>
@@ -442,10 +447,10 @@
 <span class="sd">    ------</span>
 <span class="sd">    This function is adapted from the OpenFF Toolkit Packmol wrapper&#39;s solvate_topology function.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">openff.toolkit.topology</span> <span class="kn">import</span> <span class="n">Molecule</span><span class="p">,</span> <span class="n">Topology</span>
-    <span class="kn">from</span> <span class="nn">openff.interchange.components._packmol</span> <span class="kn">import</span> <span class="n">UNIT_CUBE</span><span class="p">,</span> <span class="n">pack_box</span><span class="p">,</span> <span class="n">RHOMBIC_DODECAHEDRON</span><span class="p">,</span> <span class="n">solvate_topology</span>
-    <span class="kn">from</span> <span class="nn">openff.interchange.components._packmol</span> <span class="kn">import</span> <span class="n">_max_dist_between_points</span><span class="p">,</span> <span class="n">_compute_brick_from_box_vectors</span><span class="p">,</span> <span class="n">_center_topology_at</span>
-    <span class="kn">import</span> <span class="nn">warnings</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit.topology</span><span class="w"> </span><span class="kn">import</span> <span class="n">Molecule</span><span class="p">,</span> <span class="n">Topology</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange.components._packmol</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNIT_CUBE</span><span class="p">,</span> <span class="n">pack_box</span><span class="p">,</span> <span class="n">RHOMBIC_DODECAHEDRON</span><span class="p">,</span> <span class="n">solvate_topology</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange.components._packmol</span><span class="w"> </span><span class="kn">import</span> <span class="n">_max_dist_between_points</span><span class="p">,</span> <span class="n">_compute_brick_from_box_vectors</span><span class="p">,</span> <span class="n">_center_topology_at</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
     <span class="c1">#Create molecules for the purpose of mass calculation</span>
     <span class="c1">#Water</span>
@@ -564,7 +569,7 @@
 
 <div class="viewcode-block" id="introduce_stereoisomers">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.introduce_stereoisomers">[docs]</a>
-<span class="k">def</span> <span class="nf">introduce_stereoisomers</span><span class="p">(</span><span class="n">stereo_monomer</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">seq</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">introduce_stereoisomers</span><span class="p">(</span><span class="n">stereo_monomer</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">seq</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Introduce stereoisomers into a polymer sequence by replacing a specified percentage of &#39;A&#39; monomers with &#39;S&#39;.</span>
 
@@ -613,21 +618,21 @@
 
 <div class="viewcode-block" id="polymer_system">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system">[docs]</a>
-<span class="k">class</span> <span class="nc">polymer_system</span><span class="p">:</span>
-    <span class="kn">from</span> <span class="nn">openeye</span> <span class="kn">import</span> <span class="n">oechem</span>
-    <span class="kn">from</span> <span class="nn">openff.toolkit.utils.toolkits</span> <span class="kn">import</span> <span class="n">RDKitToolkitWrapper</span><span class="p">,</span> <span class="n">OpenEyeToolkitWrapper</span>
-    <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
-    <span class="kn">from</span> <span class="nn">statistics</span> <span class="kn">import</span> <span class="n">mean</span>
-    <span class="kn">from</span> <span class="nn">rdkit.Chem.Descriptors</span> <span class="kn">import</span> <span class="n">ExactMolWt</span>
-    <span class="kn">from</span> <span class="nn">openff.interchange</span> <span class="kn">import</span> <span class="n">Interchange</span>
-    <span class="kn">from</span> <span class="nn">openff.interchange.components._packmol</span> <span class="kn">import</span> <span class="n">UNIT_CUBE</span><span class="p">,</span> <span class="n">pack_box</span>
-    <span class="kn">from</span> <span class="nn">swiftpol.build</span> <span class="kn">import</span> <span class="n">build_polymer</span><span class="p">,</span> <span class="n">PDI</span><span class="p">,</span> <span class="n">blockiness_gen</span><span class="p">,</span> <span class="n">calculate_box_components</span><span class="p">,</span> <span class="n">introduce_stereoisomers</span>
-    <span class="kn">from</span> <span class="nn">openff.units</span> <span class="kn">import</span> <span class="n">unit</span>
-    <span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">AllChem</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">polymer_system</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openeye</span><span class="w"> </span><span class="kn">import</span> <span class="n">oechem</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit.utils.toolkits</span><span class="w"> </span><span class="kn">import</span> <span class="n">RDKitToolkitWrapper</span><span class="p">,</span> <span class="n">OpenEyeToolkitWrapper</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">reduce</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">statistics</span><span class="w"> </span><span class="kn">import</span> <span class="n">mean</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem.Descriptors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExactMolWt</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange</span><span class="w"> </span><span class="kn">import</span> <span class="n">Interchange</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange.components._packmol</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNIT_CUBE</span><span class="p">,</span> <span class="n">pack_box</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.build</span><span class="w"> </span><span class="kn">import</span> <span class="n">build_polymer</span><span class="p">,</span> <span class="n">PDI</span><span class="p">,</span> <span class="n">blockiness_gen</span><span class="p">,</span> <span class="n">calculate_box_components</span><span class="p">,</span> <span class="n">introduce_stereoisomers</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openff.units</span><span class="w"> </span><span class="kn">import</span> <span class="n">unit</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem</span><span class="w"> </span><span class="kn">import</span> <span class="n">AllChem</span>
 
 <div class="viewcode-block" id="polymer_system.__init__">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.__init__">[docs]</a>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> 
                  <span class="n">monomer_list</span><span class="p">,</span> 
                  <span class="n">reaction</span><span class="p">,</span> 
                  <span class="n">length_target</span><span class="p">,</span> 
@@ -717,7 +722,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">blockiness_target</span> <span class="o">=</span> <span class="n">blockiness_target</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">A_target</span> <span class="o">=</span> <span class="n">perc_A_target</span>
             
-            <span class="k">def</span> <span class="nf">spec</span><span class="p">(</span><span class="n">sequence</span><span class="p">):</span> <span class="c1">#Define limits of A percentage and blockiness from input</span>
+            <span class="k">def</span><span class="w"> </span><span class="nf">spec</span><span class="p">(</span><span class="n">sequence</span><span class="p">):</span> <span class="c1">#Define limits of A percentage and blockiness from input</span>
                 <span class="n">acceptance_dec</span> <span class="o">=</span> <span class="n">acceptance</span><span class="o">/</span><span class="mi">100</span>
                 <span class="n">actual_A</span> <span class="o">=</span> <span class="p">(</span><span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;A&#39;</span><span class="p">)</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span><span class="o">*</span><span class="mi">100</span>
                 <span class="n">blockiness</span> <span class="o">=</span> <span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">blockiness_target</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
@@ -823,7 +828,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;System built!, size =&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_chains</span><span class="p">)</span></div>
 
         
-    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
                 
         <span class="n">description</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SwiftPol ensemble of size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_chains</span><span class="si">}</span><span class="s2">, &quot;</span>
                        <span class="sa">f</span><span class="s2">&quot;average chain length = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">length_average</span><span class="si">}</span><span class="s2">-mers, PDI = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PDI</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -831,7 +836,7 @@
 
 <div class="viewcode-block" id="polymer_system.generate_conformers">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.generate_conformers">[docs]</a>
-    <span class="k">def</span> <span class="nf">generate_conformers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_conformers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate conformers for each polymer chain in the system.</span>
 
@@ -846,12 +851,14 @@
 <span class="sd">            If neither RDKit nor OpenEye toolkits are available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="kn">from</span> <span class="nn">openff.toolkit.utils.toolkits</span> <span class="kn">import</span> <span class="n">RDKitToolkitWrapper</span><span class="p">,</span> <span class="n">OpenEyeToolkitWrapper</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit.utils.toolkits</span><span class="w"> </span><span class="kn">import</span> <span class="n">RDKitToolkitWrapper</span><span class="p">,</span> <span class="n">OpenEyeToolkitWrapper</span>
         <span class="c1"># Generate conformers using OpenFF toolkit wrapper</span>
         <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
             <span class="n">num</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">oechem</span><span class="o">.</span><span class="n">OEChemIsLicensed</span><span class="p">():</span>
-                <span class="nb">object</span> <span class="o">=</span> <span class="n">OpenEyeToolkitWrapper</span><span class="p">()</span>
+            
+            <span class="k">if</span> <span class="n">oechem_imported</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">oechem</span><span class="o">.</span><span class="n">OEChemIsLicensed</span><span class="p">():</span>
+                    <span class="nb">object</span> <span class="o">=</span> <span class="n">OpenEyeToolkitWrapper</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="nb">object</span> <span class="o">=</span> <span class="n">RDKitToolkitWrapper</span><span class="p">()</span>
             <span class="nb">object</span><span class="o">.</span><span class="n">generate_conformers</span><span class="p">(</span><span class="n">molecule</span><span class="o">=</span><span class="n">chain</span><span class="p">,</span> <span class="n">n_conformers</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
@@ -861,7 +868,7 @@
     
 <div class="viewcode-block" id="polymer_system.charge_system">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.charge_system">[docs]</a>
-    <span class="k">def</span> <span class="nf">charge_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">charge_scheme</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">charge_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">charge_scheme</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Assign partial charges to each polymer chain in the system.</span>
 
@@ -878,13 +885,13 @@
 <span class="sd">        ImportError</span>
 <span class="sd">            If the selected toolkit is not available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">swiftpol.parameterize</span> <span class="kn">import</span> <span class="n">charge_openff_polymer</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.parameterize</span><span class="w"> </span><span class="kn">import</span> <span class="n">charge_openff_polymer</span>
         <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
             <span class="n">chain</span><span class="o">.</span><span class="n">partial_charges</span> <span class="o">=</span> <span class="n">charge_openff_polymer</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">charge_scheme</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="polymer_system.export_to_csv">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.export_to_csv">[docs]</a>
-    <span class="k">def</span> <span class="nf">export_to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">export_to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Export all the instances in polymer_system.__init__() into a pandas DataFrame and save it as a CSV file.</span>
 
@@ -917,7 +924,7 @@
 
 <div class="viewcode-block" id="polymer_system.pack_solvated_system">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.pack_solvated_system">[docs]</a>
-    <span class="k">def</span> <span class="nf">pack_solvated_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">salt_concentration</span><span class="o">=</span><span class="mf">0.0</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">mole</span> <span class="o">/</span> <span class="n">unit</span><span class="o">.</span><span class="n">liter</span><span class="p">,</span> <span class="n">residual_monomer</span><span class="o">=</span><span class="mf">0.00</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">pack_solvated_system</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">salt_concentration</span><span class="o">=</span><span class="mf">0.0</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">mole</span> <span class="o">/</span> <span class="n">unit</span><span class="o">.</span><span class="n">liter</span><span class="p">,</span> <span class="n">residual_monomer</span><span class="o">=</span><span class="mf">0.00</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Pack a solvated system using Packmol functions, and the OpenFF Packmol wrapper.</span>
 <span class="sd">    </span>
@@ -943,8 +950,8 @@
 <span class="sd">        Assigns % residual monomer value to ensemble under self.residual_monomer_actual</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">openff.interchange.components._packmol</span> <span class="kn">import</span> <span class="n">pack_box</span><span class="p">,</span> <span class="n">UNIT_CUBE</span>
-        <span class="kn">from</span> <span class="nn">swiftpol.build</span> <span class="kn">import</span> <span class="n">calculate_box_components</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange.components._packmol</span><span class="w"> </span><span class="kn">import</span> <span class="n">pack_box</span><span class="p">,</span> <span class="n">UNIT_CUBE</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.build</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_box_components</span>
     
         <span class="n">molecules</span><span class="p">,</span> <span class="n">number_of_copies</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">box_vectors</span><span class="p">,</span> <span class="n">residual_monomer_actual</span> <span class="o">=</span> <span class="n">calculate_box_components</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">monomers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="n">salt_concentration</span><span class="p">,</span> <span class="n">residual_monomer</span>
@@ -968,7 +975,7 @@
 
 <div class="viewcode-block" id="polymer_system.generate_polyply_files">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.generate_polyply_files">[docs]</a>
-    <span class="k">def</span> <span class="nf">generate_polyply_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">salt_concentration</span><span class="o">=</span><span class="mf">0.0</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">mole</span> <span class="o">/</span> <span class="n">unit</span><span class="o">.</span><span class="n">liter</span><span class="p">,</span> <span class="n">residual_monomer</span><span class="o">=</span><span class="mf">0.00</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_polyply_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">salt_concentration</span><span class="o">=</span><span class="mf">0.0</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">mole</span> <span class="o">/</span> <span class="n">unit</span><span class="o">.</span><span class="n">liter</span><span class="p">,</span> <span class="n">residual_monomer</span><span class="o">=</span><span class="mf">0.00</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate input files for Polyply from the system.</span>
 
@@ -995,10 +1002,10 @@
 <span class="sd">            If partial charges are not assigned to the system, processing large systems may raise errors from OpenFF-Interchange.</span>
 <span class="sd">        </span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">swiftpol.build</span> <span class="kn">import</span> <span class="n">calculate_box_components</span>
-        <span class="kn">from</span> <span class="nn">openff.interchange</span> <span class="kn">import</span> <span class="n">Interchange</span>
-        <span class="kn">from</span> <span class="nn">openff.toolkit</span> <span class="kn">import</span> <span class="n">ForceField</span>
-        <span class="kn">import</span> <span class="nn">warnings</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.build</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_box_components</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange</span><span class="w"> </span><span class="kn">import</span> <span class="n">Interchange</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">ForceField</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
         <span class="n">molecules</span><span class="p">,</span> <span class="n">number_of_copies</span><span class="p">,</span> <span class="n">topology</span><span class="p">,</span> <span class="n">box_vectors</span><span class="p">,</span> <span class="n">residual_monomer_actual</span> <span class="o">=</span> <span class="n">calculate_box_components</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">monomers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="n">salt_concentration</span><span class="p">,</span> <span class="n">residual_monomer</span><span class="p">,</span> <span class="n">solvated</span><span class="o">=</span><span class="kc">False</span>
@@ -1036,7 +1043,7 @@
 
 <div class="viewcode-block" id="polymer_system.calculate_residuals">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.calculate_residuals">[docs]</a>
-    <span class="k">def</span> <span class="nf">calculate_residuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">residual_monomer</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">residual_oligomer</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_residuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">residual_monomer</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">residual_oligomer</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate residual monomer and oligomer molecules, and molecule counts.</span>
 
@@ -1067,12 +1074,12 @@
 <span class="sd">        UserWarning</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
-        <span class="kn">from</span> <span class="nn">swiftpol</span> <span class="kn">import</span> <span class="n">build</span>
-        <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-        <span class="kn">from</span> <span class="nn">openff.toolkit</span> <span class="kn">import</span> <span class="n">Topology</span><span class="p">,</span> <span class="n">Molecule</span>
-        <span class="kn">from</span> <span class="nn">rdkit</span> <span class="kn">import</span> <span class="n">Chem</span>
-        <span class="kn">import</span> <span class="nn">warnings</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">functools</span><span class="w"> </span><span class="kn">import</span> <span class="n">reduce</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol</span><span class="w"> </span><span class="kn">import</span> <span class="n">build</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">Topology</span><span class="p">,</span> <span class="n">Molecule</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">rdkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">Chem</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
         <span class="n">topology</span> <span class="o">=</span> <span class="n">Topology</span><span class="o">.</span><span class="n">from_molecules</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">)</span>
         <span class="n">rolling_mass</span><span class="o">=</span><span class="mi">0</span>
         <span class="n">monomers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">monomers</span>
