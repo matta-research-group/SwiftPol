@@ -855,12 +855,10 @@
         <span class="c1"># Generate conformers using OpenFF toolkit wrapper</span>
         <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
             <span class="n">num</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
-            
+            <span class="nb">object</span> <span class="o">=</span> <span class="n">RDKitToolkitWrapper</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">oechem_imported</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">oechem</span><span class="o">.</span><span class="n">OEChemIsLicensed</span><span class="p">():</span>
                     <span class="nb">object</span> <span class="o">=</span> <span class="n">OpenEyeToolkitWrapper</span><span class="p">()</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="nb">object</span> <span class="o">=</span> <span class="n">RDKitToolkitWrapper</span><span class="p">()</span>
             <span class="nb">object</span><span class="o">.</span><span class="n">generate_conformers</span><span class="p">(</span><span class="n">molecule</span><span class="o">=</span><span class="n">chain</span><span class="p">,</span> <span class="n">n_conformers</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">chain</span><span class="o">.</span><span class="n">generate_unique_atom_names</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">[</span><span class="n">num</span><span class="p">]</span> <span class="o">=</span> <span class="n">chain</span></div>
