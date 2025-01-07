@@ -522,7 +522,11 @@ def introduce_stereoisomers(stereo_monomer, instance, seq):
 #Class object for generic polymer system
 
 class polymer_system:
-    from openeye import oechem
+    try:
+        from openeye import oechem
+    except:
+        import warnings
+        warnings.warn("OpenEye is not installed. You will not be able to use OpenEye Toolkits for conformer generation.")
     from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
     from functools import reduce
     from statistics import mean
