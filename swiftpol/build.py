@@ -1047,7 +1047,7 @@ class polymer_system:
                 else:
                     break
             monomer_mass = (A_to_add * A_mass.magnitude) + (B_to_add * B_mass.magnitude)
-            oligomer_mass = 0
+            oligomer_mass = 0 * unit.dalton
             for i in oligomers:
                 oligomer_mass += sum(atom.mass for atom in i.atoms)
             residual_monomer_actual = (monomer_mass / (rolling_mass.magnitude + monomer_mass + oligomer_mass.magnitude)) * 100
@@ -1080,7 +1080,7 @@ class polymer_system:
                     break
 
             monomer_mass = (A_to_add * A_mass.magnitude) + (B_to_add * B_mass.magnitude)
-            oligomer_mass = 0
+            oligomer_mass = 0 * unit.dalton
             for i in oligomers:
                 oligomer_mass += sum(atom.mass for atom in i.atoms)
             residual_monomer_actual = (monomer_mass / (rolling_mass.magnitude + monomer_mass + oligomer_mass.magnitude)) * 100
