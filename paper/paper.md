@@ -14,7 +14,7 @@ authors:
     orcid: 0000-0002-9852-3154
     affiliation: 1 
 affiliations: 
- - name: Department of Chemistry, King’s College London Strand Campus, East Wing, 33-41 Surrey St, London, WC2R 2ND 
+ - name: Department of Chemistry, King’s College London Strand Campus, East Wing, 33-41 Surrey St, London, WC2R 2ND, United Kingdom 
    index: 1 
    ror: 0220mzb33
 
@@ -159,7 +159,7 @@ n_{chains} = \mbox{total number of chains built}
 
 # Acknowledgements 
 
-Hannah Turney is supported by funding contributions from the UKRI Biotechnology and Biological Sciences Research Council (grant ref. BB/T008709/1) and Johnson&Johnson Innovative Medicine. 
+Hannah Turney is supported by funding contributions from the United Kingdom Research and Innovation Biotechnology and Biological Sciences Research Council (grant ref. BB/T008709/1) and Johnson&Johnson Innovative Medicine. 
 
 We acknowledge contributions and feedback from Jeffrey Wagner at the Open Force field consortium and Anusha Lalitha, David Hahn, and Gary Tresadern at Johnson&Johnson Innovative Medicine.
 
