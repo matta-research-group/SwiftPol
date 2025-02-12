@@ -921,8 +921,8 @@ class polymer_system:
         return_tuple = ('swiftpol_output.gro', 'swiftpol_output.top')
         for pdb_file in mol_pdb_files_dest:
             return_tuple += (pdb_file,)
-
-        return f'Polyply input files generated! Saved at {return_tuple}'
+        print(f'Polyply input files generated! Saved at {return_tuple}')
+        return return_tuple
 
     def calculate_residuals(self, residual_monomer = 0, residual_oligomer = 0):
         """
@@ -952,7 +952,7 @@ class polymer_system:
         
         Raises
         ------
-        UserWarning
+        UserWarning - If the residual monomer concentration is close to or lower than the weight of a single monomer.
 
         """
         from functools import reduce
