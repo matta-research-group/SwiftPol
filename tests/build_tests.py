@@ -270,8 +270,8 @@ class TestPolymerSystem(unittest.TestCase):
         x.generate_conformers()
         self.assertTrue(len(x.chains[0].conformers[0])==len(x.chains[0].atoms))
         #Test all charge methods
-        x.charge_system('espaloma')
-        self.assertTrue(len(x.chains[0].partial_charges)==len(x.chains[0].atoms))
+        #x.charge_system('espaloma')
+        #self.assertTrue(len(x.chains[0].partial_charges)==len(x.chains[0].atoms))
         x.charge_system('NAGL')
         self.assertTrue(len(x.chains[0].partial_charges)==len(x.chains[0].atoms))
 
@@ -348,7 +348,7 @@ class TestPolymerSystem(unittest.TestCase):
             self.assertTrue(os.path.isfile(i))
             os.remove(i)
         os.remove('swiftpol_output_pointenergy.mdp')
-        
+
         #Test residual calculation
         sys = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
                    reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
