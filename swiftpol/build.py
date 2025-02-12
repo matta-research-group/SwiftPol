@@ -890,10 +890,11 @@ class polymer_system:
         UserWarning
             If partial charges are not assigned to the system, processing large systems may raise errors from OpenFF-Interchange.
         """
+        from swiftpol.build import calculate_box_components
         from openff.interchange import Interchange
         from openff.toolkit import ForceField
         import warnings
-
+        box_vectors = calculate_box_components(self.chains, self.monomers, self.sequence, 0.0 * unit.mole / unit.liter, 0.0)[3]
         molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual = self.calculate_residuals(residual_monomer, residual_oligomer)
         mol_pdb_files_dest = []
         for i in molecules:
@@ -954,6 +955,7 @@ class polymer_system:
         ------
         UserWarning - If the residual monomer concentration is close to or lower than the weight of a single monomer.
 
+        
         """
         from functools import reduce
         from swiftpol import build
