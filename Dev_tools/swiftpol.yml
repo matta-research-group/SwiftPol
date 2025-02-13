@@ -32,7 +32,7 @@ dependencies:
   - pydantic
   - python>=3.11.5
   - python-dateutil
-  - pytorch>=2.3.1
+  - pytorch<=2.5.0
   - qcelemental
   - qcengine
   - qcportal
