@@ -48,6 +48,6 @@ dependencies:
       - pdb4amber
       - pytraj
       - rdkit
-      - torch
+      - torch == 2.0.0
       - torchdata
 

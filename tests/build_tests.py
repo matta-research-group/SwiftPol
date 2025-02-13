@@ -270,8 +270,8 @@ class TestPolymerSystem(unittest.TestCase):
         x.generate_conformers()
         self.assertTrue(len(x.chains[0].conformers[0])==len(x.chains[0].atoms))
         #Test all charge methods
-        #x.charge_system('espaloma')
-        #self.assertTrue(len(x.chains[0].partial_charges)==len(x.chains[0].atoms))
+        x.charge_system('espaloma')
+        self.assertTrue(len(x.chains[0].partial_charges)==len(x.chains[0].atoms))
         x.charge_system('NAGL')
         self.assertTrue(len(x.chains[0].partial_charges)==len(x.chains[0].atoms))
 
