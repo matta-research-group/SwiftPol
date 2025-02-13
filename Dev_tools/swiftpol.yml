@@ -40,7 +40,6 @@ dependencies:
   - seaborn
   - smirnoff99frosst
   - statsmodels
-  - torch == 2.3.1
   - dgl==2.0.0
   - pip
   - pip:
