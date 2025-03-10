@@ -323,7 +323,7 @@ def blockiness_gen(sequence, wrt='A'):
     else:
         raise ValueError("wrt parameter must be 'A' or 'B'")
 
-def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.0 * unit.mole / unit.liter, residual_monomer = 0.00, solvated=True):
+def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.0 * unit.mole / unit.liter, residual_monomer = 0.00, solvated=False):
     """
     Calculates the components required to construct a simulation box for a given set of molecular chains.
     
