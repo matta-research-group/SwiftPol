@@ -1,5 +1,6 @@
 ![title](Repo/logo.jpg)
 
+[![Zenodo](https://zenodo.org/badge/798303954.svg)](https://doi.org/10.5281/zenodo.15111991)
 [![PyTest](https://github.com/matta-research-group/SwiftPol/actions/workflows/SwiftPol_tests.yml/badge.svg)](https://github.com/matta-research-group/SwiftPol/actions/workflows/SwiftPol_tests.yml)
 [![Documentation](https://img.shields.io/badge/Documentation-Online-brightgreen)](https://matta-research-group.github.io/SwiftPol)
 [![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](https://github.com/yourusername/yourrepository/blob/main/LICENSE)
