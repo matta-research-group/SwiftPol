@@ -53,7 +53,7 @@ If all tests are passed, the chain is appended to the Python polymer ensemble bu
 
 This approach allows for the generation of a polydisperse chain ensemble, meaning each chain displays different properties but the ensemble matches the target properties and distribution, as is observed in experimental polymer samples. 
 
-SwiftPol also contains functions to generate conformers using RDkit or OpenEye (license-dependent), and assign force field parameters to the polydisperse ensembles using the openff-interchange infrastructure [@hawkins_comparison_2007]. The user can export the chain ensemble to existing tools such as packmol to generate initial configurations for molecular dynamics.
+SwiftPol also contains functions to generate conformers using RDkit or OpenEye Omega(license-dependent, academic license provided by OpenEye, Cadence Molecular Sciences)[@hawkins_conformer_2010;@openeye_cadence_molecular_sciences_omega_nodate], and assign force field parameters to the polydisperse ensembles using the openff-interchange infrastructure . The user can export the chain ensemble to existing tools such as packmol to generate initial configurations for molecular dynamics.
 
 # Application: building a poly(lactide-co-glycolide) ensemble
 
@@ -164,5 +164,7 @@ Hannah Turney is supported by funding contributions from the United Kingdom Rese
 We acknowledge contributions and feedback from Jeffrey Wagner at the Open Force field consortium and Anusha Lalitha, David Hahn, and Gary Tresadern at Johnson&Johnson Innovative Medicine.
 
 We acknowledge the use of King’s College London e-research Computational Research, Engineering and Technology Environment (CREATE) high-performance computing facility in the development and testing of SwiftPol [@kings_college_london_kings_2024].
+
+We acknowledge the use of a free academic license provided by OpenEye Scientific, Santa Fe, NM [@hawkins_conformer_2010; @openeye_cadence_molecular_sciences_omega_nodate].
 
 # References 
