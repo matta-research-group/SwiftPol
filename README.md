@@ -38,9 +38,12 @@ Examples of using SwiftPol code to build different polymers can be found at [Exa
 ### OpenEye License Guidance
 [Instructions for implementing an OpenEye License (not essential but speeds up conformation determination)](https://docs.eyesopen.com/toolkits/python/quickstart-python/license.html)
 
-Citation for OpenEye:
+Citation for OpenEye OMEGA:
 
-Hawkins, P. C. D.; Skillman, A. G.; Nicholls, A. Comparison of Shape-Matching and Docking as Virtual Screening Tools. J Med Chem 2007, 50 (1), 74–82. https://doi.org/10.1021/jm0603365.
+Hawkins, P. C. D.; Skillman, A. G.; Warren, G. L.; Ellingson, B. A.; Stahl, M. T. Conformer Generation with OMEGA: Algorithm and Validation Using High Quality Structures from the Protein Databank and Cambridge Structural Database. J. Chem. Inf. Model. 2010, 50 (4), 572–584. https://doi.org/10.1021/ci100031x.
+
+We acknowledge the use of a free academic license provided by OpenEye, Candence Molecular Sciences, Santa Fe, NM 
+
 
 ### File Tree
 ```
