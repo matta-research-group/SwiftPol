@@ -42,7 +42,7 @@ Citation for OpenEye OMEGA:
 
 Hawkins, P. C. D.; Skillman, A. G.; Warren, G. L.; Ellingson, B. A.; Stahl, M. T. Conformer Generation with OMEGA: Algorithm and Validation Using High Quality Structures from the Protein Databank and Cambridge Structural Database. J. Chem. Inf. Model. 2010, 50 (4), 572–584. https://doi.org/10.1021/ci100031x.
 
-We acknowledge the use of a free academic license provided by OpenEye, Candence Molecular Sciences, Santa Fe, NM 
+We acknowledge the use of a free academic license provided by OpenEye, Candence Molecular Sciences, Santa Fe, NM https://www.eyesopen.com/
 
 
 ### File Tree
