@@ -295,9 +295,8 @@
 <a class="viewcode-back" href="../../api.html#swiftpol.build.PDI">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">PDI</span><span class="p">(</span><span class="n">chains</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Calculates the Polydispersity Index (PDI), number-average molecular weight (Mn), and weight-average molecular weight (Mw) of a list of chains.</span>
-
-<span class="sd">    This function takes a list of molecular chains and calculates the PDI, which is the ratio of Mw to Mn. It also calculates Mn, which is the sum of the molecular weights of the chains divided by the number of chains, and Mw, which is the sum of the product of the weight fraction and molecular weight of each chain.</span>
+<span class="sd">    Calculates the Polydispersity Index (PDI), number-average molecular weight (Mn),</span>
+<span class="sd">    and weight-average molecular weight (Mw) of a list of chains.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -314,22 +313,16 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Calculate the molecular weights of the chains</span>
     <span class="n">mw_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">ExactMolWt</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span> <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="n">chains</span><span class="p">]</span>
-    <span class="nb">list</span> <span class="o">=</span> <span class="p">[</span><span class="nb">round</span><span class="p">(</span><span class="n">mass</span><span class="p">)</span> <span class="k">for</span> <span class="n">mass</span> <span class="ow">in</span> <span class="n">mw_list</span><span class="p">]</span>
-    <span class="n">Mi</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-    <span class="n">NiMi</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="c1"># Calculate the weight fraction of each chain</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">Mi</span><span class="p">:</span>
-        <span class="n">Ni</span> <span class="o">=</span> <span class="nb">list</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
-        <span class="n">NiMi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="o">*</span><span class="n">Ni</span><span class="p">)</span>
-    <span class="n">sigNiMi</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">NiMi</span><span class="p">)</span>
-    <span class="n">Mn</span> <span class="o">=</span> <span class="n">sigNiMi</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">mw_list</span><span class="p">)</span>
-    <span class="n">wf</span> <span class="o">=</span> <span class="p">[</span><span class="n">z</span><span class="o">/</span><span class="n">sigNiMi</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="n">NiMi</span><span class="p">]</span>
-    <span class="c1"># Calculate the weight-average molecular weight</span>
-    <span class="n">WiMi</span> <span class="o">=</span> <span class="p">[</span><span class="n">wf</span><span class="p">[</span><span class="n">n</span><span class="p">]</span><span class="o">*</span><span class="n">NiMi</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">wf</span><span class="p">))]</span>
-    <span class="n">Mw</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">WiMi</span><span class="p">)</span>
+    <span class="c1"># Count instances of each molecular weight</span>
+    <span class="n">mw_counts</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">mw_list</span><span class="p">)</span>
+    <span class="c1"># Calculate Mn </span>
+    <span class="n">total_chains</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">mw_counts</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>  <span class="c1"># Total number of chains </span>
+    <span class="n">Mn</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">mw</span> <span class="o">*</span> <span class="n">count</span> <span class="k">for</span> <span class="n">mw</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">mw_counts</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="o">/</span> <span class="n">total_chains</span>
+    <span class="c1"># Calculate Mw</span>
+    <span class="n">Mw</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">mw</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">count</span> <span class="k">for</span> <span class="n">mw</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">mw_counts</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">mw</span> <span class="o">*</span> <span class="n">count</span> <span class="k">for</span> <span class="n">mw</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">mw_counts</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+    <span class="c1"># Calculate PDI - Polydispersity Index</span>
+    <span class="n">PDI</span> <span class="o">=</span> <span class="n">Mw</span> <span class="o">/</span> <span class="n">Mn</span>
     
-    <span class="c1"># Calculate the polydispersity index</span>
-    <span class="n">PDI</span> <span class="o">=</span> <span class="n">Mw</span><span class="o">/</span><span class="n">Mn</span>
     <span class="k">return</span> <span class="n">PDI</span><span class="p">,</span> <span class="n">Mn</span><span class="p">,</span> <span class="n">Mw</span></div>
 
     
