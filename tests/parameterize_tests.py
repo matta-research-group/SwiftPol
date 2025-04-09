@@ -43,7 +43,14 @@ class TestParameterize(unittest.TestCase):
         self.assertIsNotNone(charges)
         # Test invalid charge scheme
         with self.assertRaises(AttributeError):
-            charges = charge_openff_polymer(openff_polymer, 'invalid')        
+            charges = charge_openff_polymer(openff_polymer, 'invalid')
+
+        #Test with overwrite = False
+        openff_polymer2 = Molecule.from_rdkit(polymer)
+        charges = charge_openff_polymer(openff_polymer, 'NAGL', overwrite=False)
+        self.assertIsNotNone(charges)
+        self.assertIsNone(openff_polymer2.partial_charges)
+
         
         #Test with polymer build using build
         sequence = 'ABAB'

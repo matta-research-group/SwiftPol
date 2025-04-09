@@ -7,8 +7,15 @@ import random
 import numpy as np
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 import time
-from openeye import oechem
+from collections import Counter
+try:
+    from openeye import oechem
+    oechem_imported = True
+except:
+    import warnings
+    warnings.warn("OpenEye is not installed. You will not be able to use OpenEye Toolkits for conformer generation.")
 
 import openmm
 from openff.toolkit.topology import Molecule, Topology
@@ -17,8 +24,7 @@ from openff.toolkit.utils import get_data_file_path
 from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, AmberToolsToolkitWrapper
 from openff.units import unit
 from pandas import read_csv
-import espaloma_charge as espcharge
-from espaloma_charge.openff_wrapper import EspalomaChargeToolkitWrapper
+
 
 from openff.interchange import Interchange
 from openff.interchange.components._packmol import UNIT_CUBE, pack_box, _max_dist_between_points
@@ -92,6 +98,16 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydroxyl', chain_n
             [atom.SetMonomerInfo(info)  for  atom  in  B.GetAtoms()]
             polymer = reaction.RunReactants((polymer, B))[0][0]
             Chem.SanitizeMol(polymer)
+        
+        elif sequence[i] == 'S':
+            S = Chem.MolFromSmiles(monomers['S'])
+            S = Chem.AddHs(S)
+            info = Chem.AtomPDBResidueInfo()
+            info.SetResidueName(str(chain_num) + 'S' + str(i+1))
+            info.SetResidueNumber(i+1)
+            [atom.SetMonomerInfo(info)  for  atom  in  S.GetAtoms()]
+            polymer = reaction.RunReactants((polymer, S))[0][0]
+            Chem.SanitizeMol(polymer)
     
     if terminal == 'hydroxyl':
         hydrogen = Chem.MolFromSmiles('[H]')
@@ -109,13 +125,14 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydroxyl', chain_n
         [atom.SetMonomerInfo(info)  for  atom  in  carboxyl.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), carboxyl)[0]
     elif terminal == 'ester':
-        carbon = Chem.MolFromSmiles('C')
+        carbon = Chem.MolFromSmiles('[CH3]')
+        carbon = Chem.AddHs(carbon)
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName(str(chain_num) + sequence[0] + str(1))
         info.SetResidueNumber(1)
         [atom.SetMonomerInfo(info)  for  atom  in  carbon.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), carbon)[0]
-        Chem.AddHs(polymer)
+        #Chem.AddHs(polymer)
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), Chem.MolFromSmiles('C'))[0]
     else:
         hydrogen = Chem.MolFromSmiles('[H]')
@@ -195,9 +212,8 @@ def build_linear_copolymer(sequence,
 
 def PDI(chains):
     """
-    Calculates the Polydispersity Index (PDI), number-average molecular weight (Mn), and weight-average molecular weight (Mw) of a list of chains.
-
-    This function takes a list of molecular chains and calculates the PDI, which is the ratio of Mw to Mn. It also calculates Mn, which is the sum of the molecular weights of the chains divided by the number of chains, and Mw, which is the sum of the product of the weight fraction and molecular weight of each chain.
+    Calculates the Polydispersity Index (PDI), number-average molecular weight (Mn),
+    and weight-average molecular weight (Mw) of a list of chains.
 
     Parameters
     ----------
@@ -214,28 +230,22 @@ def PDI(chains):
     """
     # Calculate the molecular weights of the chains
     mw_list = [ExactMolWt(chain) for chain in chains]
-    list = [round(mass) for mass in mw_list]
-    Mi = set(list)
-    NiMi = []
-    # Calculate the weight fraction of each chain
-    for i in Mi:
-        Ni = list.count(i)
-        NiMi.append(i*Ni)
-    sigNiMi = sum(NiMi)
-    Mn = sigNiMi/len(mw_list)
-    wf = [z/sigNiMi for z in NiMi]
-    # Calculate the weight-average molecular weight
-    WiMi = [wf[n]*NiMi[n] for n in range(len(wf))]
-    Mw = sum(WiMi)
+    # Count instances of each molecular weight
+    mw_counts = Counter(mw_list)
+    # Calculate Mn 
+    total_chains = sum(mw_counts.values())  # Total number of chains 
+    Mn = sum(mw * count for mw, count in mw_counts.items()) / total_chains
+    # Calculate Mw
+    Mw = sum(mw**2 * count for mw, count in mw_counts.items()) / sum(mw * count for mw, count in mw_counts.items())
+    # Calculate PDI - Polydispersity Index
+    PDI = Mw / Mn
     
-    # Calculate the polydispersity index
-    PDI = Mw/Mn
     return PDI, Mn, Mw
     
 
 
 
-def blockiness_gen(sequence):
+def blockiness_gen(sequence, wrt='A'):
     """
     Calculate the blockiness and average block length of a co-polymer sequence.
 
@@ -259,28 +269,55 @@ def blockiness_gen(sequence):
     -----
     If the sequence does not contain both 'A' and 'B', the function returns a string indicating that the molecule is not a co-polymer.
     """
+    if wrt == 'A':
+    
+        if 'A' in sequence and 'B' in sequence: #Check if sequence is a co-polymer
+            AB = sequence.count('AB')
+            BB = sequence.count('BB')
+            BA = sequence.count('BA')
+            AA = sequence.count('AA')
+            if 'BA' in sequence:
+                blockiness = AA/BA
+            else:
+                blockiness = AA/AB
+            #Calculate block length B
+            block_list_B = [x for x in sequence.split('A') if x!='']
+            block_length_B = mean([len(b) for b in block_list_B])
+            #Calculate block length A
+            block_list_A = [x for x in sequence.split('B') if x!='']
+            block_length_A = mean([len(b) for b in block_list_A])
+            return blockiness, block_length_B, block_length_A
 
-    if 'A' in sequence and 'B' in sequence: #Check if sequence is a co-polymer
-        AB = sequence.count('AB')
-        BB = sequence.count('BB')
-        BA = sequence.count('BA')
-        AA = sequence.count('AA')
-        if 'BA' in sequence:
-            blockiness = BB/BA
         else:
-            blockiness = BB/AB
-        #Calculate block length B
-        block_list_B = [x for x in sequence.split('A') if x!='']
-        block_length_B = mean([len(b) for b in block_list_B])
-        #Calculate block length A
-        block_list_A = [x for x in sequence.split('B') if x!='']
-        block_length_A = mean([len(b) for b in block_list_A])
-        return blockiness, block_length_B, block_length_A
+            return 'Molecule is not a co-polymer, no blockiness calculation performed', 0, len(sequence)
+    
+    elif wrt == 'B':
+       
+        if 'A' in sequence and 'B' in sequence:
+            AB = sequence.count('AB')
+            BB = sequence.count('BB')
+            BA = sequence.count('BA')
+            AA = sequence.count('AA')
+            if 'AB' in sequence:
+                blockiness = BB/AB
+            else:
+                blockiness = BB/BA
+            #Calculate block length A
+            block_list_A = [x for x in sequence.split('B') if x!='']
+            block_length_A = mean([len(b) for b in block_list_A])
+            #Calculate block length B
+            block_list_B = [x for x in sequence.split('A') if x!='']
+            block_length_B = mean([len(b) for b in block_list_B])
+            return blockiness, block_length_A, block_length_B
+
+        else:  
+            return 'Molecule is not a co-polymer, no blockiness calculation performed', 0, len(sequence)
+    
 
     else:
-        return 'Molecule is not a co-polymer, no blockiness calculation performed', 0, len(sequence)
+        raise ValueError("wrt parameter must be 'A' or 'B'")
 
-def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.0 * unit.mole / unit.liter, residual_monomer = 0.00, solvated=True):
+def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.0 * unit.mole / unit.liter, residual_monomer = 0.00, solvated=False):
     """
     Calculates the components required to construct a simulation box for a given set of molecular chains.
     
@@ -317,8 +354,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     from openff.interchange.components._packmol import UNIT_CUBE, pack_box, RHOMBIC_DODECAHEDRON, solvate_topology
     from openff.interchange.components._packmol import _max_dist_between_points, _compute_brick_from_box_vectors, _center_topology_at
     import warnings
-    if not solvated and len(chains) < 15:
-        warnings.warn('Residual monomer calculation may not be accurate for small systems. Please check the output by querying the value of residual_monomer_actual')
+
     #Create molecules for the purpose of mass calculation
     #Water
     water = Molecule.from_smiles('O')
@@ -375,28 +411,31 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     for m in topology.molecules:
         rolling_mass += sum(atom.mass for atom in m.atoms)
     rolling_mass += nacl_mass * nacl_to_add
-    if solvated:
-        rolling_mass += water_mass * water_to_add
-    
-    # residual monomer to add
+
+    # Calculate residual monomer to add
     mass_to_add = (rolling_mass.magnitude/100-residual_monomer) * residual_monomer
-    
+    if mass_to_add < 90:
+        warnings.warn('Residual monomer calculation may not be accurate for small systems, as the residual monomer mass can be lower than the weight of a single monomer. Please check the output by querying the value of residual_monomer_actual')
     
     if 'A' in sequence and 'B' in sequence:
         A_rd = Chem.MolFromSmiles(monomers[0])
+        A_rd = Chem.AddHs(A_rd)
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName('A' + str(1))
         info.SetResidueNumber(1)
         [atom.SetMonomerInfo(info)  for  atom  in  A_rd.GetAtoms()]
         A = Molecule.from_rdkit(A_rd)
+        A.name = 'A_residual'
         A_mass = sum([atom.mass for atom in A.atoms])
-        B_rd = Chem.MolFromSmiles(monomers[0])
+        B_rd = Chem.MolFromSmiles(monomers[1])
+        B_rd = Chem.AddHs(B_rd)
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName('B' + str(1))
         info.SetResidueNumber(1)
         [atom.SetMonomerInfo(info)  for  atom  in  B_rd.GetAtoms()]
         B = Molecule.from_rdkit(B_rd)
         B_mass = sum([atom.mass for atom in B.atoms])
+        B.name = 'B_residual'
         for r in range(0,100):
             if (r * A_mass.magnitude) + (r * B_mass.magnitude) <= mass_to_add:
                 A_to_add = r
@@ -409,13 +448,16 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     
     elif 'A' in sequence and 'B' not in sequence:
         A_rd = Chem.MolFromSmiles(monomers[0])
+        A_rd = Chem.AddHs(A_rd)
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName('A' + str(1))
         info.SetResidueNumber(1)
         [atom.SetMonomerInfo(info)  for  atom  in  A_rd.GetAtoms()]
         A = Molecule.from_rdkit(A_rd)
         A_mass = sum([atom.mass for atom in A.atoms])
+        A.name = 'A_residual'
         B = Molecule.from_smiles('C')
+        B.name = 'B_residual'
         for r in range(0,100):
             if r * A_mass.magnitude <= mass_to_add:
                 A_to_add = r
@@ -427,23 +469,80 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
         number_of_copies=[water_to_add, na_to_add, cl_to_add, A_to_add, B_to_add]
     return molecules, number_of_copies, topology, box_vectors, residual_monomer_actual
 
+def introduce_stereoisomers(stereo_monomer, instance, seq):
+    """
+    Introduce stereoisomers into a polymer sequence by replacing a specified percentage of 'A' monomers with 'S'.
+
+    This function replaces a specified percentage of 'A' monomers with 'S' in the given sequence. The replacements
+    are made in pairs of 'A' monomers to ensure stereoisomerism.
+
+    Parameters
+    ----------
+    stereo_monomer : str
+        The monomer to be replaced with its stereoisomer (e.g., 'A').
+    instance : float
+        The fraction of 'stereo_monomer' monomers to be replaced with stereoisomer (e.g., 0.5 for 50%).
+    seq : str
+        The original polymer sequence.
+
+    Returns
+    -------
+    str
+        The modified sequence with stereoisomers introduced.
+
+    """
+    assert stereo_monomer in seq, f"Monomer {stereo_monomer} not found in sequence"
+    assert instance <= 1 and instance > 0, "Instance must be a fraction between 0 and 1"
+    assert instance > 0, "Instance must be greater than 0"
+    assert type(stereo_monomer) == str, "Monomer must be a string"
+    num_replacements = round(seq.count(stereo_monomer) * instance)
+    seq_list = list(seq)
+
+    # Initialize a counter for replacements
+    replacement_count = 0
+    i = 0
+    while i < len(seq_list) - 1:
+        if seq_list[i] == 'A' and seq_list[i + 1] == 'A':
+            seq_list[i + 1] = 'S'
+            replacement_count += 1
+            if replacement_count >= num_replacements:
+                break
+            i += 1
+        i += 1
+    
+    modified_seq = ''.join(seq_list)
+    return modified_seq
 
 #Class object for generic polymer system
 
 class polymer_system:
-    from openeye import oechem
+    try:
+        from openeye import oechem
+    except:
+        import warnings
+        warnings.warn("OpenEye is not installed. You will not be able to use OpenEye Toolkits for conformer generation.")
     from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
     from functools import reduce
     from statistics import mean
     from rdkit.Chem.Descriptors import ExactMolWt
     from openff.interchange import Interchange
     from openff.interchange.components._packmol import UNIT_CUBE, pack_box
-    from swiftpol.build import build_polymer, PDI, blockiness_gen, calculate_box_components
+    from swiftpol.build import build_polymer, PDI, blockiness_gen, calculate_box_components, introduce_stereoisomers
     from openff.units import unit
     from rdkit.Chem import AllChem
-    import numpy as np
 
-    def __init__(self, monomer_list, reaction, length_target, num_chains, terminals='standard', perc_A_target=100, blockiness_target=1.0, copolymer=False, acceptance = 10):
+    def __init__(self, 
+                 monomer_list, 
+                 reaction, 
+                 length_target, 
+                 num_chains, 
+                 stereoisomerism_input=None,
+                 terminals='standard', 
+                 perc_A_target=100, 
+                 blockiness_target=[1.0, 'A'], 
+                 copolymer=False, 
+                 acceptance = 10
+                 ):
         """
         Initialize the polymer system and build the polymer chains.
 
@@ -458,11 +557,13 @@ class polymer_system:
 
         num_chains (int): The number of polymer chains to be generated.
 
+        stereoisomerism_input (tuple, optional): A tuple containing the monomer, instance fraction (e.g. 0.5 for 50% stereoisomer), and SMILES string of the stereoisomer to be introduced. Default is None.
+
         terminals (str, optional): The type of terminal groups to be used. Default is 'standard'.
 
         perc_A_target (float, optional): The target percentage of monomer A in the copolymer. Default is 100.
 
-        blockiness_target (float, optional): The target blockiness of the copolymer. Default is 1.0.
+        blockiness_target (float, optional): The target blockiness of the copolymer, and indication of method calculation. Default is 1.0, with reference to 'A' monomer linkages.
 
         copolymer (bool, optional): Flag to indicate if the system is a copolymer. Default is False.
 
@@ -517,13 +618,14 @@ class polymer_system:
         self.terminals = terminals
         perc_A_actual = []
         if copolymer==True:
-            self.blockiness_target = blockiness_target
+            self.blockiness_target = blockiness_target[0]
             self.A_target = perc_A_target
-            def spec(sequence, blockiness): #Define limits of A percentage and blockiness from input
+            
+            def spec(sequence): #Define limits of A percentage and blockiness from input
                 acceptance_dec = acceptance/100
                 actual_A = (sequence.count('A')/len(sequence))*100
-                blockiness = blockiness_gen(sequence)[0]
-                return actual_A > perc_A_target*(1-acceptance_dec) and actual_A < perc_A_target*(1+acceptance_dec) and blockiness>blockiness_target*(1-acceptance_dec) and blockiness<blockiness_target*(1+acceptance_dec)
+                blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
+                return actual_A > perc_A_target*(1-acceptance_dec) and actual_A < perc_A_target*(1+acceptance_dec) and blockiness>blockiness_target[0]*(1-acceptance_dec) and blockiness<blockiness_target[0]*(1+acceptance_dec)
             
             blockiness_list = []
             out_of_spec = 0
@@ -534,39 +636,52 @@ class polymer_system:
         lengths = []
         
         self.monomers = [mono.replace("[I]", "") for mono in monomer_list]
+        self.reaction = reaction
+        reaction = AllChem.ReactionFromSmarts(reaction)
+        if stereoisomerism_input is not None:
+            stereo_monomer, instance, new_smiles = stereoisomerism_input
+            monomer_list.append(new_smiles)
         #First round of building - copolymer
         if copolymer==True:
             for n in range(num_chains):
                 length_actual = np.random.normal(length_target, 0.5)
                 sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
-                blockiness = blockiness_gen(sequence)[0]
-                if spec(sequence, blockiness)==True:
-                    pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
+                if spec(sequence)==True:
+                    if stereoisomerism_input is not None:
+                        sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence)
+                        pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                    else:
+                        pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
                     lengths.append(int(length_actual))
                     chains_rdkit.append(pol)
                     chain = Molecule.from_rdkit(pol)
                     chains.append(chain)
                     perc_A_actual.append((sequence.count('A')/len(sequence))*100)
                     blockiness_list.append(blockiness)
-                    BBL.append(blockiness_gen(sequence)[1])
-                    ABL.append(blockiness_gen(sequence)[2])
+                    BBL.append(blockiness_gen(sequence, blockiness_target[1])[1])
+                    ABL.append(blockiness_gen(sequence, blockiness_target[1])[2])
                 else:
                     out_of_spec +=1
                 #Second round of building
                 while out_of_spec >0:
                     length_actual = np.random.normal(length_target, 0.5)
                     sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
-                    blockiness = blockiness_gen(sequence)[0]
-                    if spec(sequence, blockiness)==True:
-                        pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                    blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
+                    if spec(sequence)==True:
+                        if stereoisomerism_input is not None:
+                            sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence) 
+                            pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                        else:
+                            pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)                   
                         lengths.append(int(length_actual))
                         chains_rdkit.append(pol)
                         chain = Molecule.from_rdkit(pol)
                         chains.append(chain)
                         perc_A_actual.append((sequence.count('A')/len(sequence))*100)
                         blockiness_list.append(blockiness)
-                        BBL.append(blockiness_gen(sequence)[1])
-                        ABL.append(blockiness_gen(sequence)[2])
+                        BBL.append(blockiness_gen(sequence, blockiness_target[1])[1])
+                        ABL.append(blockiness_gen(sequence, blockiness_target[1])[2])
                         out_of_spec-=1
 
                 self.B_block_length = mean(BBL)
@@ -579,12 +694,22 @@ class polymer_system:
             for n in range(num_chains):
                 length_actual = np.random.normal(length_target, 0.5)
                 sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
-                pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                if stereoisomerism_input is not None:
+                    sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence) 
+                    pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                else:
+                    pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)                   
                 lengths.append(int(length_actual))
                 chains_rdkit.append(pol)
                 chain = Molecule.from_rdkit(pol)
                 chains.append(chain)
                 perc_A_actual.append((sequence.count('A')/len(sequence))*100)
+            self.B_block_length = None
+            self.A_block_length = None
+            self.blockiness_list = None
+            self.mean_blockiness = None
+            self.perc_A_actual = None
+            self.A_actual = None
         self.sequence = sequence
         self.chains = chains
         for i in range(len(self.chains)):
@@ -599,9 +724,13 @@ class polymer_system:
         self.lengths = lengths
         self.min_length = min(lengths)
         self.max_length = max(lengths)
-
-
         print('System built!, size =', self.num_chains)
+        
+    def __repr__(self):
+                
+        description = (f"SwiftPol ensemble of size {self.num_chains}, "
+                       f"average chain length = {self.length_average}-mers, PDI = {self.PDI}")
+        return description
 
     def generate_conformers(self):
         """
@@ -622,10 +751,10 @@ class polymer_system:
         # Generate conformers using OpenFF toolkit wrapper
         for chain in self.chains:
             num = self.chains.index(chain)
-            if oechem.OEChemIsLicensed():
-                object = OpenEyeToolkitWrapper()
-            else:
-                object = RDKitToolkitWrapper()
+            object = RDKitToolkitWrapper()
+            if oechem_imported:
+                if oechem.OEChemIsLicensed():
+                    object = OpenEyeToolkitWrapper()
             object.generate_conformers(molecule=chain, n_conformers=1)
             chain.generate_unique_atom_names()
             self.chains[num] = chain
@@ -650,4 +779,306 @@ class polymer_system:
         from swiftpol.parameterize import charge_openff_polymer
         for chain in self.chains:
             chain.partial_charges = charge_openff_polymer(chain, charge_scheme)
+    def export_to_csv(self, filename):
+        """
+        Export all the instances in polymer_system.__init__() into a pandas DataFrame and save it as a CSV file.
 
+        Parameters
+        ----------
+        filename : str
+            The name of the CSV file to save the data.
+        """
+        data = {
+            'monomers': [self.monomers],
+            'length_target': [self.length_target],
+            'terminals': [self.terminals],
+            'num_chains': [self.num_chains],
+            'mol_weight_average': [self.mol_weight_average],
+            'PDI': [self.PDI],
+            'Mn': [self.Mn],
+            'Mw': [self.Mw],
+            'sequence': [self.sequence],
+            'B_block_length': [self.B_block_length],
+            'A_block_length': [self.A_block_length],
+            'blockiness_list': [self.blockiness_list],
+            'mean_blockiness': [self.mean_blockiness],
+            'perc_A_actual': [self.perc_A_actual],
+            'A_actual': [self.A_actual]
+        }
+
+        df = pd.DataFrame(data)
+        df.to_csv(filename, index=False)
+
+    def pack_solvated_system(self, salt_concentration=0.0 * unit.mole / unit.liter, residual_monomer=0.00):
+        """
+        Pack a solvated system using Packmol functions, and the OpenFF Packmol wrapper.
+    
+        This method uses Packmol to build a solvated system by packing molecules into a simulation box.
+        It considers the salt concentration and residual monomer concentration to determine the quantity of each molecule type required.
+    
+        Parameters
+        ----------
+        salt_concentration : openff.units.Quantity, optional
+            The desired salt concentration in the simulation box. Default is 0.0 M.
+        residual_monomer : float, optional
+            The desired residual monomer concentration in the simulation box. Default is 0.00.
+    
+        Returns
+        -------
+        openff.toolkit.topology.topology.Topology
+            An Interchange object representing the packed solvated system.
+
+        Notes
+        -----
+        This function uses the OpenFF Interchange Packmol wrapper to pack the molecules into the simulation box.
+        It removes any molecules with zero copies before packing, to avoid packmol errors.
+        Assigns % residual monomer value to ensemble under self.residual_monomer_actual
+
+        """
+        from openff.interchange.components._packmol import pack_box, UNIT_CUBE
+        from swiftpol.build import calculate_box_components
+    
+        molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = calculate_box_components(
+            self.chains, self.monomers, self.sequence, salt_concentration, residual_monomer
+        )
+        molecules = [molecules[i] for i in range(len(number_of_copies)) if number_of_copies[i] != 0]
+        number_of_copies = [num for num in number_of_copies if num != 0]
+        self.residual_monomer_actual = residual_monomer_actual
+        if topology.n_molecules == 1:
+            return pack_box(molecules=molecules,
+                            number_of_copies=number_of_copies,
+                            solute=topology,
+                            box_vectors=box_vectors,
+                            box_shape=UNIT_CUBE,
+                            center_solute = 'BRICK')
+        else:
+            return pack_box(molecules = molecules + self.chains,
+                            number_of_copies = number_of_copies+[1 for i in range(len(self.chains))],
+                            box_vectors = box_vectors,
+                            tolerance = 1*unit.angstrom)
+
+    def generate_polyply_files(self, residual_monomer=0.00, residual_oligomer=0.00):
+        """
+        Generate input files for Polyply from the system.
+
+        This method generates the input files required for Polyply (https://github.com/marrink-lab/polyply_1.0/) from the system.
+
+        Parameters
+        ----------
+        residual_monomer : float, optional
+            The desired residual monomer concentration in the simulation box. Default is 0.00.
+        residual_oligomer : float, optional
+            The desired residual oligomer concentration in the simulation box. Default is 0.00.
+
+        Returns
+        -------
+        tuple
+            A tuple containing the paths to the .gro, .top, and .pdb files generated for Polyply and GROMACS insert-molecules input.
+
+        Notes
+        -----
+        This function uses OpenFF Interchange to generate the input files for Polyply.
+
+        Raises
+        ------
+        UserWarning
+            If partial charges are not assigned to the system, processing large systems may raise errors from OpenFF-Interchange.
+        """
+        from swiftpol.build import calculate_box_components
+        from openff.interchange import Interchange
+        from openff.toolkit import ForceField
+        import warnings
+        box_vectors = calculate_box_components(self.chains, self.monomers, self.sequence, 0.0 * unit.mole / unit.liter, 0.0)[3]
+        molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual = self.calculate_residuals(residual_monomer, residual_oligomer)
+        mol_pdb_files_dest = []
+        for i in molecules:
+            string_i = str(molecules.index(i)) + '.pdb'
+            mol_pdb_files_dest.append(string_i)
+            i.generate_conformers(n_conformers=1)
+            i.to_file(string_i, file_format='pdb')
+        self.residual_monomer_actual = residual_monomer_actual
+        topology = Topology.from_molecules(self.chains+[molecules[i] for i in range(len(number_of_copies)) if number_of_copies[i] != 0])
+        if self.chains[0].partial_charges is None:
+            warnings.warn('Partial charges may not be assigned to the system. Processing large systems may raise errors from OpenFF-Interchange', UserWarning)
+            interchange = Interchange.from_smirnoff(
+                topology=topology,
+                force_field=ForceField("openff-2.2.0.offxml"),
+                box=box_vectors
+            )
+        else:
+            interchange = Interchange.from_smirnoff(
+                topology=topology,
+                force_field=ForceField("openff-2.2.0.offxml"),
+                charge_from_molecules=[i for i in self.chains],
+                box=box_vectors
+            )
+        interchange.to_gromacs('swiftpol_output')
+        return_tuple = ('swiftpol_output.gro', 'swiftpol_output.top')
+        for pdb_file in mol_pdb_files_dest:
+            return_tuple += (pdb_file,)
+        print(f'Polyply input files generated! Saved at {return_tuple}')
+        return return_tuple
+
+    def calculate_residuals(self, residual_monomer = 0, residual_oligomer = 0):
+        """
+        Generate residual monomer and oligomer molecules, and molecule counts.
+
+        Parameters
+        ----------
+        residual_monomer : float
+            The desired residual monomer concentration in the simulation box. Default is 0.00.
+        residual_oligomer : float
+            The desired residual oligomer concentration in the simulation box. Default is 0.00.
+            
+        Returns
+        -------
+        tuple
+        A tuple containing the following elements:
+            - A list of OpenFF Molecule objects representing the residual monomer and oligomer molecules.
+            - A list of molecule counts, corresponding with the molecule list
+            - Actual value for % residual monomer
+            - Actual value for % residual oligomer
+
+        Notes
+        -----
+        EXPERIMENTAL CAPABILITY. Proceed with caution
+
+        This function works independently of, and is unrelated to, the build.calculate_box_components function.
+        
+        Raises
+        ------
+        UserWarning - If the residual monomer concentration is close to or lower than the weight of a single monomer.
+
+        
+        """
+        from functools import reduce
+        from swiftpol import build
+        import numpy as np
+        from openff.toolkit import Topology, Molecule
+        from rdkit import Chem
+        import warnings
+        topology = Topology.from_molecules(self.chains)
+        rolling_mass=0
+        monomers = self.monomers
+        sequence = self.sequence
+        for m in topology.molecules:
+            rolling_mass += sum(atom.mass for atom in m.atoms)
+        if rolling_mass.magnitude < 1000:
+            warnings.warn('Residual monomer/oligomer calculation may not be accurate for small systems, as the residual mass can be close to or lower than the weight of a single monomer. Please check the output by querying the value of residual_monomer_actual')
+        number_of_copies = []
+        # residual to add
+        monomer_to_add = (rolling_mass.magnitude/100 - residual_monomer - residual_oligomer) * residual_monomer
+        oligo_to_add = (rolling_mass.magnitude/100 - residual_monomer - residual_oligomer) * residual_oligomer
+        if 'A' in sequence and 'B' in sequence:
+            A_rd = Chem.MolFromSmiles(monomers[0])
+            A_rd = Chem.AddHs(A_rd)
+            info = Chem.AtomPDBResidueInfo()
+            info.SetResidueName('A' + str(1))
+            info.SetResidueNumber(1)
+            [atom.SetMonomerInfo(info)  for  atom  in  A_rd.GetAtoms()]
+            A = Molecule.from_rdkit(A_rd)
+            A.name = 'A_residual'
+            A_mass = sum([atom.mass for atom in A.atoms])
+            B_rd = Chem.MolFromSmiles(monomers[1])
+            B_rd = Chem.AddHs(B_rd)
+            info = Chem.AtomPDBResidueInfo()
+            info.SetResidueName('B' + str(1))
+            info.SetResidueNumber(1)
+            [atom.SetMonomerInfo(info)  for  atom  in  B_rd.GetAtoms()]
+            B = Molecule.from_rdkit(B_rd)
+            B_mass = sum([atom.mass for atom in B.atoms])
+            B.name = 'B_residual'
+            for r in range(1,100):
+                if (r * A_mass.magnitude) + (r * B_mass.magnitude) >= monomer_to_add:
+                    mon_count = r
+                    break
+            A_to_add = mon_count
+            B_to_add = mon_count
+
+        elif 'A' in sequence and 'B' not in sequence:
+            A_rd = Chem.MolFromSmiles(monomers[0])
+            A_rd = Chem.AddHs(A_rd)
+            info = Chem.AtomPDBResidueInfo()
+            info.SetResidueName('A' + str(1))
+            info.SetResidueNumber(1)
+            [atom.SetMonomerInfo(info)  for  atom  in  A_rd.GetAtoms()]
+            A = Molecule.from_rdkit(A_rd)
+            A_mass = sum([atom.mass for atom in A.atoms])
+            A.name = 'A_residual'
+            B = Molecule.from_smiles('C')
+            B.name = 'B_residual'
+            for r in range(1,100):
+                if (r * A_mass.magnitude) >= monomer_to_add:
+                    mon_count = r
+                    break
+
+            A_to_add = mon_count
+            B_to_add = 0
+        
+       
+        oligomers = []
+        if 'A' in sequence and 'B' in sequence:
+            for i in range(1000):
+                oligo_seq = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(self.length_target * 0.1)), p=[self.A_target/100,1-(self.A_target/100)]))
+                monomer_list = [mono+'[I]' for mono in self.monomers]
+                oligomer_rd = build.build_polymer(oligo_seq, 
+                            monomer_list=monomer_list, 
+                            reaction=AllChem.ReactionFromSmarts(self.reaction))
+                oligomer_rd = Chem.AddHs(oligomer_rd)
+                info = Chem.AtomPDBResidueInfo()
+                info.SetResidueName('O' + str(i+1))
+                info.SetResidueNumber(1)
+                [atom.SetMonomerInfo(info)  for  atom  in  oligomer_rd.GetAtoms()]
+                oligomer = Molecule.from_rdkit(oligomer_rd)
+                oligo_mass = 0
+                oligomers_new = oligomers + [oligomer]
+                for i in oligomers_new:
+                    oligo_mass += sum(atom.mass for atom in i.atoms)
+                if oligo_mass.magnitude <= oligo_to_add:
+                    oligomers.append(oligomer)
+                else:
+                    break
+            monomer_mass = (A_to_add * A_mass.magnitude) + (B_to_add * B_mass.magnitude)
+            oligomer_mass = 0 * unit.dalton
+            for i in oligomers:
+                oligomer_mass += sum(atom.mass for atom in i.atoms)
+            residual_monomer_actual = (monomer_mass / (rolling_mass.magnitude + monomer_mass + oligomer_mass.magnitude)) * 100
+            residual_oligomer_actual = (oligomer_mass.magnitude / (rolling_mass.magnitude + monomer_mass + oligomer_mass.magnitude)) * 100
+            
+            molecules = [A, B] + oligomers
+            number_of_copies = [A_to_add, B_to_add] + [1 for c in range(len(oligomers))]
+
+        elif 'A' in sequence and 'B' not in sequence:
+            for i in range(1000):
+                oligo_seq = reduce(lambda x, y: x + y, np.random.choice(['A'], size=(int(self.length_target * 0.1)), p=[self.A_target/100,1-(self.A_target/100)]))
+                monomer_list = [mono+'[I]' for mono in self.monomers]
+                oligomer_rd = build.build_polymer(oligo_seq, 
+                            monomer_list=monomer_list, 
+                            reaction=AllChem.ReactionFromSmarts(self.reaction))
+                oligomer_rd = Chem.AddHs(oligomer_rd)
+                info = Chem.AtomPDBResidueInfo()
+                info.SetResidueName('O' + str(i+1))
+                info.SetResidueNumber(1)
+                [atom.SetMonomerInfo(info)  for  atom  in  oligomer_rd.GetAtoms()]
+                oligomer = Molecule.from_rdkit(oligomer_rd)
+                oligomer.name = 'oligo' + str(i+1)
+                oligo_mass = 0
+                oligomers_new = oligomers + [oligomer]
+                for i in oligomers_new:
+                    oligo_mass += sum(atom.mass for atom in i.atoms)
+                if oligo_mass.magnitude <= oligo_to_add:
+                    oligomers.append(oligomer)
+                else:
+                    break
+
+            monomer_mass = (A_to_add * A_mass.magnitude) + (B_to_add * B_mass.magnitude)
+            oligomer_mass = 0 * unit.dalton
+            for i in oligomers:
+                oligomer_mass += sum(atom.mass for atom in i.atoms)
+            residual_monomer_actual = (monomer_mass / (rolling_mass.magnitude + monomer_mass + oligomer_mass.magnitude)) * 100
+            residual_oligomer_actual = (oligomer_mass.magnitude / (rolling_mass.magnitude + monomer_mass + oligomer_mass.magnitude)) * 100
+            
+            molecules = [A, B] + oligomers
+            number_of_copies = [A_to_add, B_to_add] + [1 for c in range(len(oligomers))]
+    
+        return molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual

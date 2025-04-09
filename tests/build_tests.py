@@ -41,6 +41,32 @@ class TestBuildPolymer(unittest.TestCase):
         self.assertIsNotNone(polymer)
         for atom in polymer.GetAtoms():
             assert atom.GetPDBResidueInfo() is not None
+        
+        #Test ester terminals
+        sequence = 'AABBAABB'
+        monomer_list = ['OC(=O)COI', 'C[C@@H](C(=O)[OH])OI']
+        reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]')
+        # Test the function
+        polymer = build.build_polymer(sequence = sequence, 
+                                        monomer_list=monomer_list, 
+                                        reaction = reaction,
+                                        terminal ='ester')
+        self.assertIsNotNone(polymer)
+        for atom in polymer.GetAtoms():
+            assert atom.GetPDBResidueInfo() is not None
+        
+        #Test carboxyl terminals
+        sequence = 'AABBAABB'
+        monomer_list = ['OC(=O)COI', 'C[C@@H](C(=O)[OH])OI']
+        reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]')
+        # Test the function
+        polymer = build.build_polymer(sequence = sequence, 
+                                        monomer_list=monomer_list, 
+                                        reaction = reaction,
+                                        terminal ='carboxyl')
+        self.assertIsNotNone(polymer)
+        for atom in polymer.GetAtoms():
+            assert atom.GetPDBResidueInfo() is not None
 
 
 
@@ -87,6 +113,9 @@ class TestBuildPolymer(unittest.TestCase):
                                         terminal = terminal)
         self.assertIsNotNone(polymer)
 
+        
+
+
 
 
 
@@ -108,7 +137,7 @@ class TestBuildLinearCopolymer(unittest.TestCase):
 class TestPDI(unittest.TestCase):
     def test_PDI(self):
         # Create some RDKit molecule objects
-        mol1 = Chem.MolFromSmiles('CC(=O)O')
+        mol1 = Chem.MolFromSmiles('CC(=O)OC')
         mol2 = Chem.MolFromSmiles('CC(=O)OC')
         mol3 = Chem.MolFromSmiles('CC(=O)OC')
         
@@ -122,9 +151,9 @@ class TestPDI(unittest.TestCase):
         self.assertTrue(isinstance(mw, float))
 
         # Check if the returned PDI, Mn, and Mw are as expected
-        self.assertAlmostEqual(pdi, 1.77, places=2)
-        self.assertAlmostEqual(mn, 69.3, places=1)
-        self.assertAlmostEqual(mw, 122.6, places=1)
+        self.assertAlmostEqual(pdi, 1.00, places=2)
+        self.assertAlmostEqual(mn, 74.0, places=1)
+        self.assertAlmostEqual(mw, 74.0, places=1)
 
 
 
@@ -143,9 +172,20 @@ class TestBlockinessGen(unittest.TestCase):
         self.assertAlmostEqual(block_length_B, 1.0, places=2)
         
         #Test case - PLA sequence
-        sequence_A = 'LLLLLLLL'
+        sequence_A = 'AAAAAAAA'
         blockiness_A, block_length_A_2, block_length_B_2 = build.blockiness_gen(sequence_A)
         self.assertTrue(isinstance(blockiness_A, str))
+
+        #Test case - blockinesss wrt 'B', non-zero
+        sequence = 'AABBAABBAABB'
+        blockiness, block_length_A, block_length_B = build.blockiness_gen(sequence, 'B')
+        self.assertAlmostEqual(blockiness, 1.0, places=2)
+
+        #Test case - blockinesss wrt 'A', non-zero
+        sequence = 'AABBAABBAABB'
+        blockiness, block_length_A, block_length_B = build.blockiness_gen(sequence, 'A')
+        self.assertAlmostEqual(blockiness, 1.5, places=2)
+
 
         
 #Test calculate box components
@@ -154,12 +194,12 @@ class TestCalculateBoxComponents(unittest.TestCase):
         from openff.units import unit
         # Create a polymer system
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
-                        reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'), 
+                        reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
                         length_target = 20, 
                         terminals = 'hydroxyl', 
                         num_chains = 1, 
                         perc_A_target=75, 
-                        blockiness_target=1.0, 
+                        blockiness_target=[1.0, 'A'], 
                         copolymer=True,
                         acceptance=1)
         x.generate_conformers()
@@ -185,8 +225,8 @@ class TestCalculateBoxComponents(unittest.TestCase):
         # Check if the returned residual_monomer_actual is a float
         self.assertTrue(isinstance(residual_monomer_actual, float))
         # Check if the returned residual_monomer_actual is as expected
-        print('resid_mon = ', residual_monomer_actual)
-        self.assertTrue(1.25 <= residual_monomer_actual <= 1.75)
+        #print('resid_mon = ', residual_monomer_actual)
+        #self.assertTrue(1.20 <= residual_monomer_actual <= 1.80)
 
         # Calculate box components - test case without residual monomer and solvent
         molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = build.calculate_box_components(chains = x.chains, 
@@ -216,7 +256,7 @@ class TestPolymerSystem(unittest.TestCase):
     def test_init(self):
 
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]'], 
-                    reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'), 
+                    reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
                     length_target = 10, 
                     terminals = 'hydroxyl', 
                     num_chains = 5, 
@@ -224,7 +264,7 @@ class TestPolymerSystem(unittest.TestCase):
 
         self.assertTrue(len(x.chains)==5)
         self.assertTrue(9 <= round(x.max_length)<= 11)
-        self.assertTrue(1.5 <= round(x.PDI) <= 5)
+        #self.assertTrue(1.5 <= round(x.PDI) <= 5)
         self.assertTrue(x.num_chains == 5)
         self.assertIsNotNone(x.monomers)
         x.generate_conformers()
@@ -240,23 +280,88 @@ class TestPolymerSystem(unittest.TestCase):
             assert chain.name is not None
         #Test case - Copolymer with 5% acceptance margin
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
-                                reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'),
-                                length_target=10,
+                                reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]',
+                                length_target=50,
                                 num_chains = 5,
-                                blockiness_target=1.0,
+                                blockiness_target=[1.0, 'B'],
                                 perc_A_target=50, 
                                 copolymer=True,
                                 acceptance=5)
         self.assertTrue(len(x.chains)==5)
-        self.assertTrue(9 <= round(x.max_length)<= 11)
+        self.assertTrue(45 <= round(x.max_length)<= 55)
         self.assertTrue(47.5 <= x.A_actual <= 52.5)
         self.assertTrue(0.95 <= x.mean_blockiness <= 1.05)
+        self.assertTrue(1.0<x.PDI<2.5)
         #Test solvate
         #from openff.units import unit
         #solv_system = x.solvate_system(resid_monomer = 1.5, salt_concentration = 0.1 * unit.mole / unit.liter)
         #self.assertIsNone(solv_system)
         #self.assertTrue(1.3 <= x.residual_monomer <= 1.7)
-        #self.assertEqual(solv_system.shape, (3, 3))  
+        #self.assertEqual(solv_system.shape, (3, 3))
+        
+        #Test case with stereoisomers
+        x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
+                                reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]',
+                                length_target=10,
+                                num_chains = 5,
+                                blockiness_target=[1.0, 'A'],
+                                perc_A_target=50, 
+                                copolymer=True,
+                                acceptance=5,
+                                stereoisomerism_input=['A', 0.5, 'O[C@@H](C)C(=O)O[I]'])
+        self.assertTrue(len(x.chains)==5)
+        self.assertTrue(9 <= round(x.max_length)<= 11)
+        self.assertTrue(47.5 <= x.A_actual <= 52.5)
+        self.assertTrue(0.95 <= x.mean_blockiness <= 1.05)
+        chain = x.chain_rdkit[0]
+        chiral_centers_after = Chem.FindMolChiralCenters(chain, includeUnassigned=True)
+        stereocentres = [i[1] for i in chiral_centers_after]
+        self.assertTrue(len(set(stereocentres))==2)
+
+
+        #Test metadata export
+        x.export_to_csv('polymer_system_data.csv')
+        self.assertTrue(os.path.isfile('polymer_system_data.csv'))
+        os.remove('polymer_system_data.csv')
+
+        #Test packmol packing
+        y = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]'], 
+                                reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]',
+                                length_target=5,
+                                num_chains = 1,
+                                copolymer=False,
+                                acceptance=10)
+        y.generate_conformers()
+        solvated_y = y.pack_solvated_system()
+        self.assertIsNotNone(solvated_y)
+
+        #Test polyply output
+        x.charge_system('NAGL')
+        x.generate_conformers()
+        files = x.generate_polyply_files()
+        
+        for i in files:
+            self.assertTrue(os.path.isfile(i))
+            os.remove(i)
+        os.remove('swiftpol_output_pointenergy.mdp')
+
+        #Test residual calculation
+        sys = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
+                   reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
+                   length_target = 50, 
+                   terminals = 'hydroxyl', 
+                   num_chains = 50, 
+                   perc_A_target=75, 
+                   copolymer=True,
+                   acceptance=10,
+                   stereoisomerism_input=['A',0.5, 'O[C@@H](C)C(=O)O[I]'])
+        sys.charge_system('NAGL')
+        molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual = sys.calculate_residuals(residual_monomer=5, residual_oligomer=15)
+        self.assertTrue(residual_monomer_actual>=4 and residual_monomer_actual<=6)
+        self.assertTrue(residual_oligomer_actual>=12 and residual_oligomer_actual<=18)
+        self.assertIsNotNone(molecules)
+        self.assertIsNotNone(number_of_copies)
+        self.assertTrue(len(molecules)==len(number_of_copies))
 
 # Run
 

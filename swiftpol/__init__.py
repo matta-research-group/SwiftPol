@@ -9,7 +9,13 @@ import random
 import numpy as np
 import numpy as np
 import time
-from openeye import oechem
+try:
+    from openeye import oechem
+    oechem_imported = True
+except:
+    import warnings
+    warnings.warn("OpenEye is not installed. You will not be able to use OpenEye Toolkits for conformer generation.")
+
 
 import openmm
 from openff.toolkit.topology import Molecule, Topology
@@ -18,8 +24,7 @@ from openff.toolkit.utils import get_data_file_path
 from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, AmberToolsToolkitWrapper
 from openff.units import unit
 from pandas import read_csv
-import espaloma_charge as espcharge
-from espaloma_charge.openff_wrapper import EspalomaChargeToolkitWrapper
+
 
 from openff.interchange import Interchange
 from openff.interchange.components._packmol import UNIT_CUBE, pack_box

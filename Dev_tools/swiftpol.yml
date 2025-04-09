@@ -17,7 +17,7 @@ dependencies:
   - openbabel
   - openeye-toolkits
   - openff-forcefields
-  - openff-interchange>=0.3.27
+  - openff-interchange>=0.4.0
   - openff-nagl>=0.3.8 
   - openff-models
   - openff-toolkit>=0.16.0
@@ -32,7 +32,7 @@ dependencies:
   - pydantic
   - python>=3.11.5
   - python-dateutil
-  - pytorch
+  - pytorch==2.0.0
   - qcelemental
   - qcengine
   - qcportal
@@ -48,6 +48,6 @@ dependencies:
       - pdb4amber
       - pytraj
       - rdkit
-      - torch
+      - torch == 2.0.0
       - torchdata
 
