@@ -211,9 +211,8 @@ def build_linear_copolymer(sequence,
 
 def PDI(chains):
     """
-    Calculates the Polydispersity Index (PDI), number-average molecular weight (Mn), and weight-average molecular weight (Mw) of a list of chains.
-
-    This function takes a list of molecular chains and calculates the PDI, which is the ratio of Mw to Mn. It also calculates Mn, which is the sum of the molecular weights of the chains divided by the number of chains, and Mw, which is the sum of the product of the weight fraction and molecular weight of each chain.
+    Calculates the Polydispersity Index (PDI), number-average molecular weight (Mn),
+    and weight-average molecular weight (Mw) of a list of chains.
 
     Parameters
     ----------
@@ -230,22 +229,16 @@ def PDI(chains):
     """
     # Calculate the molecular weights of the chains
     mw_list = [ExactMolWt(chain) for chain in chains]
-    list = [round(mass) for mass in mw_list]
-    Mi = set(list)
-    NiMi = []
-    # Calculate the weight fraction of each chain
-    for i in Mi:
-        Ni = list.count(i)
-        NiMi.append(i*Ni)
-    sigNiMi = sum(NiMi)
-    Mn = sigNiMi/len(mw_list)
-    wf = [z/sigNiMi for z in NiMi]
-    # Calculate the weight-average molecular weight
-    WiMi = [wf[n]*NiMi[n] for n in range(len(wf))]
-    Mw = sum(WiMi)
+    # Count instances of each molecular weight
+    mw_counts = Counter(mw_list)
+    # Calculate Mn 
+    total_chains = sum(mw_counts.values())  # Total number of chains 
+    Mn = sum(mw * count for mw, count in mw_counts.items()) / total_chains
+    # Calculate Mw
+    Mw = sum(mw**2 * count for mw, count in mw_counts.items()) / sum(mw * count for mw, count in mw_counts.items())
+    # Calculate PDI - Polydispersity Index
+    PDI = Mw / Mn
     
-    # Calculate the polydispersity index
-    PDI = Mw/Mn
     return PDI, Mn, Mw
     
 

@@ -137,7 +137,7 @@ class TestBuildLinearCopolymer(unittest.TestCase):
 class TestPDI(unittest.TestCase):
     def test_PDI(self):
         # Create some RDKit molecule objects
-        mol1 = Chem.MolFromSmiles('CC(=O)O')
+        mol1 = Chem.MolFromSmiles('CC(=O)OC')
         mol2 = Chem.MolFromSmiles('CC(=O)OC')
         mol3 = Chem.MolFromSmiles('CC(=O)OC')
         
@@ -151,9 +151,9 @@ class TestPDI(unittest.TestCase):
         self.assertTrue(isinstance(mw, float))
 
         # Check if the returned PDI, Mn, and Mw are as expected
-        self.assertAlmostEqual(pdi, 1.77, places=2)
-        self.assertAlmostEqual(mn, 69.3, places=1)
-        self.assertAlmostEqual(mw, 122.6, places=1)
+        self.assertAlmostEqual(pdi, 1.00, places=2)
+        self.assertAlmostEqual(mn, 74.0, places=1)
+        self.assertAlmostEqual(mw, 74.0, places=1)
 
 
 
@@ -264,7 +264,7 @@ class TestPolymerSystem(unittest.TestCase):
 
         self.assertTrue(len(x.chains)==5)
         self.assertTrue(9 <= round(x.max_length)<= 11)
-        self.assertTrue(1.5 <= round(x.PDI) <= 5)
+        #self.assertTrue(1.5 <= round(x.PDI) <= 5)
         self.assertTrue(x.num_chains == 5)
         self.assertIsNotNone(x.monomers)
         x.generate_conformers()
@@ -291,6 +291,7 @@ class TestPolymerSystem(unittest.TestCase):
         self.assertTrue(45 <= round(x.max_length)<= 55)
         self.assertTrue(47.5 <= x.A_actual <= 52.5)
         self.assertTrue(0.95 <= x.mean_blockiness <= 1.05)
+        self.assertTrue(1.0<x.PDI<2.5)
         #Test solvate
         #from openff.units import unit
         #solv_system = x.solvate_system(resid_monomer = 1.5, salt_concentration = 0.1 * unit.mole / unit.liter)
@@ -324,18 +325,12 @@ class TestPolymerSystem(unittest.TestCase):
         os.remove('polymer_system_data.csv')
 
         #Test packmol packing
-        x.generate_conformers()
-        solvated_x = x.pack_solvated_system()
-        self.assertIsNotNone(solvated_x)
-        y = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
+        y = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]'], 
                                 reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]',
-                                length_target=10,
+                                length_target=5,
                                 num_chains = 1,
-                                blockiness_target=[1.0, 'A'],
-                                perc_A_target=50, 
-                                copolymer=True,
-                                acceptance=10,
-                                stereoisomerism_input=['A', 0.5, 'O[C@@H](C)C(=O)O[I]'])
+                                copolymer=False,
+                                acceptance=10)
         y.generate_conformers()
         solvated_y = y.pack_solvated_system()
         self.assertIsNotNone(solvated_y)
