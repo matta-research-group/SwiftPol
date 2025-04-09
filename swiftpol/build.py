@@ -1247,7 +1247,7 @@ class polymer_system_from_PDI:
             monomer_list.append(new_smiles)
         # Calculate range of chain lengths needed to build around a particular PDI
         sigma = np.sqrt(np.log(PDI_target))  
-        mu = np.log(mean_length) - 0.5 * sigma**2  
+        mu = np.log(length_target) - 0.5 * sigma**2  
         chain_lengths = np.random.lognormal(mu, sigma, size=num_chains)
         chain_lengths = np.round(chain_lengths).astype(int)  
         #First round of building - copolymer
