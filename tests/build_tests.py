@@ -337,6 +337,7 @@ class TestPolymerSystem(unittest.TestCase):
 
         #Test polyply output
         x.charge_system('NAGL')
+        x.generate_conformers()
         files = x.generate_polyply_files()
         
         for i in files:
