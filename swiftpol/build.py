@@ -1082,3 +1082,247 @@ class polymer_system:
             number_of_copies = [A_to_add, B_to_add] + [1 for c in range(len(oligomers))]
     
         return molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual
+
+class polymer_system_from_PDI:
+    """
+    Build a polymer system based on a target polydispersity index (PDI).
+
+    This class generates a polymer system with a specified number of chains, 
+    target chain length, and target PDI. It supports the generation of copolymers, 
+    stereoisomers, and blockiness control. The system is built using OpenFF and RDKit 
+    toolkits, with optional support for OpenEye toolkits if installed.
+
+    **Note**: This is an experimental capability and is not routinely tested. 
+    Proceed with caution.
+
+    Parameters
+    ----------
+    monomer_list : list of str
+        A list of monomer SMILES strings to be used in the polymer system.
+    reaction : str
+        A SMARTS string defining the polymerization reaction.
+    length_target : int
+        The target average chain length for the polymer system.
+    num_chains : int
+        The number of polymer chains to generate.
+    PDI_target : float
+        The target polydispersity index (PDI) for the polymer system.
+    stereoisomerism_input : tuple, optional
+        A tuple containing the stereoisomer monomer, the fraction of stereoisomers 
+        to introduce, and the SMILES string of the stereoisomer. Default is None.
+    terminals : str, optional
+        The type of terminal groups to use for the polymer chains. Default is 'standard'.
+    perc_A_target : float, optional
+        The target percentage of monomer 'A' in the copolymer. Default is 100.
+    blockiness_target : list, optional
+        A list containing the target blockiness value and the monomer to control 
+        blockiness for. Default is [1.0, 'A'].
+    copolymer : bool, optional
+        Whether to generate a copolymer. Default is False.
+    acceptance : float, optional
+        The acceptance margin (in percentage) for the target blockiness and 
+        monomer percentage. Default is 10.
+
+    Attributes
+    ----------
+    chains : list of openff.toolkit.topology.Molecule
+        A list of OpenFF Molecule objects representing the polymer chains.
+    chain_rdkit : list of rdkit.Chem.Mol
+        A list of RDKit Molecule objects representing the polymer chains.
+    sequence : str
+        The sequence of monomers in the polymer system.
+    mol_weight_average : float
+        The average molecular weight of the polymer chains.
+    PDI : float
+        The polydispersity index of the polymer system.
+    Mn : float
+        The number-average molecular weight of the polymer system.
+    Mw : float
+        The weight-average molecular weight of the polymer system.
+    num_chains : int
+        The number of polymer chains in the system.
+    length_average : float
+        The average chain length of the polymer system.
+    lengths : list of int
+        A list of chain lengths for the polymer chains.
+    min_length : int
+        The minimum chain length in the polymer system.
+    max_length : int
+        The maximum chain length in the polymer system.
+    A_actual : float or None
+        The actual percentage of monomer 'A' in the copolymer. None if not a copolymer.
+    perc_A_actual : list of float or None
+        A list of the actual percentages of monomer 'A' in each chain. None if not a copolymer.
+    B_block_length : float or None
+        The average block length of monomer 'B'. None if not a copolymer.
+    A_block_length : float or None
+        The average block length of monomer 'A'. None if not a copolymer.
+    blockiness_list : list of float or None
+        A list of blockiness values for each chain. None if not a copolymer.
+    mean_blockiness : float or None
+        The mean blockiness value for the polymer system. None if not a copolymer.
+
+    Notes
+    -----
+    - If OpenEye toolkits are not installed, RDKit will be used for conformer generation.
+    - The system is built using a log-normal distribution of chain lengths to achieve 
+      the target PDI.
+    - For small systems, PDI may not be close to the target value.
+
+    Examples
+    --------
+    >>> from swiftpol.build import polymer_system_from_PDI
+    >>> monomer_list = ['C=C', 'C#C']
+    >>> reaction = '[C:1]=[C:2].[C:3]#[C:4]>>[C:1]-[C:3]'
+    >>> system = polymer_system_from_PDI(
+    ...     monomer_list=monomer_list,
+    ...     reaction=reaction,
+    ...     length_target=10,
+    ...     num_chains=5,
+    ...     PDI_target=1.2,
+    ...     copolymer=True,
+    ...     perc_A_target=50,
+    ...     blockiness_target=[1.0, 'A']
+    ... )
+    >>> print(system)
+    SwiftPol ensemble of size 5, average chain length = 10-mers, PDI = 1.2
+    """
+
+    # Class implementation here
+    try:
+        from openeye import oechem
+    except:
+        import warnings
+        warnings.warn("OpenEye is not installed. You will not be able to use OpenEye Toolkits for conformer generation.")
+    from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, OpenEyeToolkitWrapper
+    from functools import reduce
+    from statistics import mean
+    from rdkit.Chem.Descriptors import ExactMolWt
+    from openff.interchange import Interchange
+    from openff.interchange.components._packmol import UNIT_CUBE, pack_box
+    from swiftpol.build import build_polymer, PDI, blockiness_gen, calculate_box_components, introduce_stereoisomers
+    from openff.units import unit
+    from rdkit.Chem import AllChem
+
+    def __init__(self, 
+                 monomer_list, 
+                 reaction, 
+                 length_target, 
+                 num_chains,
+                 PDI_target, 
+                 stereoisomerism_input=None,
+                 terminals='standard',
+                 perc_A_target=100, 
+                 blockiness_target=[1.0, 'A'], 
+                 copolymer=False, 
+                 acceptance = 10
+                 ):
+
+        self.length_target = length_target
+        self.terminals = terminals
+        perc_A_actual = []
+        if copolymer==True:
+            self.blockiness_target = blockiness_target[0]
+            self.A_target = perc_A_target
+            
+            def spec(sequence): #Define limits of A percentage and blockiness from input
+                acceptance_dec = acceptance/100
+                actual_A = (sequence.count('A')/len(sequence))*100
+                blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
+                return actual_A > perc_A_target*(1-acceptance_dec) and actual_A < perc_A_target*(1+acceptance_dec) and blockiness>blockiness_target[0]*(1-acceptance_dec) and blockiness<blockiness_target[0]*(1+acceptance_dec)
+            
+            blockiness_list = []
+            out_of_spec = 0
+            BBL = []
+            ABL = []
+        chains = []
+        chains_rdkit = []
+        lengths = []
+        
+        self.monomers = [mono.replace("[I]", "") for mono in monomer_list]
+        self.reaction = reaction
+        reaction = AllChem.ReactionFromSmarts(reaction)
+        if stereoisomerism_input is not None:
+            stereo_monomer, instance, new_smiles = stereoisomerism_input
+            monomer_list.append(new_smiles)
+        # Calculate range of chain lengths needed to build around a particular PDI
+        sigma = np.sqrt(np.log(PDI_target))  
+        mu = np.log(mean_length) - 0.5 * sigma**2  
+        chain_lengths = np.random.lognormal(mu, sigma, size=num_chains)
+        chain_lengths = np.round(chain_lengths).astype(int)  
+        #First round of building - copolymer
+        if copolymer==True:
+            n=0
+            for l in chain_lengths:
+                sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(l,), p=[perc_A_target/100,1-(perc_A_target/100)]))
+                blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
+                while spec(sequence)==False:
+                    sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(l,), p=[perc_A_target/100,1-(perc_A_target/100)]))
+                    blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
+
+                if stereoisomerism_input is not None:
+                    sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence)
+                    pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                else:    
+                    pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                lengths.append(int(l))
+                chains_rdkit.append(pol)
+                chain = Molecule.from_rdkit(pol)
+                chains.append(chain)
+                perc_A_actual.append((sequence.count('A')/len(sequence))*100)
+                blockiness_list.append(blockiness)
+                BBL.append(blockiness_gen(sequence, blockiness_target[1])[1])
+                ABL.append(blockiness_gen(sequence, blockiness_target[1])[2])
+                n+=1
+
+
+
+            self.B_block_length = mean(BBL)
+            self.A_block_length = mean(ABL)
+            self.blockiness_list = blockiness_list
+            self.mean_blockiness = mean(blockiness_list)
+            self.perc_A_actual = perc_A_actual
+            self.A_actual = mean(perc_A_actual)
+        else:
+            n=0
+            for l in chain_lengths:
+                sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(l),), p=[perc_A_target/100,1-(perc_A_target/100)]))
+                if stereoisomerism_input is not None:
+                    sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence) 
+                    pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                else:
+                    pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)                   
+                lengths.append(int(l))
+                chains_rdkit.append(pol)
+                chain = Molecule.from_rdkit(pol)
+                chains.append(chain)
+                perc_A_actual.append((sequence.count('A')/len(sequence))*100)
+                n+=1
+            self.B_block_length = None
+            self.A_block_length = None
+            self.blockiness_list = None
+            self.mean_blockiness = None
+            self.perc_A_actual = None
+            self.A_actual = None
+
+        self.sequence = sequence
+        self.chains = chains
+        for i in range(len(self.chains)):
+            self.chains[i].name = 'chain' + str(i+1)
+        self.chain_rdkit = chains_rdkit
+        self.mol_weight_average = round(mean([ExactMolWt(c) for c in chains_rdkit]),2)
+        self.PDI, self.Mn, self.Mw = PDI(chains_rdkit)
+        self.num_chains = len(chains)
+        self.A_actual = mean(perc_A_actual)
+        self.perc_A_actual = perc_A_actual
+        self.length_average = mean(lengths)
+        self.lengths = lengths
+        self.min_length = min(lengths)
+        self.max_length = max(lengths)
+        print('System built!, size =', self.num_chains)
+        
+    def __repr__(self):
+                
+        description = (f"SwiftPol ensemble of size {self.num_chains}, "
+                       f"average chain length = {self.length_average}-mers, PDI = {self.PDI}")
+        return description
