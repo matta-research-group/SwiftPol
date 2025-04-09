@@ -264,7 +264,7 @@ class TestPolymerSystem(unittest.TestCase):
 
         self.assertTrue(len(x.chains)==5)
         self.assertTrue(9 <= round(x.max_length)<= 11)
-        #self.assertTrue(1.5 <= round(x.PDI) <= 5)
+        self.assertTrue(1.0 <= round(x.PDI) <= 6)
         self.assertTrue(x.num_chains == 5)
         self.assertIsNotNone(x.monomers)
         x.generate_conformers()
