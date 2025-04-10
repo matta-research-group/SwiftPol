@@ -1092,7 +1092,7 @@ class polymer_system_from_PDI:
     stereoisomers, and blockiness control. The system is built using OpenFF and RDKit 
     toolkits, with optional support for OpenEye toolkits if installed.
 
-    **Note**: This is an experimental capability and is not routinely tested. 
+    **Note**: This capability is under development and may change significantly in the next version of SwiftPol. 
     Proceed with caution.
 
     Parameters
@@ -1172,20 +1172,18 @@ class polymer_system_from_PDI:
     Examples
     --------
     >>> from swiftpol.build import polymer_system_from_PDI
-    >>> monomer_list = ['C=C', 'C#C']
-    >>> reaction = '[C:1]=[C:2].[C:3]#[C:4]>>[C:1]-[C:3]'
+    >>> monomer_list=['OC(=O)COI']
+    >>> reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]'
     >>> system = polymer_system_from_PDI(
     ...     monomer_list=monomer_list,
     ...     reaction=reaction,
-    ...     length_target=10,
-    ...     num_chains=5,
-    ...     PDI_target=1.2,
-    ...     copolymer=True,
-    ...     perc_A_target=50,
-    ...     blockiness_target=[1.0, 'A']
+    ...     length_target=50,
+    ...     num_chains=50,
+    ...     PDI_target=1.7,
+    ...     copolymer=False,
     ... )
     >>> print(system)
-    SwiftPol ensemble of size 5, average chain length = 10-mers, PDI = 1.2
+    SwiftPol ensemble of size 50, average chain length = 10.6-mers, PDI = 1.7006109664210667
     """
 
     # Class implementation here

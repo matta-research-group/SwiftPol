@@ -363,6 +363,29 @@ class TestPolymerSystem(unittest.TestCase):
         self.assertIsNotNone(number_of_copies)
         self.assertTrue(len(molecules)==len(number_of_copies))
 
+class TestPolymerSystemFromPDI(unittest.TestCase):
+    def test_init(self):
+        #Test PDI=1.7
+        sys = polymer_system_from_PDI(monomer_list=['OC(=O)COI'], 
+                            reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
+                            length_target= 50, 
+                            num_chains=50,
+                            PDI_target=1.7,
+                            copolymer=False,
+                            acceptance=10)
+        self.assertTrue(len(sys.chains)==50)
+        self.assertTrue(45 <= round(sys.max_length)<= 55)
+        self.assertTrue(1.2 <= sys.PDI <= 2.3)
+        #Test PDI=1.0 (monodisperse)
+        sys = polymer_system_from_PDI(monomer_list=['OC(=O)COI'], 
+                            reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
+                            length_target= 50, 
+                            num_chains=50,
+                            PDI_target=1.0,
+                            copolymer=False,
+                            acceptance=10)
+        self.assertTrue(round(sys.PDI, 1) == 1.0)
+
 # Run
 
 if __name__ == '__main__':
