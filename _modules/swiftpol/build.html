@@ -1212,7 +1212,7 @@
 <span class="sd">    stereoisomers, and blockiness control. The system is built using OpenFF and RDKit </span>
 <span class="sd">    toolkits, with optional support for OpenEye toolkits if installed.</span>
 
-<span class="sd">    **Note**: This is an experimental capability and is not routinely tested. </span>
+<span class="sd">    **Note**: This capability is under development and may change significantly in the next version of SwiftPol. </span>
 <span class="sd">    Proceed with caution.</span>
 
 <span class="sd">    Parameters</span>
@@ -1292,20 +1292,18 @@
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; from swiftpol.build import polymer_system_from_PDI</span>
-<span class="sd">    &gt;&gt;&gt; monomer_list = [&#39;C=C&#39;, &#39;C#C&#39;]</span>
-<span class="sd">    &gt;&gt;&gt; reaction = &#39;[C:1]=[C:2].[C:3]#[C:4]&gt;&gt;[C:1]-[C:3]&#39;</span>
+<span class="sd">    &gt;&gt;&gt; monomer_list=[&#39;OC(=O)COI&#39;]</span>
+<span class="sd">    &gt;&gt;&gt; reaction = &#39;[C:1][O:2][H:3].[I:4][O:5][C:6]&gt;&gt;[C:1][O:2][C:6].[H:3][O:5][I:4]&#39;</span>
 <span class="sd">    &gt;&gt;&gt; system = polymer_system_from_PDI(</span>
 <span class="sd">    ...     monomer_list=monomer_list,</span>
 <span class="sd">    ...     reaction=reaction,</span>
-<span class="sd">    ...     length_target=10,</span>
-<span class="sd">    ...     num_chains=5,</span>
-<span class="sd">    ...     PDI_target=1.2,</span>
-<span class="sd">    ...     copolymer=True,</span>
-<span class="sd">    ...     perc_A_target=50,</span>
-<span class="sd">    ...     blockiness_target=[1.0, &#39;A&#39;]</span>
+<span class="sd">    ...     length_target=50,</span>
+<span class="sd">    ...     num_chains=50,</span>
+<span class="sd">    ...     PDI_target=1.7,</span>
+<span class="sd">    ...     copolymer=False,</span>
 <span class="sd">    ... )</span>
 <span class="sd">    &gt;&gt;&gt; print(system)</span>
-<span class="sd">    SwiftPol ensemble of size 5, average chain length = 10-mers, PDI = 1.2</span>
+<span class="sd">    SwiftPol ensemble of size 50, average chain length = 10.6-mers, PDI = 1.7006109664210667</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Class implementation here</span>
