@@ -86,7 +86,10 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydroxyl', chain_n
             info.SetResidueName(str(chain_num) + 'A' + str(i+1))
             info.SetResidueNumber(i+1)
             [atom.SetMonomerInfo(info)  for  atom  in  A.GetAtoms()]
-            polymer = reaction.RunReactants((polymer, A))[0][0]
+            try:
+                polymer = reaction.RunReactants((polymer, A))[0][0]
+            except IndexError:
+                raise ValueError("Reaction failed. Please check the reaction SMARTS and monomer SMILES. For support with constructing reaction SMARTS, raise an issue at https://github.com/matta-research-group/SwiftPol/issues")
             Chem.SanitizeMol(polymer)
                 
         elif sequence[i] == 'B':
@@ -96,7 +99,10 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydroxyl', chain_n
             info.SetResidueName(str(chain_num) + 'B' + str(i+1))
             info.SetResidueNumber(i+1)
             [atom.SetMonomerInfo(info)  for  atom  in  B.GetAtoms()]
-            polymer = reaction.RunReactants((polymer, B))[0][0]
+            try:
+                polymer = reaction.RunReactants((polymer, B))[0][0]
+            except IndexError:
+                raise ValueError("Reaction failed. Please check the reaction SMARTS and monomer SMILES. For support with constructing reaction SMARTS, raise an issue at https://github.com/matta-research-group/SwiftPol/issues")
             Chem.SanitizeMol(polymer)
         
         elif sequence[i] == 'S':
@@ -106,7 +112,10 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydroxyl', chain_n
             info.SetResidueName(str(chain_num) + 'S' + str(i+1))
             info.SetResidueNumber(i+1)
             [atom.SetMonomerInfo(info)  for  atom  in  S.GetAtoms()]
-            polymer = reaction.RunReactants((polymer, S))[0][0]
+            try:
+                polymer = reaction.RunReactants((polymer, S))[0][0]
+            except IndexError:
+                raise ValueError("Reaction failed. Please check the reaction SMARTS and monomer SMILES. For support with constructing reaction SMARTS, raise an issue at https://github.com/matta-research-group/SwiftPol/issues")
             Chem.SanitizeMol(polymer)
     
     if terminal == 'hydroxyl':
