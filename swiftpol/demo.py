@@ -35,7 +35,7 @@ from functools import reduce
 from statistics import mean
 from rdkit.Chem.Descriptors import ExactMolWt
 from openff.interchange import Interchange
-from swiftpol import build
+from swiftpol import build, demo
 
 
 #Ring opening polymerisation
@@ -705,4 +705,4 @@ def build_crosslinked_polymer(starting_polymer,
         polymer_history.append(polymer_network)  #Save the new polymer version
         successful_reactions += 1  #Count successful reactions
 
-    return demo.replace_halogens_with_hydrogens(polymer_history[-1])  #Return last polymer in the history
+    return replace_halogens_with_hydrogens(polymer_history[-1])  #Return last polymer in the history
