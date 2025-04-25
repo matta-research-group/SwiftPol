@@ -810,6 +810,7 @@ class polymer_system:
         df.to_csv(filename, index=False)
 
     def pack_solvated_system(self, salt_concentration=0.0 * unit.mole / unit.liter, residual_monomer=0.00):
+        from swiftpol.build import calculate_box_components
         """
         Pack a solvated system using Packmol functions, and the OpenFF Packmol wrapper.
     
@@ -839,7 +840,7 @@ class polymer_system:
         from swiftpol.build import calculate_box_components
     
         molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = calculate_box_components(
-            self.chains, self.monomers, self.sequence, salt_concentration, residual_monomer
+            self.chains, self.monomers, self.sequence, salt_concentration, residual_monomer, solvated=True
         )
         molecules = [molecules[i] for i in range(len(number_of_copies)) if number_of_copies[i] != 0]
         number_of_copies = [num for num in number_of_copies if num != 0]
