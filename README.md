@@ -15,7 +15,7 @@ This repository is currently under development. To do a development install incl
 
 `cd SwiftPol`
 
-`conda env create --f Dev_tools/swiftpol.yml`
+`conda env create --file Dev_tools/swiftpol.yml`
 
 `conda activate swiftpol`
 
