@@ -11,9 +11,13 @@
 # SwiftPol
 Tools for building polydisperse polymer systems for molecular dynamics.
 
-This repository is currently under development. To do a development install, clone this repository and type
+This repository is currently under development. To do a development install including dependencies, clone this repository and type
 
 `cd SwiftPol`
+
+`conda env create --f Dev_tools/swiftpol.yml`
+
+`conda activate swiftpol`
 
 `pip install -e .`
 

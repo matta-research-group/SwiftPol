@@ -32,7 +32,7 @@ dependencies:
   - pydantic
   - python>=3.11.5
   - python-dateutil
-  - pytorch==2.0.0
+  - pytorch>=2.0.0
   - qcelemental
   - qcengine
   - qcportal
@@ -40,7 +40,7 @@ dependencies:
   - seaborn
   - smirnoff99frosst
   - statsmodels
-  - dgl==2.0.0
+  - dgl>=2.0.0
   - pip
   - pip:
       - amberutils
@@ -48,6 +48,6 @@ dependencies:
       - pdb4amber
       - pytraj
       - rdkit
-      - torch == 2.0.0
+      - torch >= 2.0.0
       - torchdata
 
