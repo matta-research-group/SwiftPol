@@ -39,6 +39,31 @@ Examples of using SwiftPol code to build different polymers can be found at [Exa
 -  [Building Chitin](Example_Notebooks/Chitin.ipynb)
 -  [Constructing Reaction SMARTS](Example_Notebooks/rxn_smarts.ipynb)
 
+### Dependencies
+[YAML environment file listing all required packages to use SwiftPol](https://github.com/matta-research-group/SwiftPol/blob/main/Dev_tools/swiftpol.yml)
+
+To use SwiftPol please download the following packages:
+- RDkit
+- openff-interchange
+- openff-toolkit
+- openff-nagl
+- openeye-toolkits
+- dgl==2.0.0
+
+optional dependencies:
+- espaloma charge
+
+
+for quick dependency and swiftpol install using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), run the following commands in bash
+```bash
+conda create -n swiftpol python=3.10 rdkit openff-interchange openff-toolkit openff-nagl dgl=2.0.0 openeye-toolkits nglview -c conda-forge -c dglteam -c openeye
+conda activate swiftpol
+git clone https://github.com/matta-research-group/SwiftPol
+cd SwiftPol
+pip install -e .
+```
+
+
 ### OpenEye License Guidance
 [Instructions for implementing an OpenEye License (not essential but speeds up conformation determination)](https://docs.eyesopen.com/toolkits/python/quickstart-python/license.html)
 

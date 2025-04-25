@@ -157,6 +157,31 @@ n_{chains} = \mbox{total number of chains built}
 \mathit{M_{resid}} = \frac{M_{w}(\mbox{resid})}{M_{w}(\mbox{carbon-containing compounds})} 
 \end{equation} 
 
+# User guidance: Dependencies
+
+[YAML environment file listing all required packages to use SwiftPol](https://github.com/matta-research-group/SwiftPol/blob/main/Dev_tools/swiftpol.yml)
+
+To use SwiftPol please download the following packages:
+- RDkit
+- openff-interchange
+- openff-toolkit
+- openff-nagl
+- openeye-toolkits
+- dgl==2.0.0
+
+optional dependencies:
+- espaloma charge
+
+
+for quick dependency and swiftpol install using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), run the following commands in bash
+```bash
+conda create -n swiftpol python=3.10 rdkit openff-interchange openff-toolkit openff-nagl dgl=2.0.0 openeye-toolkits nglview -c conda-forge -c dglteam -c openeye
+conda activate swiftpol
+git clone https://github.com/matta-research-group/SwiftPol
+cd SwiftPol
+pip install -e .
+```
+
 # Acknowledgements 
 
 Hannah Turney is supported by funding contributions from the United Kingdom Research and Innovation Biotechnology and Biological Sciences Research Council (grant ref. BB/T008709/1) and Johnson&Johnson Innovative Medicine. 
