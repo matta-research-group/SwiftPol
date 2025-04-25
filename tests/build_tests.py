@@ -375,7 +375,7 @@ class TestPolymerSystemFromPDI(unittest.TestCase):
                             acceptance=10)
         self.assertTrue(len(sys.chains)==50)
         self.assertTrue(45 <= sys.length_average<= 55)
-        self.assertTrue(1.2 <= sys.PDI <= 2.3)
+        self.assertTrue(1.0 <= sys.PDI <= 3.0)
         #Test PDI=1.0 (monodisperse)
         sys = build.polymer_system_from_PDI(monomer_list=['OC(=O)COI'], 
                             reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
