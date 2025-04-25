@@ -336,9 +336,9 @@ class TestPolymerSystem(unittest.TestCase):
         self.assertIsNotNone(solvated_y)
 
         #Test polyply output
-        x.charge_system('NAGL')
-        x.generate_conformers()
-        files = x.generate_polyply_files()
+        y.charge_system('NAGL')
+        y.generate_conformers()
+        files = y.generate_polyply_files()
         
         for i in files:
             self.assertTrue(os.path.isfile(i))
