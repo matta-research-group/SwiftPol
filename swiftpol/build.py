@@ -654,7 +654,7 @@ class polymer_system:
         if copolymer==True:
             for n in range(num_chains):
                 length_actual = np.random.normal(length_target, 0.5)
-                sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,100-(perc_A_target/100)]))
+                sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                 blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
                 if spec(sequence)==True:
                     if stereoisomerism_input is not None:
@@ -702,7 +702,7 @@ class polymer_system:
         else:
             for n in range(num_chains):
                 length_actual = np.random.normal(length_target, 0.5)
-                sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,100-(perc_A_target/100)]))
+                sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                 if stereoisomerism_input is not None:
                     sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence) 
                     pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
