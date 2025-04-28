@@ -22,7 +22,7 @@ dependencies:
   - openff-models
   - openff-toolkit>=0.16.0
   - openff-toolkit-examples
-  - openff-units #==0.2.2
+  - openff-units
   - openff-utilities
   - openmm
   - packmol
