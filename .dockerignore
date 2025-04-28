@@ -1,0 +1,7 @@
+# Ignore build directories
+build/
+
+# Ignore temporary files and directories
+*.tmp
+*.log
+.DS_Store
