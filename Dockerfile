@@ -18,7 +18,7 @@ RUN chown -R $MAMBA_USER:$MAMBA_USER /opt/app && \
     chmod -R u+rw /opt/app
 
 # Install the environment and Jupyter (meta-package includes JupyterLab and Jupyter Notebook)
-RUN micromamba install -y -n base -f ./Dev_tools/swiftpol.yml && \
+RUN micromamba install -y -n base -f ./Dev_tools/docker.yml && \
     micromamba install -y -n base -c conda-forge jupyter 
     #&& \
     #micromamba clean --all --yes
