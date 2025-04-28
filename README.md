@@ -54,6 +54,7 @@ To use SwiftPol please download the following packages:
 - openff-toolkit
 - openff-nagl
 - openeye-toolkits
+- openff-units==0.2.2
 - dgl==2.0.0
 
 optional dependencies:
@@ -62,11 +63,25 @@ optional dependencies:
 
 for quick dependency and swiftpol install using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), run the following commands in bash
 ```bash
-conda create -n swiftpol python=3.10 rdkit openff-interchange openff-toolkit openff-nagl dgl=2.0.0 openeye-toolkits nglview -c conda-forge -c dglteam -c openeye
+conda create -n swiftpol python=3.10 rdkit openff-interchange openff-toolkit openff-nagl dgl=2.0.0 openeye-toolkits nglview openff-units=0.2.2 -c conda-forge -c dglteam -c openeye
 conda activate swiftpol
 git clone https://github.com/matta-research-group/SwiftPol
 cd SwiftPol
 pip install -e .
+```
+
+### Installing With a Docker Container
+
+To install SwiftPol as a docker container, install [docker desktop](https://docs.docker.com/desktop/) and run the following command in the terminal
+
+```bash
+docker build --no-cache --platform=linux/amd64 -f Dockerfile -t my-image -t setup/swiftpol:latest .
+```
+
+to open a jupyter notebook run
+
+```bash
+docker run --rm -it -p 8888:8888 setup/swiftpol:latest
 ```
 
 
