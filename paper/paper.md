@@ -173,6 +173,8 @@ To use SwiftPol please download the following packages:
 
 - openeye-toolkits
 
+- openff-units==0.2.2
+
 - dgl==2.0.0
 
 
@@ -183,7 +185,7 @@ optional dependencies:
 
 for quick dependency and swiftpol install using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), run the following commands in bash
 ```bash
-conda create -n swiftpol python=3.10 rdkit openff-interchange openff-toolkit openff-nagl dgl=2.0.0 openeye-toolkits nglview -c conda-forge -c dglteam -c openeye
+conda create -n swiftpol python=3.10 rdkit openff-interchange openff-toolkit openff-nagl dgl=2.0.0 openeye-toolkits openff-units=0.2.2 nglview -c conda-forge -c dglteam -c openeye
 conda activate swiftpol
 git clone https://github.com/matta-research-group/SwiftPol
 cd SwiftPol
