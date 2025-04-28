@@ -1,0 +1,53 @@
+name: swiftpol
+channels:
+  - pytorch
+  - openeye
+  - conda-forge
+  - dglteam
+dependencies:
+  - ambertools
+  - jedi
+  - matplotlib-base
+  - matplotlib-inline
+  - mdtraj
+  - networkx
+  - nglview
+  - jupyter
+  - numpy
+  - openbabel
+  - openeye-toolkits
+  - openff-forcefields
+  - openff-interchange>=0.4.0
+  - openff-nagl>=0.3.8 
+  - openff-models
+  - openff-toolkit>=0.16.0
+  - openff-toolkit-examples
+  - openff-units #==0.2.2
+  - openff-utilities
+  - openmm
+  - packmol
+  - pandas
+  - parmed
+  - plotly
+  - pydantic
+  - python>=3.11.5
+  - python-dateutil
+  - pytorch>=2.0.0
+  - qcelemental
+  - qcengine
+  - qcportal
+  - scipy
+  - seaborn
+  - smirnoff99frosst
+  - statsmodels
+  - dgl==2.0.0
+  - pip
+  - pip:
+      - amberutils
+      - espaloma-charge
+      - pdb4amber
+      - pytraj
+      - rdkit==2024.03.5
+      #- torch == 2.0.0
+      - torchdata
+
