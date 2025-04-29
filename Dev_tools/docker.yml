@@ -18,11 +18,11 @@ dependencies:
   - openeye-toolkits
   - openff-forcefields
   - openff-interchange>=0.4.0
-  - openff-nagl>=0.3.8 
+  - openff-nagl==0.4.0 
   - openff-models
-  - openff-toolkit>=0.16.0
+  - openff-toolkit==0.16.7
   - openff-toolkit-examples
-  - openff-units #==0.2.2
+  - openff-units 
   - openff-utilities
   - openmm
   - packmol
@@ -32,7 +32,7 @@ dependencies:
   - pydantic
   - python>=3.11.5
   - python-dateutil
-  - pytorch>=2.0.0
+  - pytorch==2.3.1
   - qcelemental
   - qcengine
   - qcportal
@@ -41,6 +41,7 @@ dependencies:
   - smirnoff99frosst
   - statsmodels
   - dgl==2.0.0
+  - llvm-openmp==19.1.2
   - pip
   - pip:
       - amberutils
@@ -50,4 +51,5 @@ dependencies:
       - rdkit==2024.03.5
       #- torch == 2.0.0
       - torchdata
+      - llvmlite
 
