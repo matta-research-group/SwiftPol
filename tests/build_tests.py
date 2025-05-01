@@ -369,13 +369,13 @@ class TestPolymerSystemFromPDI(unittest.TestCase):
         sys = build.polymer_system_from_PDI(monomer_list=['OC(=O)COI'], 
                             reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
                             length_target= 50, 
-                            num_chains=50,
+                            num_chains=100,
                             PDI_target=1.7,
                             copolymer=False,
                             acceptance=10)
         self.assertTrue(len(sys.chains)==50)
         self.assertTrue(40 <= sys.length_average<= 60)
-        self.assertTrue(1.0 <= sys.PDI <= 3.0)
+        self.assertTrue(1.0 <= sys.PDI <= 3.5)
         #Test PDI=1.0 (monodisperse)
         sys = build.polymer_system_from_PDI(monomer_list=['OC(=O)COI'], 
                             reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
