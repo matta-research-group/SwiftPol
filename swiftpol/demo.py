@@ -23,8 +23,7 @@ from openff.toolkit.utils import get_data_file_path
 from openff.toolkit.utils.toolkits import RDKitToolkitWrapper, AmberToolsToolkitWrapper
 from openff.units import unit
 from pandas import read_csv
-import espaloma_charge as espcharge
-from espaloma_charge.openff_wrapper import EspalomaChargeToolkitWrapper
+
 
 from openff.interchange import Interchange
 from openff.interchange.components._packmol import UNIT_CUBE, pack_box, _max_dist_between_points
@@ -654,7 +653,7 @@ def build_crosslinked_polymer(starting_polymer,
     ...                                           probability_of_crosslinked_addition=0.6, 
     ...                                           probability_of_linear_addition=0.4)
     """
-    from demo import replace_halogens_with_hydrogens
+    from swiftpol.demo import replace_halogens_with_hydrogens
     # Check if the probabilities sum to 1
     if probability_of_crosslinked_addition + probability_of_linear_addition != 1:
         raise AssertionError("Probabilities must sum to 1.")
