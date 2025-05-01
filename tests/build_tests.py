@@ -373,7 +373,7 @@ class TestPolymerSystemFromPDI(unittest.TestCase):
                             PDI_target=1.7,
                             copolymer=False,
                             acceptance=10)
-        self.assertTrue(len(sys.chains)==50)
+        self.assertTrue(len(sys.chains)==100)
         self.assertTrue(40 <= sys.length_average<= 60)
         self.assertTrue(1.0 <= sys.PDI <= 3.5)
         #Test PDI=1.0 (monodisperse)
