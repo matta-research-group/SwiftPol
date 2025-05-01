@@ -906,6 +906,7 @@ class polymer_system:
             i.generate_conformers(n_conformers=1)
             i.to_file(string_i, file_format='pdb')
         self.residual_monomer_actual = residual_monomer_actual
+        self.residual_oligomer_actual = residual_oligomer_actual
         topology = Topology.from_molecules(self.chains+[molecules[i] for i in range(len(number_of_copies)) if number_of_copies[i] != 0])
         if self.chains[0].partial_charges is None:
             warnings.warn('Partial charges may not be assigned to the system. Processing large systems may raise errors from OpenFF-Interchange', UserWarning)
