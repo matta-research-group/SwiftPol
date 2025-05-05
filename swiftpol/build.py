@@ -1262,13 +1262,11 @@ class polymer_system_from_PDI:
         if copolymer==True:
             n=0
             for l in chain_lengths:
-                for i in range(1000):
+                while True:
                     sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(l,), p=[perc_A_target/100,1-(perc_A_target/100)]))
                     blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
-                    if spec(sequence)==False:
-                        sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(l,), p=[perc_A_target/100,1-(perc_A_target/100)]))
-                        blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
-
+                    if spec(sequence):
+                        break  # Exit the loop if the sequence is valid
                 if stereoisomerism_input is not None:
                     sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence)
                     pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
