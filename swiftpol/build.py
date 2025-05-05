@@ -1327,7 +1327,7 @@ class polymer_system_from_PDI:
         self.max_length = max(lengths)
         print('System built!, size =', self.num_chains)
         
-        def __repr__(self):
+    def __repr__(self):
                 
         description = (f"SwiftPol ensemble of size {self.num_chains}, "
                        f"average chain length = {self.length_average}-mers, PDI = {self.PDI}")
