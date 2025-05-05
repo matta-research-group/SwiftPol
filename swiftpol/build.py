@@ -1286,6 +1286,7 @@ class polymer_system_from_PDI:
             self.B_block_length = mean(BBL)
             self.A_block_length = mean(ABL)
             self.blockiness_list = blockiness_list
+            blockiness_list = [i for i in blockiness_list if type(i)!=str]
             self.mean_blockiness = mean(blockiness_list)
             self.perc_A_actual = perc_A_actual
             self.A_actual = mean(perc_A_actual)
