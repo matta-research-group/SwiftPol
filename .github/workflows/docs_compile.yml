@@ -49,7 +49,7 @@ jobs:
         source ~/.bashrc
         conda env create -f Dev_tools/swiftpol.yml
         conda activate swiftpol
-        conda install sphinx sphinx_rtd_theme 
+        pip install sphinx sphinx_rtd_theme 
         pip install .
 
     - name: Run build

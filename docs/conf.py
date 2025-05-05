@@ -34,7 +34,7 @@ sys.path.insert(0, os.path.abspath('../swiftpol'))
 
 project = 'SwiftPol'
 author = 'Your Name'
-release = '0.1.0'
+release = '0.1.2'
 
 # -- General configuration ---------------------------------------------------
 
