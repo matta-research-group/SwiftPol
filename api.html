@@ -1,0 +1,795 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>swiftpol &mdash; swiftpol  documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Getting Started with Swiftpol" href="getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            swiftpol
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started with Swiftpol</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">swiftpol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#module-swiftpol.build">swiftpol.build</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.build.build_polymer"><code class="docutils literal notranslate"><span class="pre">build_polymer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.build.build_linear_copolymer"><code class="docutils literal notranslate"><span class="pre">build_linear_copolymer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.build.PDI"><code class="docutils literal notranslate"><span class="pre">PDI()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.build.blockiness_gen"><code class="docutils literal notranslate"><span class="pre">blockiness_gen()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.build.calculate_box_components"><code class="docutils literal notranslate"><span class="pre">calculate_box_components()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.build.introduce_stereoisomers"><code class="docutils literal notranslate"><span class="pre">introduce_stereoisomers()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol-build-polymer-system">swiftpol.build.polymer_system</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#swiftpol.build.polymer_system"><code class="docutils literal notranslate"><span class="pre">polymer_system</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.__init__"><code class="docutils literal notranslate"><span class="pre">polymer_system.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.generate_conformers"><code class="docutils literal notranslate"><span class="pre">polymer_system.generate_conformers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.charge_system"><code class="docutils literal notranslate"><span class="pre">polymer_system.charge_system()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.export_to_csv"><code class="docutils literal notranslate"><span class="pre">polymer_system.export_to_csv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.pack_solvated_system"><code class="docutils literal notranslate"><span class="pre">polymer_system.pack_solvated_system()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.generate_polyply_files"><code class="docutils literal notranslate"><span class="pre">polymer_system.generate_polyply_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system.calculate_residuals"><code class="docutils literal notranslate"><span class="pre">polymer_system.calculate_residuals()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol-build-polymer-system-from-pdi">swiftpol.build.polymer_system_from_PDI</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#swiftpol.build.polymer_system_from_PDI"><code class="docutils literal notranslate"><span class="pre">polymer_system_from_PDI</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system_from_PDI.__init__"><code class="docutils literal notranslate"><span class="pre">polymer_system_from_PDI.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system_from_PDI.generate_conformers"><code class="docutils literal notranslate"><span class="pre">polymer_system_from_PDI.generate_conformers()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system_from_PDI.charge_system"><code class="docutils literal notranslate"><span class="pre">polymer_system_from_PDI.charge_system()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system_from_PDI.export_to_csv"><code class="docutils literal notranslate"><span class="pre">polymer_system_from_PDI.export_to_csv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system_from_PDI.pack_solvated_system"><code class="docutils literal notranslate"><span class="pre">polymer_system_from_PDI.pack_solvated_system()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system_from_PDI.generate_polyply_files"><code class="docutils literal notranslate"><span class="pre">polymer_system_from_PDI.generate_polyply_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system_from_PDI.calculate_residuals"><code class="docutils literal notranslate"><span class="pre">polymer_system_from_PDI.calculate_residuals()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="#module-swiftpol.parameterize">swiftpol.parameterize</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.parameterize.charge_polymer"><code class="docutils literal notranslate"><span class="pre">charge_polymer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.parameterize.charge_openff_polymer"><code class="docutils literal notranslate"><span class="pre">charge_openff_polymer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.parameterize.forcefield_with_charge_handler"><code class="docutils literal notranslate"><span class="pre">forcefield_with_charge_handler()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">swiftpol</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">swiftpol</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/api.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-swiftpol">
+<span id="swiftpol"></span><h1>swiftpol<a class="headerlink" href="#module-swiftpol" title="Link to this heading"></a></h1>
+<p>A Python package for building in silico polymer systems</p>
+</section>
+<section id="module-swiftpol.build">
+<span id="swiftpol-build"></span><h1>swiftpol.build<a class="headerlink" href="#module-swiftpol.build" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.build.build_polymer">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.build.</span></span><span class="sig-name descname"><span class="pre">build_polymer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">monomer_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hydroxyl'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">chain_num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#build_polymer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.build_polymer" title="Link to this definition"></a></dt>
+<dd><p>Constructs a polymer from a given sequence of monomers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequence</strong> (<em>str</em>) – A string representing the sequence of monomers (e.g., ‘ABAB’).</p></li>
+<li><p><strong>monomer_list</strong> (<em>list</em>) – A list of SMILES strings representing the monomers.</p></li>
+<li><p><strong>reaction</strong> (<em>rdkit.Chem.rdChemReactions.ChemicalReaction</em>) – An RDKit reaction object used to link monomers.</p></li>
+<li><p><strong>terminal</strong> (<em>str, optional</em>) – The terminal group to be added to the polymer. Options are ‘hydroxyl’, ‘carboxyl’, or ‘ester’.
+Default is ‘hydroxyl’.</p></li>
+<li><p><strong>chain_number</strong> (<em>int, optional</em>) – The number of polymer chains to construct. Default is 1. Input used for ensemble build.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The constructed polymer as an RDKit molecule object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>rdkit.Chem.rdchem.Mol</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.build.build_linear_copolymer">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.build.</span></span><span class="sig-name descname"><span class="pre">build_linear_copolymer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">monomer_a_smiles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">monomer_b_smiles</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction=&lt;rdkit.Chem.rdChemReactions.ChemicalReaction</span> <span class="pre">object&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#build_linear_copolymer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.build_linear_copolymer" title="Link to this definition"></a></dt>
+<dd><p>Constructs a linear co-polymer from the provided sequence of monomers.</p>
+<p>This function takes a sequence of monomers represented as ‘A’ and ‘B’, and the SMILES strings of two monomers.
+It constructs a co-polymer based on the sequence, using the provided reaction SMARTS for joining the monomers.
+The function returns the sanitized polymer and the percentage composition of each monomer in the polymer.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequence</strong> (<em>str</em>) – A string representing the sequence of monomers. ‘A’ represents monomer_a and ‘B’ represents monomer_b.</p></li>
+<li><p><strong>monomer_a_smiles</strong> (<em>str</em>) – The SMILES string of monomer A.</p></li>
+<li><p><strong>monomer_b_smiles</strong> (<em>str</em>) – The SMILES string of monomer B.</p></li>
+<li><p><strong>reaction</strong> (<em>rdkit.Chem.rdChemReactions.ChemicalReaction, optional</em>) – The reaction SMARTS used for joining the monomers. Defaults to ‘[C:1][HO:2].[HO:3][C:4]&gt;&gt;[C:1][O:2][C:4].[O:3]’,
+representing a condensation polymerisation.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the following elements:
+- sanitized_polymer (rdkit.Chem.rdchem.Mol): The constructed and sanitized polymer.
+- percentage_monomer_a (float): The percentage composition of monomer A in the polymer.
+- percentage_monomer_b (float): The percentage composition of monomer B in the polymer.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.build.PDI">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.build.</span></span><span class="sig-name descname"><span class="pre">PDI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chains</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#PDI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.PDI" title="Link to this definition"></a></dt>
+<dd><p>Calculates the Polydispersity Index (PDI), number-average molecular weight (Mn),
+and weight-average molecular weight (Mw) of a list of chains.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>chains</strong> (<em>list</em>) – A list of molecular chains. Each chain is represented as an RDKit molecule object.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the following elements:
+- PDI (float): The Polydispersity Index, which is the ratio of Mw to Mn.
+- Mn (float): The number-average molecular weight.
+- Mw (float): The weight-average molecular weight.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.build.blockiness_gen">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.build.</span></span><span class="sig-name descname"><span class="pre">blockiness_gen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wrt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'A'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#blockiness_gen"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.blockiness_gen" title="Link to this definition"></a></dt>
+<dd><p>Calculate the blockiness and average block length of a co-polymer sequence.</p>
+<p>This function calculates the blockiness of a co-polymer sequence by counting the occurrences of ‘BB’ and ‘BA’ or ‘AB’ in the sequence.
+It also calculates the average block length of ‘A’ and ‘B’ monomers in the sequence.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>sequence</strong> (<em>str</em>) – A string representing the co-polymer sequence. ‘A’ represents one type of monomer and ‘B’ represents another type.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the following elements:
+- blockiness (float): The blockiness of the co-polymer sequence. Calculated as the ratio of ‘BB’ to ‘BA’ or ‘AB’.
+- block_length_A (float): The average block length of ‘A’ in the sequence.
+- block_length_B (float): The average block length of ‘B’ in the sequence.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>If the sequence does not contain both ‘A’ and ‘B’, the function returns a string indicating that the molecule is not a co-polymer.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.build.calculate_box_components">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.build.</span></span><span class="sig-name descname"><span class="pre">calculate_box_components</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chains</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">monomers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">salt_concentration=&lt;Quantity(0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'mole</span> <span class="pre">/</span> <span class="pre">liter')&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_monomer=0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">solvated=False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#calculate_box_components"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.calculate_box_components" title="Link to this definition"></a></dt>
+<dd><p>Calculates the components required to construct a simulation box for a given set of molecular chains.</p>
+<p>This function determines the quantity of each molecule type required, considering the salt concentration
+and residual monomer concentration. It is adapted from the OpenFF Toolkit Packmol wrapper’s solvate_topology function.</p>
+<section id="parameters">
+<h2>Parameters:<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>chains<span class="classifier">list</span></dt><dd><p>A list of molecular chains to be included in the simulation box.</p>
+</dd>
+<dt>sequence<span class="classifier">str</span></dt><dd><p>A string representing the sequence of the molecular chains. ‘G’ and ‘L’ represent different types of monomers.</p>
+</dd>
+<dt>salt_concentration<span class="classifier">float, optional</span></dt><dd><p>The desired salt concentration in the simulation box. Defaults to 0 M.</p>
+</dd>
+<dt>residual_monomer<span class="classifier">float, optional</span></dt><dd><p>The desired residual monomer concentration in the simulation box. Defaults to 0.00%.</p>
+</dd>
+<dt>solvated<span class="classifier">bool, optional</span></dt><dd><p>Indicates whether the system contains water. Defaults to False.</p>
+</dd>
+</dl>
+</section>
+<section id="returns">
+<h2>Returns:<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>tuple</dt><dd><p>A tuple containing the following elements:
+- molecules (list): A list of molecules to be included in the simulation box.
+- number_of_copies (list): A list indicating the quantity of each molecule to be included in the simulation box.
+- topology (openff.toolkit.topology.Topology): The topology of the simulation box.
+- box_vectors (numpy.ndarray): The vectors defining the dimensions of the simulation box.</p>
+</dd>
+</dl>
+</section>
+<section id="notes">
+<h2>Notes:<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
+<p>This function is adapted from the OpenFF Toolkit Packmol wrapper’s solvate_topology function.</p>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.build.introduce_stereoisomers">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.build.</span></span><span class="sig-name descname"><span class="pre">introduce_stereoisomers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">stereo_monomer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seq</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#introduce_stereoisomers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.introduce_stereoisomers" title="Link to this definition"></a></dt>
+<dd><p>Introduce stereoisomers into a polymer sequence by replacing a specified percentage of ‘A’ monomers with ‘S’.</p>
+<p>This function replaces a specified percentage of ‘A’ monomers with ‘S’ in the given sequence. The replacements
+are made in pairs of ‘A’ monomers to ensure stereoisomerism.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stereo_monomer</strong> (<em>str</em>) – The monomer to be replaced with its stereoisomer (e.g., ‘A’).</p></li>
+<li><p><strong>instance</strong> (<em>float</em>) – The fraction of ‘stereo_monomer’ monomers to be replaced with stereoisomer (e.g., 0.5 for 50%).</p></li>
+<li><p><strong>seq</strong> (<em>str</em>) – The original polymer sequence.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The modified sequence with stereoisomers introduced.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<section id="swiftpol-build-polymer-system">
+<h2>swiftpol.build.polymer_system<a class="headerlink" href="#swiftpol-build-polymer-system" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">swiftpol.build.</span></span><span class="sig-name descname"><span class="pre">polymer_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monomer_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_chains</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stereoisomerism_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perc_A_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blockiness_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">'A']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copolymer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acceptance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monomer_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_chains</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stereoisomerism_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perc_A_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blockiness_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">'A']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copolymer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acceptance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the polymer system and build the polymer chains.</p>
+<section id="id1">
+<h3><strong>Parameters:</strong><a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
+<p>monomer_list (list): List of monomers to be used in the polymerization.</p>
+<p>reaction (str): The type of reaction to be used for polymerization.</p>
+<p>length_target (float): The target length of the polymer chains.</p>
+<p>num_chains (int): The number of polymer chains to be generated.</p>
+<p>stereoisomerism_input (tuple, optional): A tuple containing the monomer, instance fraction (e.g. 0.5 for 50% stereoisomer), and SMILES string of the stereoisomer to be introduced. Default is None.</p>
+<p>terminals (str, optional): The type of terminal groups to be used. Default is ‘standard’.</p>
+<p>perc_A_target (float, optional): The target percentage of monomer A in the copolymer. Default is 100.</p>
+<p>blockiness_target (float, optional): The target blockiness of the copolymer, and indication of method calculation. Default is 1.0, with reference to ‘A’ monomer linkages.</p>
+<p>copolymer (bool, optional): Flag to indicate if the system is a copolymer. Default is False.</p>
+<p>acceptance = % deviation of blockiness and A percentage from target values. Default is 10%</p>
+</section>
+<section id="attributes">
+<h3><strong>Attributes:</strong><a class="headerlink" href="#attributes" title="Link to this heading"></a></h3>
+<p>length_target (float): The target length of the polymer chains.</p>
+<p>terminals (str): The type of terminal groups used.</p>
+<p>blockiness_target (float): The target blockiness of the copolymer.</p>
+<p>A_target (float): The target percentage of monomer A in the copolymer.</p>
+<p>chains (list): List of polymer chains as OpenFF Molecule objects.</p>
+<p>chain_rdkit (list): List of polymer chains as RDKit molecule objects.</p>
+<p>lengths (list): List of lengths of the polymer chains.</p>
+<p>perc_A_actual (list): List of actual percentages of monomer A in the polymer chains.</p>
+<p>B_block_length (float): The average block length of monomer B in the copolymer.</p>
+<p>A_block_length (float): The average block length of monomer A in the copolymer.</p>
+<p>blockiness_list (list): List of blockiness values for the polymer chains.</p>
+<p>mean_blockiness (float): The mean blockiness of the polymer chains.</p>
+<p>mol_weight_average (float): The average molecular weight of the polymer chains.</p>
+<p>PDI (float): The polydispersity index of the polymer chains.</p>
+<p>Mn (float): The number-average molecular weight of the polymer chains.</p>
+<p>Mw (float): The weight-average molecular weight of the polymer chains.</p>
+<p>num_chains (int): The number of polymer chains generated.</p>
+<p>length_average (float): The average length of the polymer chains.</p>
+<p>min_length (float): The minimum length of the polymer chains.</p>
+<p>max_length (float): The maximum length of the polymer chains.</p>
+</section>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system.generate_conformers">
+<span class="sig-name descname"><span class="pre">generate_conformers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.generate_conformers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.generate_conformers" title="Link to this definition"></a></dt>
+<dd><p>Generate conformers for each polymer chain in the system.</p>
+<p>This method uses the OpenFF toolkit OpenEye Wrapper to generate conformers for each polymer chain in the system.
+It first checks if the OpenEye toolkit is licensed and available. If it is, it uses the OpenEyeToolkitWrapper
+to generate conformers. Otherwise, it falls back to using the RDKitToolkitWrapper. Each chain is processed
+to generate a single conformer, and unique atom names are assigned to each chain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ImportError</strong> – If neither RDKit nor OpenEye toolkits are available.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system.charge_system">
+<span class="sig-name descname"><span class="pre">charge_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">charge_scheme</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.charge_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.charge_system" title="Link to this definition"></a></dt>
+<dd><p>Assign partial charges to each polymer chain in the system.</p>
+<p>This method uses one of AM1-BCC, Espaloma, or OpenFF NAGL to assign partial charges to each polymer chain in the system.
+It iterates over each chain in the <cite>self.chains</cite> list and assigns partial charges to the chain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>charge_scheme</strong> (<em>str</em>) – The charge assignment scheme to use. Options are ‘AM1_BCC’, ‘espaloma’, or ‘NAGL’.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ImportError</strong> – If the selected toolkit is not available.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system.export_to_csv">
+<span class="sig-name descname"><span class="pre">export_to_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.export_to_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.export_to_csv" title="Link to this definition"></a></dt>
+<dd><p>Export all the instances in polymer_system.__init__() into a pandas DataFrame and save it as a CSV file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – The name of the CSV file to save the data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system.pack_solvated_system">
+<span class="sig-name descname"><span class="pre">pack_solvated_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">salt_concentration=&lt;Quantity(0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'mole</span> <span class="pre">/</span> <span class="pre">liter')&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_monomer=0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.pack_solvated_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.pack_solvated_system" title="Link to this definition"></a></dt>
+<dd><p>Pack a solvated system using Packmol functions, and the OpenFF Packmol wrapper.</p>
+<p>This method uses Packmol to build a solvated system by packing molecules into a simulation box.
+It considers the salt concentration and residual monomer concentration to determine the quantity of each molecule type required.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>salt_concentration</strong> (<em>openff.units.Quantity, optional</em>) – The desired salt concentration in the simulation box. Default is 0.0 M.</p></li>
+<li><p><strong>residual_monomer</strong> (<em>float, optional</em>) – The desired residual monomer concentration in the simulation box. Default is 0.00.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An Interchange object representing the packed solvated system.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>openff.toolkit.topology.topology.Topology</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function uses the OpenFF Interchange Packmol wrapper to pack the molecules into the simulation box.
+It removes any molecules with zero copies before packing, to avoid packmol errors.
+Assigns % residual monomer value to ensemble under self.residual_monomer_actual</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system.generate_polyply_files">
+<span class="sig-name descname"><span class="pre">generate_polyply_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residual_monomer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_oligomer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.generate_polyply_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.generate_polyply_files" title="Link to this definition"></a></dt>
+<dd><p>Generate input files for Polyply from the system.</p>
+<p>This method generates the input files required for Polyply (<a class="reference external" href="https://github.com/marrink-lab/polyply_1.0/">https://github.com/marrink-lab/polyply_1.0/</a>) from the system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>residual_monomer</strong> (<em>float, optional</em>) – The desired residual monomer concentration in the simulation box. Default is 0.00.</p></li>
+<li><p><strong>residual_oligomer</strong> (<em>float, optional</em>) – The desired residual oligomer concentration in the simulation box. Default is 0.00.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the paths to the .gro, .top, and .pdb files generated for Polyply and GROMACS insert-molecules input.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function uses OpenFF Interchange to generate the input files for Polyply.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>UserWarning</strong> – If partial charges are not assigned to the system, processing large systems may raise errors from OpenFF-Interchange.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system.calculate_residuals">
+<span class="sig-name descname"><span class="pre">calculate_residuals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residual_monomer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_oligomer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.calculate_residuals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.calculate_residuals" title="Link to this definition"></a></dt>
+<dd><p>Generate residual monomer and oligomer molecules, and molecule counts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>residual_monomer</strong> (<em>float</em>) – The desired residual monomer concentration in the simulation box. Default is 0.00.</p></li>
+<li><p><strong>residual_oligomer</strong> (<em>float</em>) – The desired residual oligomer concentration in the simulation box. Default is 0.00.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>tuple</em></p></li>
+<li><p><em>A tuple containing the following elements</em> –</p>
+<ul>
+<li><p>A list of OpenFF Molecule objects representing the residual monomer and oligomer molecules.</p></li>
+<li><p>A list of molecule counts, corresponding with the molecule list</p></li>
+<li><p>Actual value for % residual monomer</p></li>
+<li><p>Actual value for % residual oligomer</p></li>
+</ul>
+</li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>EXPERIMENTAL CAPABILITY. Proceed with caution</p>
+<p>This function works independently of, and is unrelated to, the build.calculate_box_components function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>UserWarning - If the residual monomer concentration is close to</strong><strong> or </strong><strong>lower than the weight</strong><strong> of </strong><strong>a single monomer.</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="swiftpol-build-polymer-system-from-pdi">
+<h2>swiftpol.build.polymer_system_from_PDI<a class="headerlink" href="#swiftpol-build-polymer-system-from-pdi" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system_from_PDI">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">swiftpol.build.</span></span><span class="sig-name descname"><span class="pre">polymer_system_from_PDI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monomer_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_chains</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PDI_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stereoisomerism_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perc_A_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blockiness_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">'A']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copolymer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acceptance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system_from_PDI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system_from_PDI" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Build a polymer system based on a target polydispersity index (PDI).</p>
+<p>This class generates a polymer system with a specified number of chains,
+target chain length, and target PDI. It supports the generation of copolymers,
+stereoisomers, and blockiness control. The system is built using OpenFF and RDKit
+toolkits, with optional support for OpenEye toolkits if installed.</p>
+<p><strong>Note</strong>: This capability is under development and may change significantly in the next version of SwiftPol.
+Proceed with caution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>monomer_list</strong> (<em>list of str</em>) – A list of monomer SMILES strings to be used in the polymer system.</p></li>
+<li><p><strong>reaction</strong> (<em>str</em>) – A SMARTS string defining the polymerization reaction.</p></li>
+<li><p><strong>length_target</strong> (<em>int</em>) – The target average chain length for the polymer system.</p></li>
+<li><p><strong>num_chains</strong> (<em>int</em>) – The number of polymer chains to generate.</p></li>
+<li><p><strong>PDI_target</strong> (<em>float</em>) – The target polydispersity index (PDI) for the polymer system.</p></li>
+<li><p><strong>stereoisomerism_input</strong> (<em>tuple, optional</em>) – A tuple containing the stereoisomer monomer, the fraction of stereoisomers
+to introduce, and the SMILES string of the stereoisomer. Default is None.</p></li>
+<li><p><strong>terminals</strong> (<em>str, optional</em>) – The type of terminal groups to use for the polymer chains. Default is ‘standard’.</p></li>
+<li><p><strong>perc_A_target</strong> (<em>float, optional</em>) – The target percentage of monomer ‘A’ in the copolymer. Default is 100.</p></li>
+<li><p><strong>blockiness_target</strong> (<em>list, optional</em>) – A list containing the target blockiness value and the monomer to control
+blockiness for. Default is [1.0, ‘A’].</p></li>
+<li><p><strong>copolymer</strong> (<em>bool, optional</em>) – Whether to generate a copolymer. Default is False.</p></li>
+<li><p><strong>acceptance</strong> (<em>float, optional</em>) – The acceptance margin (in percentage) for the target blockiness and
+monomer percentage. Default is 10.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>chains</strong> (<em>list</em><em> of </em><em>openff.toolkit.topology.Molecule</em>) – A list of OpenFF Molecule objects representing the polymer chains.</p></li>
+<li><p><strong>chain_rdkit</strong> (<em>list</em><em> of </em><em>rdkit.Chem.Mol</em>) – A list of RDKit Molecule objects representing the polymer chains.</p></li>
+<li><p><strong>sequence</strong> (<em>str</em>) – The sequence of monomers in the polymer system.</p></li>
+<li><p><strong>mol_weight_average</strong> (<em>float</em>) – The average molecular weight of the polymer chains.</p></li>
+<li><p><strong>PDI</strong> (<em>float</em>) – The polydispersity index of the polymer system.</p></li>
+<li><p><strong>Mn</strong> (<em>float</em>) – The number-average molecular weight of the polymer system.</p></li>
+<li><p><strong>Mw</strong> (<em>float</em>) – The weight-average molecular weight of the polymer system.</p></li>
+<li><p><strong>num_chains</strong> (<em>int</em>) – The number of polymer chains in the system.</p></li>
+<li><p><strong>length_average</strong> (<em>float</em>) – The average chain length of the polymer system.</p></li>
+<li><p><strong>lengths</strong> (<em>list</em><em> of </em><em>int</em>) – A list of chain lengths for the polymer chains.</p></li>
+<li><p><strong>min_length</strong> (<em>int</em>) – The minimum chain length in the polymer system.</p></li>
+<li><p><strong>max_length</strong> (<em>int</em>) – The maximum chain length in the polymer system.</p></li>
+<li><p><strong>A_actual</strong> (<em>float</em><em> or </em><em>None</em>) – The actual percentage of monomer ‘A’ in the copolymer. None if not a copolymer.</p></li>
+<li><p><strong>perc_A_actual</strong> (<em>list</em><em> of </em><em>float</em><em> or </em><em>None</em>) – A list of the actual percentages of monomer ‘A’ in each chain. None if not a copolymer.</p></li>
+<li><p><strong>B_block_length</strong> (<em>float</em><em> or </em><em>None</em>) – The average block length of monomer ‘B’. None if not a copolymer.</p></li>
+<li><p><strong>A_block_length</strong> (<em>float</em><em> or </em><em>None</em>) – The average block length of monomer ‘A’. None if not a copolymer.</p></li>
+<li><p><strong>blockiness_list</strong> (<em>list</em><em> of </em><em>float</em><em> or </em><em>None</em>) – A list of blockiness values for each chain. None if not a copolymer.</p></li>
+<li><p><strong>mean_blockiness</strong> (<em>float</em><em> or </em><em>None</em>) – The mean blockiness value for the polymer system. None if not a copolymer.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li><p>If OpenEye toolkits are not installed, RDKit will be used for conformer generation.</p></li>
+<li><p>The system is built using a log-normal distribution of chain lengths to achieve
+the target PDI.</p></li>
+<li><p>For small systems, PDI may not be close to the target value.</p></li>
+</ul>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.build</span><span class="w"> </span><span class="kn">import</span> <span class="n">polymer_system_from_PDI</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">monomer_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;OC(=O)COI&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reaction</span> <span class="o">=</span> <span class="s1">&#39;[C:1][O:2][H:3].[I:4][O:5][C:6]&gt;&gt;[C:1][O:2][C:6].[H:3][O:5][I:4]&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">system</span> <span class="o">=</span> <span class="n">polymer_system_from_PDI</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">monomer_list</span><span class="o">=</span><span class="n">monomer_list</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">reaction</span><span class="o">=</span><span class="n">reaction</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">length_target</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">num_chains</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">PDI_target</span><span class="o">=</span><span class="mf">1.7</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">copolymer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
+<span class="go">SwiftPol ensemble of size 50, average chain length = 10.6-mers, PDI = 1.7006109664210667</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system_from_PDI.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monomer_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_chains</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PDI_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stereoisomerism_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'standard'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perc_A_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blockiness_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">'A']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copolymer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acceptance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system_from_PDI.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system_from_PDI.__init__" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system_from_PDI.generate_conformers">
+<span class="sig-name descname"><span class="pre">generate_conformers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system_from_PDI.generate_conformers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system_from_PDI.generate_conformers" title="Link to this definition"></a></dt>
+<dd><p>Generate conformers for each polymer chain in the system.</p>
+<p>This method uses the OpenFF toolkit OpenEye Wrapper to generate conformers for each polymer chain in the system.
+It first checks if the OpenEye toolkit is licensed and available. If it is, it uses the OpenEyeToolkitWrapper
+to generate conformers. Otherwise, it falls back to using the RDKitToolkitWrapper. Each chain is processed
+to generate a single conformer, and unique atom names are assigned to each chain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ImportError</strong> – If neither RDKit nor OpenEye toolkits are available.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system_from_PDI.charge_system">
+<span class="sig-name descname"><span class="pre">charge_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">charge_scheme</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system_from_PDI.charge_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system_from_PDI.charge_system" title="Link to this definition"></a></dt>
+<dd><p>Assign partial charges to each polymer chain in the system.</p>
+<p>This method uses one of AM1-BCC, Espaloma, or OpenFF NAGL to assign partial charges to each polymer chain in the system.
+It iterates over each chain in the <cite>self.chains</cite> list and assigns partial charges to the chain.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>charge_scheme</strong> (<em>str</em>) – The charge assignment scheme to use. Options are ‘AM1_BCC’, ‘espaloma’, or ‘NAGL’.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ImportError</strong> – If the selected toolkit is not available.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system_from_PDI.export_to_csv">
+<span class="sig-name descname"><span class="pre">export_to_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system_from_PDI.export_to_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system_from_PDI.export_to_csv" title="Link to this definition"></a></dt>
+<dd><p>Export all the instances in polymer_system.__init__() into a pandas DataFrame and save it as a CSV file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – The name of the CSV file to save the data.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system_from_PDI.pack_solvated_system">
+<span class="sig-name descname"><span class="pre">pack_solvated_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">salt_concentration=&lt;Quantity(0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">'mole</span> <span class="pre">/</span> <span class="pre">liter')&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_monomer=0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system_from_PDI.pack_solvated_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system_from_PDI.pack_solvated_system" title="Link to this definition"></a></dt>
+<dd><p>Pack a solvated system using Packmol functions, and the OpenFF Packmol wrapper.</p>
+<p>This method uses Packmol to build a solvated system by packing molecules into a simulation box.
+It considers the salt concentration and residual monomer concentration to determine the quantity of each molecule type required.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>salt_concentration</strong> (<em>openff.units.Quantity, optional</em>) – The desired salt concentration in the simulation box. Default is 0.0 M.</p></li>
+<li><p><strong>residual_monomer</strong> (<em>float, optional</em>) – The desired residual monomer concentration in the simulation box. Default is 0.00.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An Interchange object representing the packed solvated system.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>openff.toolkit.topology.topology.Topology</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function uses the OpenFF Interchange Packmol wrapper to pack the molecules into the simulation box.
+It removes any molecules with zero copies before packing, to avoid packmol errors.
+Assigns % residual monomer value to ensemble under self.residual_monomer_actual</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system_from_PDI.generate_polyply_files">
+<span class="sig-name descname"><span class="pre">generate_polyply_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residual_monomer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_oligomer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system_from_PDI.generate_polyply_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system_from_PDI.generate_polyply_files" title="Link to this definition"></a></dt>
+<dd><p>Generate input files for Polyply from the system.</p>
+<p>This method generates the input files required for Polyply (<a class="reference external" href="https://github.com/marrink-lab/polyply_1.0/">https://github.com/marrink-lab/polyply_1.0/</a>) from the system.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>residual_monomer</strong> (<em>float, optional</em>) – The desired residual monomer concentration in the simulation box. Default is 0.00.</p></li>
+<li><p><strong>residual_oligomer</strong> (<em>float, optional</em>) – The desired residual oligomer concentration in the simulation box. Default is 0.00.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple containing the paths to the .gro, .top, and .pdb files generated for Polyply and GROMACS insert-molecules input.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>This function uses OpenFF Interchange to generate the input files for Polyply.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>UserWarning</strong> – If partial charges are not assigned to the system, processing large systems may raise errors from OpenFF-Interchange.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system_from_PDI.calculate_residuals">
+<span class="sig-name descname"><span class="pre">calculate_residuals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residual_monomer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_oligomer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system_from_PDI.calculate_residuals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system_from_PDI.calculate_residuals" title="Link to this definition"></a></dt>
+<dd><p>Generate residual monomer and oligomer molecules, and molecule counts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>residual_monomer</strong> (<em>float</em>) – The desired residual monomer concentration in the simulation box. Default is 0.00.</p></li>
+<li><p><strong>residual_oligomer</strong> (<em>float</em>) – The desired residual oligomer concentration in the simulation box. Default is 0.00.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>tuple</em></p></li>
+<li><p><em>A tuple containing the following elements</em> –</p>
+<ul>
+<li><p>A list of OpenFF Molecule objects representing the residual monomer and oligomer molecules.</p></li>
+<li><p>A list of molecule counts, corresponding with the molecule list</p></li>
+<li><p>Actual value for % residual monomer</p></li>
+<li><p>Actual value for % residual oligomer</p></li>
+</ul>
+</li>
+</ul>
+</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>EXPERIMENTAL CAPABILITY. Proceed with caution</p>
+<p>This function works independently of, and is unrelated to, the build.calculate_box_components function.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>UserWarning - If the residual monomer concentration is close to</strong><strong> or </strong><strong>lower than the weight</strong><strong> of </strong><strong>a single monomer.</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+<section id="module-swiftpol.parameterize">
+<span id="swiftpol-parameterize"></span><h1>swiftpol.parameterize<a class="headerlink" href="#module-swiftpol.parameterize" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.parameterize.charge_polymer">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.parameterize.</span></span><span class="sig-name descname"><span class="pre">charge_polymer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polymer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge_scheme</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/parameterize.html#charge_polymer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.parameterize.charge_polymer" title="Link to this definition"></a></dt>
+<dd><p>Calculate and return the partial charges of a polymer chain based on the specified charge scheme.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>polymer</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – A polymer chain for which the charges are to be calculated.</p></li>
+<li><p><strong>charge_scheme</strong> (<em>str</em>) – A string that specifies the charge scheme to be used. It can be either ‘AM1_BCC’, ‘espaloma’, or ‘NAGL’.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The partial charges of the polymer chain according to the specified charge scheme.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>numpy.ndarray</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>AttributeError</strong> – If the charge_scheme input is not ‘AM1_BCC’, ‘NAGL’, or ‘espaloma’.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.parameterize.charge_openff_polymer">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.parameterize.</span></span><span class="sig-name descname"><span class="pre">charge_openff_polymer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">openff_chain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge_scheme</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/parameterize.html#charge_openff_polymer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.parameterize.charge_openff_polymer" title="Link to this definition"></a></dt>
+<dd><p>Assign partial charges to a polymer chain based on the specified charge scheme.</p>
+<p>This function assigns partial charges to a polymer chain using one of the following charge schemes:
+‘AM1_BCC’, ‘NAGL’, or ‘espaloma’. It can optionally overwrite existing charges.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>openff_chain</strong> (<em>openff.toolkit.topology.Molecule</em>) – The original polymer chain to which partial charges will be assigned.</p></li>
+<li><p><strong>charge_scheme</strong> (<em>str</em>) – The charge scheme to use for assigning partial charges. Options are ‘AM1_BCC’, ‘NAGL’, or ‘espaloma’.</p></li>
+<li><p><strong>overwrite</strong> (<em>bool, optional</em>) – Whether to overwrite existing partial charges. Default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The partial charges assigned to the polymer chain.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>openff.toolkit.topology.molecule.PartialChargeArray</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ModuleNotFoundError</strong> – If the installed version of openff-toolkit is below what is required to use NAGL.</p></li>
+<li><p><strong>ImportError</strong> – If the required package for the specified charge scheme is not installed.</p></li>
+<li><p><strong>AttributeError</strong> – If the charge_scheme input is not ‘AM1_BCC’, ‘NAGL’, or ‘espaloma’.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.parameterize.forcefield_with_charge_handler">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.parameterize.</span></span><span class="sig-name descname"><span class="pre">forcefield_with_charge_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecule</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forcefield</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'openff-2.2.0.offxml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensemble</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/parameterize.html#forcefield_with_charge_handler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.parameterize.forcefield_with_charge_handler" title="Link to this definition"></a></dt>
+<dd><p>Create a forcefield with a charge handler for a given molecule and charge method.</p>
+<p>The function can handle both individual molecules and ensembles of molecules.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>molecule</strong> (<em>rdkit.Chem.rdchem.Mol or list of rdkit.Chem.rdchem.Mol</em>) – An RDKit molecule object or a list of RDKit molecule objects for which the forcefield is to be created.</p></li>
+<li><p><strong>charge_method</strong> (<em>str</em>) – A string that specifies the charge method to be used for the molecule.</p></li>
+<li><p><strong>forcefield</strong> (<em>str, optional</em>) – A string that specifies the forcefield to be used. Default is “openff-2.2.0.offxml”.</p></li>
+<li><p><strong>ensemble</strong> (<em>bool, optional</em>) – A boolean that specifies whether the input molecule is an ensemble of molecules. Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An OpenFF ForceField object with the specified molecule’s charges added to the LibraryCharges parameter.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>openff.toolkit.typing.engines.smirnoff.ForceField</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Exception</strong> – If the charge method is not supported.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started with Swiftpol" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2024, Hannah Turney. Project structure based on the Computational Molecular Science Python Cookiecutter version 1.1.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
