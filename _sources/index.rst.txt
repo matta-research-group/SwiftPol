@@ -32,6 +32,8 @@ SwiftPol.build.polymer_system takes as an input:
    :width: 300px
    :align: left
 
+
+
 above - A 3D representation of a polydisperse polymer system built with SwiftPol. `PolyPly <https://github.com/marrink-lab/polyply_1.0/tree/master/polyply/src>`_ used for generating 3D configuration.
 
 
