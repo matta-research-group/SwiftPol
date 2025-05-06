@@ -8,7 +8,7 @@ Welcome to SwiftPol's documentation!
 .. image:: _static/logo.png
    :alt: SwiftPol Logo
    :width: 300px
-   :align: left
+   :align: center
 
 About SwiftPol
 --------------
@@ -30,7 +30,7 @@ SwiftPol.build.polymer_system takes as an input:
 .. image:: _static/melt.png
    :alt: Polymer melt
    :width: 300px
-   :align: left
+   :align: center
 
 
 
