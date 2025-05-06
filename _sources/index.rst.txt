@@ -5,6 +5,10 @@
 
 Welcome to SwiftPol's documentation!
 =========================================================
+.. image:: _static/logo.png
+   :alt: SwiftPol Logo
+   :width: 300px
+   :align: left
 
 About SwiftPol
 --------------
@@ -21,7 +25,14 @@ SwiftPol.build.polymer_system takes as an input:
 
 - Reaction SMARTS which describes the polymerization reaction associated with their polymer chemistry.
 
-...and build a polydisperse chain ensemble.
+...and builds a polydisperse chain ensemble.
+
+.. image:: _static/melt.png
+   :alt: SwiftPol Logo
+   :width: 300px
+   :align: left
+
+above - A 3D representation of a polydisperse polymer system built with SwiftPol. [PolyPly](https://github.com/marrink-lab/polyply_1.0/tree/master/polyply/src) used for generating 3D configuration.
 
 
 .. toctree::
