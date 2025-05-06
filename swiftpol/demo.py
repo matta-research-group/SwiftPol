@@ -606,7 +606,12 @@ def replace_halogens_with_hydrogens(mol):
 def build_crosslinked_polymer(starting_polymer, 
                               num_iterations=1, 
                               probability_of_crosslinked_addition=0.5, 
-                              probability_of_linear_addition=0.5):
+                              probability_of_linear_addition=0.5,
+                              reaction_templates=[('[Cl:1]-[*:2]-[*:3](-[I:4])-[*:7].[Cl:8]-[*:9]-[*:10](-[I:11])-[*:12].[F:15].[F:16]>>[*:12]-[*:10](-[F:15])-[*:9]-[*:2]-[*:3](-[F:16])-[*:7].[Cl:1].[I:4].[Cl:8].[I:11]', (Chem.MolFromSmiles('F'), Chem.MolFromSmiles('F'))),
+                                                  ('[*:2]-[*:4](-[F:5])-[*:6]-[*:7]-[*:8](-[F:9])-[*:10].[Cl:13]-[*:14]-[*:15](-[I:16])-[*:17].[Br:20]>>[*:2]-[*:4](-[Br:20])-[*:6]-[*:7]-[*C:8](-[*:10])-[*:14]-[*:15](-[I:16])-[*:17].[Cl:1].[F:9].[F:5]', (Chem.MolFromSmiles('Br'),)),
+                                                  ('[*:2]-[*:4](-[Br:5])-[*:6]-[*:7]-[*:8](-[*:9]-[*:12]-[*:13](-[I:14])-[*:15]).[Cl:18]-[*:19]-[*:20](-[I:21])-[*:22]>>[*:2]-[*:4]-[*:19]-[*:20](-[I:21])-[*:22]-[*:6]-[*:7]-[*:8](-[*:9]-[*:12]-[*:13](-[I:14])-[*:15]).[Br:5].[Cl:18]', ()),
+                                                  ('[*:2]-[*:4](-[F:5])-[*:6]-[*:7]-[*:8](-[F:9])-[*:10].[*:14]-[*:16](-[F:17])-[*:18]-[*:19]-[*:20](-[F:21])-[*:22]>>[*:2]-[*:4](-[*:16](-[*:14])(-[*:18]-[*:19]-[*:20](-[F:21])-[*:22]))-[*:6]-[*:7]-[*:8](-[F:9])-[*:10].[F:5].[F:17]', ()),]
+                                                  ):
     """
     Builds a crosslinked polymer network by iteratively applying chemical reactions.
 
@@ -657,16 +662,6 @@ def build_crosslinked_polymer(starting_polymer,
     # Check if the probabilities sum to 1
     if probability_of_crosslinked_addition + probability_of_linear_addition != 1:
         raise AssertionError("Probabilities must sum to 1.")
-    #Define the reaction parameters
-    activatorF = Chem.MolFromSmiles('F')
-    activatorBr = Chem.MolFromSmiles('Br')
-
-    reaction_templates = [
-        ('[Cl:1]-[*:2]-[*:3](-[I:4])-[*:7].[Cl:8]-[*:9]-[*:10](-[I:11])-[*:12].[F:15].[F:16]>>[*:12]-[*:10](-[F:15])-[*:9]-[*:2]-[*:3](-[F:16])-[*:7].[Cl:1].[I:4].[Cl:8].[I:11]', (activatorF, activatorF)),
-        ('[*:2]-[*:4](-[F:5])-[*:6]-[*:7]-[*:8](-[F:9])-[*:10].[Cl:13]-[*:14]-[*:15](-[I:16])-[*:17].[Br:20]>>[*:2]-[*:4](-[Br:20])-[*:6]-[*:7]-[*C:8](-[*:10])-[*:14]-[*:15](-[I:16])-[*:17].[Cl:1].[F:9].[F:5]', (activatorBr,)),
-        ('[*:2]-[*:4](-[Br:5])-[*:6]-[*:7]-[*:8](-[*:9]-[*:12]-[*:13](-[I:14])-[*:15]).[Cl:18]-[*:19]-[*:20](-[I:21])-[*:22]>>[*:2]-[*:4]-[*:19]-[*:20](-[I:21])-[*:22]-[*:6]-[*:7]-[*:8](-[*:9]-[*:12]-[*:13](-[I:14])-[*:15]).[Br:5].[Cl:18]', ()),
-        ('[*:2]-[*:4](-[F:5])-[*:6]-[*:7]-[*:8](-[F:9])-[*:10].[*:14]-[*:16](-[F:17])-[*:18]-[*:19]-[*:20](-[F:21])-[*:22]>>[*:2]-[*:4](-[*:16](-[*:14])(-[*:18]-[*:19]-[*:20](-[F:21])-[*:22]))-[*:6]-[*:7]-[*:8](-[F:9])-[*:10].[F:5].[F:17]', ()),
-    ]
 
     #Convert SMARTS strings into RDKit reactions
     reactions = [(AllChem.ReactionFromSmarts(smarts), reactants) for smarts, reactants in reaction_templates]
