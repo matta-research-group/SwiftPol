@@ -84,6 +84,10 @@ to open a jupyter notebook run
 docker run --rm -it -p 8888:8888 setup/swiftpol:latest
 ```
 
+### Reporting Issues and Seeking Support
+
+If you encounter issues or erroneous behaviour when using SwiftPol, or would like support with using the software tools please [raise an issue](https://github.com/matta-research-group/SwiftPol/issues).
+
 
 
 ### OpenEye License Guidance
