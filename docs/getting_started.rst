@@ -4,28 +4,13 @@ Getting Started with Swiftpol
 Welcome to the Swiftpol documentation! This guide will help you get started with using Swiftpol for polymer molecular dynamics simulations.
 
 
-About SwiftPol
---------------
 
-A polymer sample contains a natural degree of variation in its structure and non-uniformity between its chains, which is often disregarded in MD systems.
-
-SwiftPol uses a statistical approach to build polydisperse polymer systems, allowing for a more realistic representation of polymer systems in MD.
-
-SwiftPol.build.polymer_system takes as an input: 
-
-- The simplified molecular-input line-entry system (SMILES) string of all co-monomers.
-
-- Values of the target average properties of the ensemble: monomer % composition (for copolymers), length, number of chains, blockiness (for blocky copolymers), terminals, residual monomer. 
-
-- Reaction SMARTS which describes the polymerization reaction associated with their polymer chemistry.
-
-...and build a polydisperse chain ensemble.
 
 
 Installation
 ------------
 
-To install Swiftpol, you can use `conda`. Run the following commands in your terminal:
+To install Swiftpol dependencies, you can use `conda`. Run the following commands in your terminal:
 
 .. code-block:: bash
 
@@ -42,6 +27,21 @@ Swiftpol is in development. To install an editable version, clone the repository
     cd swiftpol
     pip install -e .
 
+Installing With a Docker Container
+----------------------------------
+
+To install SwiftPol as a docker container, install `docker desktop <https://docs.docker.com/desktop/>`_ and run the following command in the terminal
+
+.. code-block:: bash
+    docker build --no-cache --platform=linux/amd64 -f Dockerfile -t my-image -t setup/swiftpol:latest .
+
+
+to open a jupyter notebook run
+
+.. code-block:: bash
+    docker run --rm -it -p 8888:8888 setup/swiftpol:latest
+
+
 Basic Usage
 -----------
 
@@ -56,7 +56,7 @@ To submit your feature to be incorporated to the main branch, you should submit 
 Support
 -------
 
-If you encounter any issues or have any questions, please open an issue on our `GitHub repository <https://github.com/matta-research-group/SwiftPol/issues>`_.
+If you encounter any issues or have any questions regarding the use of SwiftPol, please open an issue on our `GitHub repository <https://github.com/matta-research-group/SwiftPol/issues>`_.
 
 License
 -------
