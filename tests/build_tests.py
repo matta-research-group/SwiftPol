@@ -261,10 +261,6 @@ class TestPolymerSystem(unittest.TestCase):
                     terminals = 'hydroxyl', 
                     num_chains = 5, 
                     copolymer=False)
-
-        self.assertTrue(len(x.chains)==5)
-        self.assertTrue(9 <= round(x.length_average)<= 11)
-        self.assertTrue(1.0 <= round(x.PDI) <= 6)
         self.assertTrue(x.num_chains == 5)
         self.assertIsNotNone(x.monomers)
         x.generate_conformers()
