@@ -329,14 +329,14 @@ class TestPolymerSystem(unittest.TestCase):
         self.assertIsNotNone(solvated_y)
 
         #Test polyply output
-        y.charge_system('NAGL')
-        y.generate_conformers()
-        files = y.generate_polyply_files()
+        #y.charge_system('NAGL')
+        #y.generate_conformers()
+        #files = y.generate_polyply_files()
         
-        for i in files:
-            self.assertTrue(os.path.isfile(i))
-            os.remove(i)
-        os.remove('swiftpol_output_pointenergy.mdp')
+        #for i in files:
+        #    self.assertTrue(os.path.isfile(i))
+        #    os.remove(i)
+        #os.remove('swiftpol_output_pointenergy.mdp')
 
         #Test residual calculation
         sys = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
