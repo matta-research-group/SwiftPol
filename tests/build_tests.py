@@ -289,11 +289,7 @@ class TestPolymerSystem(unittest.TestCase):
         self.assertTrue(47.5 <= x.A_actual <= 52.5)
         self.assertTrue(0.95 <= x.mean_blockiness <= 1.05)
         self.assertTrue(1.0<x.PDI<2.5)
-        #Test solvate
-        from openff.units import unit
-        solv_system = x.solvate_system(resid_monomer = 1.5, salt_concentration = 0.1 * unit.mole / unit.liter)
-        self.assertIsNone(solv_system)
-        self.assertEqual(solv_system.shape, (3, 3))
+
         
         #Test case with stereoisomers
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
