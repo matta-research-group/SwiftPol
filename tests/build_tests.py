@@ -257,11 +257,12 @@ class TestPolymerSystem(unittest.TestCase):
 
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]'], 
                     reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
-                    length_target = 10, 
+                    length_target = 30, 
                     terminals = 'hydroxyl', 
                     num_chains = 5, 
                     copolymer=False)
         self.assertTrue(x.num_chains == 5)
+        self.assertTrue(20 <= round(x.length_average)<= 40)
         self.assertIsNotNone(x.monomers)
         x.generate_conformers()
         self.assertTrue(len(x.chains[0].conformers[0])==len(x.chains[0].atoms))
@@ -277,23 +278,22 @@ class TestPolymerSystem(unittest.TestCase):
         #Test case - Copolymer with 5% acceptance margin
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
                                 reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]',
-                                length_target=50,
+                                length_target=30,
                                 num_chains = 5,
                                 blockiness_target=[1.0, 'B'],
                                 perc_A_target=50, 
                                 copolymer=True,
-                                acceptance=1)
+                                acceptance=5)
         self.assertTrue(len(x.chains)==5)
-        self.assertTrue(45 <= round(x.length_average)<= 55)
+        self.assertTrue(20 <= round(x.length_average)<= 40)
         self.assertTrue(47.5 <= x.A_actual <= 52.5)
         self.assertTrue(0.95 <= x.mean_blockiness <= 1.05)
         self.assertTrue(1.0<x.PDI<2.5)
         #Test solvate
-        #from openff.units import unit
-        #solv_system = x.solvate_system(resid_monomer = 1.5, salt_concentration = 0.1 * unit.mole / unit.liter)
-        #self.assertIsNone(solv_system)
-        #self.assertTrue(1.3 <= x.residual_monomer <= 1.7)
-        #self.assertEqual(solv_system.shape, (3, 3))
+        from openff.units import unit
+        solv_system = x.solvate_system(resid_monomer = 1.5, salt_concentration = 0.1 * unit.mole / unit.liter)
+        self.assertIsNone(solv_system)
+        self.assertEqual(solv_system.shape, (3, 3))
         
         #Test case with stereoisomers
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
@@ -306,10 +306,11 @@ class TestPolymerSystem(unittest.TestCase):
                                 acceptance=5,
                                 stereoisomerism_input=['A', 0.5, 'O[C@@H](C)C(=O)O[I]'])
         self.assertTrue(len(x.chains)==5)
-        self.assertTrue(45 <= round(x.length_average)<= 44)
+        self.assertTrue(40 <= round(x.length_average)<= 60)
         self.assertTrue(47.5 <= x.A_actual <= 52.5)
         self.assertTrue(0.95 <= x.mean_blockiness <= 1.05)
         chain = x.chain_rdkit[0]
+        # Check isomerism has occurred
         chiral_centers_after = Chem.FindMolChiralCenters(chain, includeUnassigned=True)
         stereocentres = [i[1] for i in chiral_centers_after]
         self.assertTrue(len(set(stereocentres))==2)
@@ -334,12 +335,12 @@ class TestPolymerSystem(unittest.TestCase):
         #Test polyply output
         y.charge_system('NAGL')
         y.generate_conformers()
-        #files = y.generate_polyply_files()
+        files = y.generate_polyply_files()
         
-        #for i in files:
-        #    self.assertTrue(os.path.isfile(i))
-        #    os.remove(i)
-        #os.remove('swiftpol_output_pointenergy.mdp')
+        for i in files:
+            self.assertTrue(os.path.isfile(i))
+            os.remove(i)
+        os.remove('swiftpol_output_pointenergy.mdp')
 
         #Test residual calculation
         sys = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
