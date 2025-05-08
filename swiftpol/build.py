@@ -644,7 +644,9 @@ class polymer_system:
         #First round of building - copolymer
         if copolymer==True:
             for n in range(num_chains):
-                length_actual = np.random.normal(length_target, 0.5)
+                sigma = np.sqrt(np.log(1.5*(1+acceptance/100)))
+                mu = np.log(length_target) - 0.5 * sigma**2
+                length_actual = np.random.lognormal(mu, sigma)    
                 sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                 blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
                 if spec(sequence)==True:
@@ -665,7 +667,9 @@ class polymer_system:
                     out_of_spec +=1
                 #Second round of building
                 while out_of_spec >0:
-                    length_actual = np.random.normal(length_target, 0.5)
+                    sigma = np.sqrt(np.log(1.5*(1+acceptance/100)))
+                    mu = np.log(length_target) - 0.5 * sigma**2
+                    length_actual = np.random.lognormal(mu, sigma)  
                     sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                     blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
                     if spec(sequence)==True:
@@ -692,7 +696,9 @@ class polymer_system:
                 self.A_actual = mean(perc_A_actual)
         else:
             for n in range(num_chains):
-                length_actual = np.random.normal(length_target, 0.5)
+                sigma = np.sqrt(np.log(1.5*(1+acceptance/100)))
+                mu = np.log(length_target) - 0.5 * sigma**2
+                length_actual = np.random.lognormal(mu, sigma)  
                 sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                 if stereoisomerism_input is not None:
                     sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence) 
