@@ -263,7 +263,7 @@ class TestPolymerSystem(unittest.TestCase):
                     copolymer=False)
 
         self.assertTrue(len(x.chains)==5)
-        self.assertTrue(9 <= round(x.max_length)<= 11)
+        self.assertTrue(9 <= round(x.length_average)<= 11)
         self.assertTrue(1.0 <= round(x.PDI) <= 6)
         self.assertTrue(x.num_chains == 5)
         self.assertIsNotNone(x.monomers)
@@ -286,9 +286,9 @@ class TestPolymerSystem(unittest.TestCase):
                                 blockiness_target=[1.0, 'B'],
                                 perc_A_target=50, 
                                 copolymer=True,
-                                acceptance=5)
+                                acceptance=1)
         self.assertTrue(len(x.chains)==5)
-        self.assertTrue(45 <= round(x.max_length)<= 55)
+        self.assertTrue(45 <= round(x.length_average)<= 55)
         self.assertTrue(47.5 <= x.A_actual <= 52.5)
         self.assertTrue(0.95 <= x.mean_blockiness <= 1.05)
         self.assertTrue(1.0<x.PDI<2.5)
@@ -310,7 +310,7 @@ class TestPolymerSystem(unittest.TestCase):
                                 acceptance=5,
                                 stereoisomerism_input=['A', 0.5, 'O[C@@H](C)C(=O)O[I]'])
         self.assertTrue(len(x.chains)==5)
-        self.assertTrue(9 <= round(x.max_length)<= 11)
+        self.assertTrue(9 <= round(x.length_average)<= 11)
         self.assertTrue(47.5 <= x.A_actual <= 52.5)
         self.assertTrue(0.95 <= x.mean_blockiness <= 1.05)
         chain = x.chain_rdkit[0]
