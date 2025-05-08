@@ -302,7 +302,7 @@ class TestPolymerSystem(unittest.TestCase):
         #Test case with stereoisomers
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
                                 reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]',
-                                length_target=10,
+                                length_target=50,
                                 num_chains = 5,
                                 blockiness_target=[1.0, 'A'],
                                 perc_A_target=50, 
@@ -310,7 +310,7 @@ class TestPolymerSystem(unittest.TestCase):
                                 acceptance=5,
                                 stereoisomerism_input=['A', 0.5, 'O[C@@H](C)C(=O)O[I]'])
         self.assertTrue(len(x.chains)==5)
-        self.assertTrue(9 <= round(x.length_average)<= 11)
+        self.assertTrue(45 <= round(x.length_average)<= 44)
         self.assertTrue(47.5 <= x.A_actual <= 52.5)
         self.assertTrue(0.95 <= x.mean_blockiness <= 1.05)
         chain = x.chain_rdkit[0]
