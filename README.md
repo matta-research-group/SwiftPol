@@ -1,5 +1,6 @@
 ![title](Repo/logo.jpg)
 
+[![status](https://joss.theoj.org/papers/8ddec851cf6ac8c0ae55ed4024b75b79/status.svg)](https://joss.theoj.org/papers/8ddec851cf6ac8c0ae55ed4024b75b79)
 [![Zenodo](https://zenodo.org/badge/798303954.svg)](https://doi.org/10.5281/zenodo.15111991)
 [![PyTest](https://github.com/matta-research-group/SwiftPol/actions/workflows/SwiftPol_tests.yml/badge.svg)](https://github.com/matta-research-group/SwiftPol/actions/workflows/SwiftPol_tests.yml)
 [![Documentation](https://img.shields.io/badge/Documentation-Online-brightgreen)](https://matta-research-group.github.io/SwiftPol)
