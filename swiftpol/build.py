@@ -925,7 +925,7 @@ class polymer_system:
             interchange = Interchange.from_smirnoff(
                 topology=topology,
                 force_field=ForceField("openff-2.2.0.offxml"),
-                charge_from_molecules=[i for i in self.chains],
+                charge_from_molecules=list(set([i for i in self.chains])),
                 box=box_vectors
             )
         interchange.to_gromacs('swiftpol_output')
