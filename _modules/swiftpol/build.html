@@ -1036,7 +1036,7 @@
             <span class="n">interchange</span> <span class="o">=</span> <span class="n">Interchange</span><span class="o">.</span><span class="n">from_smirnoff</span><span class="p">(</span>
                 <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
                 <span class="n">force_field</span><span class="o">=</span><span class="n">ForceField</span><span class="p">(</span><span class="s2">&quot;openff-2.2.0.offxml&quot;</span><span class="p">),</span>
-                <span class="n">charge_from_molecules</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">],</span>
+                <span class="n">charge_from_molecules</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">])),</span>
                 <span class="n">box</span><span class="o">=</span><span class="n">box_vectors</span>
             <span class="p">)</span>
         <span class="n">interchange</span><span class="o">.</span><span class="n">to_gromacs</span><span class="p">(</span><span class="s1">&#39;swiftpol_output&#39;</span><span class="p">)</span>
