@@ -37,7 +37,7 @@ Open-source software packages designed to build *in silico* polymer chains are f
 Packages that have the capability to build multi-chain systems such as Polyply [@grunewald_polyply_2022], RadonPy [@hayashi_radonpy_2022], and Polymer Structure Predictor [@sahu_polymer_2022], do not contain in-built functions to incorporate molecular weight diversity, and put the onus on the user to generate an ensemble of polydisperse chain sequences prior to using their chain building functions. Polymatic [@abbott_polymatic_2013], an algorithm to simulate polymerization, can theoretically create polydisperse systems through its random bond formation scheme, but does not have to ability to simultaneously control other key attributes of polymers such as blockiness and monomer ratio. The python tool Hoobas [@girard_hoobas_2019] builds polydisperse systems of randomized polymer chains for coarse-grained models. However, there is not currently a software package available that contains in-built functions to integrate multiple smaller-scale characteristics (monomer ratio, blockiness, degree of polymerization, chain terminal) into \textbf{atomistic} computational polymer models, whilst effectively capturing the heterogeneity and polydispersity of real-life samples. The development of SwiftPol was driven by the need to fill this gap in multi-scale building functionality of existing polymer building packages, to enable the simulation of realistic polymer models whilst allowing close user control of multiple system characteristics.
 
 
-SwiftPol uses open-source Python libraries RDkit [@landrum_rdkitrdkit_2024], OpenFF-interchange [@thompson_openff_2024], and OpenFF-toolkit [@wagner_openforcefieldopenff-toolkit_2024] to promote reproducibility and portability.  We have ensured that SwiftPol objects can be seamlessly integrated into existing open-source software built for parameterization and simulation, to allow the user to select their preferred force field, topology format, and engine. RDkit, OpenFF-interchange and OpenFF-toolkit enable the export of SwiftPol polymer ensembles directly to simulation engines, and to a range of MD-compatible file formats, including .pdb, .top, .prmtop, and .json.
+SwiftPol uses open-source Python libraries RDKit [@landrum_rdkitrdkit_2024], OpenFF-interchange [@thompson_openff_2024], and OpenFF-toolkit [@wagner_openforcefieldopenff-toolkit_2024] to promote reproducibility and portability.  We have ensured that SwiftPol objects can be seamlessly integrated into existing open-source software built for parameterization and simulation, to allow the user to select their preferred force field, topology format, and engine. RDKit, OpenFF-interchange and OpenFF-toolkit enable the export of SwiftPol polymer ensembles directly to simulation engines, and to a range of MD-compatible file formats, including .pdb, .top, .prmtop, and .json.
 
 Here, we will detail the development of SwiftPol - a user-guided Python tool for building representative polymer ensembles, and subsequent studies to show its relevance and performance. 
 
@@ -56,7 +56,7 @@ If all tests are passed, the chain is appended to the Python polymer ensemble bu
 
 This approach allows for the generation of a polydisperse chain ensemble, meaning each chain displays different properties but the ensemble matches the target properties and distribution, as is observed in experimental polymer samples. 
 
-SwiftPol also contains functions to generate conformers using RDkit [@landrum_rdkitrdkit_2024] or OpenEye Omega(license-dependent, academic license provided by OpenEye, Cadence Molecular Sciences)[@hawkins_conformer_2010;@openeye_cadence_molecular_sciences_omega_2025], and assign force field parameters to the polydisperse ensembles using the openff-interchange infrastructure. The user can export the chain ensemble to existing tools such as packmol [@martinez_packmol_2009] and PolyPly [@grunewald_polyply_2022] to generate initial positions for molecular dynamics, the latter of which is particularly well-suited for building amorphous configurations for amorphous multi-component systems.
+SwiftPol also contains functions to generate conformers using RDKit [@landrum_rdkitrdkit_2024] or OpenEye Omega(license-dependent, academic license provided by OpenEye, Cadence Molecular Sciences)[@hawkins_conformer_2010;@openeye_cadence_molecular_sciences_omega_2025], and assign force field parameters to the polydisperse ensembles using the openff-interchange infrastructure. The user can export the chain ensemble to existing tools such as packmol [@martinez_packmol_2009] and PolyPly [@grunewald_polyply_2022] to generate initial positions for molecular dynamics, the latter of which is particularly well-suited for building amorphous configurations for amorphous multi-component systems.
 
 # Application: building a poly(lactide-co-glycolide) ensemble
 
@@ -113,8 +113,8 @@ BUILD TIME (S)  & 1.4 \\
 \end{table}
 \end{flushleft}
 
-# Speed Benchmarking
-We determined whether SwiftPol can build polymer ensembles and chains with sizes that are relevant to the system scales of interest by performing a stress test. \autoref{Figure 2} shows measurements of the time benchmarking results, illustrating that SwiftPol can build large-scale systems in a realistic time frame.
+# Performance Benchmarking
+We determined whether SwiftPol can build polymer ensembles and chains with sizes that are relevant to the system scales of interest by performing a stress test. \autoref{Figure 2} shows measurements of the performance benchmarking results, illustrating that SwiftPol can build large-scale systems in a realistic time frame.
 
 
 ![A) Time, t, taken to build systems with a single-chain, ranging from a 10-mer to a 1000-mer. B) Time, t, taken to 50-mer chain build systems ranging from 10 chains to 250 chains.\label{Figure 2}](Fig_2_Swiftpol.png) 
@@ -166,7 +166,7 @@ n_{chains} = \mbox{total number of chains built}
 
 To use SwiftPol please download the following packages:
 
-- RDkit
+- RDKit
 
 - openff-interchange
 
