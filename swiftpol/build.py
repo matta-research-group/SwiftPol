@@ -1065,7 +1065,7 @@ class polymer_system:
 
         elif 'A' in sequence and 'B' not in sequence:
             for i in range(1000):
-                oligo_seq = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(self.length_target * 0.1)), p=[1,0]))
+                oligo_seq = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(self.length_target * 0.1)), p=[self.A_target/100,1-(self.A_target/100)]))
                 monomer_list = [mono+'[I]' for mono in self.monomers]
                 oligomer_rd = build.build_polymer(oligo_seq, 
                             monomer_list=monomer_list, 
@@ -1094,6 +1094,7 @@ class polymer_system:
             number_of_copies = [A_to_add, B_to_add] + [1 for c in range(len(oligomers))]
     
         return molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual
+    
 
 class polymer_system_from_PDI:
     """
