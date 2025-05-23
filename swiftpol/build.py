@@ -719,6 +719,7 @@ class polymer_system:
                 chain = Molecule.from_rdkit(pol)
                 chains.append(chain)
                 perc_A_actual.append((sequence.count('A')/len(sequence))*100)
+            self.A_target = perc_A_target
             self.B_block_length = None
             self.A_block_length = None
             self.blockiness_list = None
@@ -1039,13 +1040,11 @@ class polymer_system:
                 monomer_list = [mono+'[I]' for mono in self.monomers]
                 oligomer_rd = build.build_polymer(oligo_seq, 
                             monomer_list=monomer_list, 
-                            reaction=AllChem.ReactionFromSmarts(self.reaction))
+                            reaction=AllChem.ReactionFromSmarts(self.reaction),
+                            chain_num=len(self.chains)+1+i)
                 oligomer_rd = Chem.AddHs(oligomer_rd)
-                info = Chem.AtomPDBResidueInfo()
-                info.SetResidueName('O' + str(i+1))
-                info.SetResidueNumber(1)
-                [atom.SetMonomerInfo(info)  for  atom  in  oligomer_rd.GetAtoms()]
                 oligomer = Molecule.from_rdkit(oligomer_rd)
+                oligomer.name = 'oligo' + str(len(self.chains)+1+i)
                 oligo_mass = 0
                 oligomers_new = oligomers + [oligomer]
                 for i in oligomers_new:
@@ -1066,18 +1065,15 @@ class polymer_system:
 
         elif 'A' in sequence and 'B' not in sequence:
             for i in range(1000):
-                oligo_seq = reduce(lambda x, y: x + y, np.random.choice(['A'], size=(int(self.length_target * 0.1)), p=[self.A_target/100,1-(self.A_target/100)]))
+                oligo_seq = int(50 * 0.1) * 'A'
                 monomer_list = [mono+'[I]' for mono in self.monomers]
                 oligomer_rd = build.build_polymer(oligo_seq, 
                             monomer_list=monomer_list, 
-                            reaction=AllChem.ReactionFromSmarts(self.reaction))
+                            reaction=AllChem.ReactionFromSmarts(self.reaction),
+                            chain_num=len(self.chains)+1+i)
                 oligomer_rd = Chem.AddHs(oligomer_rd)
-                info = Chem.AtomPDBResidueInfo()
-                info.SetResidueName('O' + str(i+1))
-                info.SetResidueNumber(1)
-                [atom.SetMonomerInfo(info)  for  atom  in  oligomer_rd.GetAtoms()]
                 oligomer = Molecule.from_rdkit(oligomer_rd)
-                oligomer.name = 'oligo' + str(i+1)
+                oligomer.name = 'oligo' + str(len(self.chains)+1+i)
                 oligo_mass = 0
                 oligomers_new = oligomers + [oligomer]
                 for i in oligomers_new:
@@ -1086,8 +1082,9 @@ class polymer_system:
                     oligomers.append(oligomer)
                 else:
                     break
+            B_to_add = 0
 
-            monomer_mass = (A_to_add * A_mass.magnitude) + (B_to_add * B_mass.magnitude)
+            monomer_mass = (A_to_add * A_mass.magnitude) + (B_to_add * 0)
             oligomer_mass = 0 * unit.dalton
             for i in oligomers:
                 oligomer_mass += sum(atom.mass for atom in i.atoms)
@@ -1098,6 +1095,7 @@ class polymer_system:
             number_of_copies = [A_to_add, B_to_add] + [1 for c in range(len(oligomers))]
     
         return molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual
+    
 
 class polymer_system_from_PDI:
     """
@@ -1500,6 +1498,7 @@ class polymer_system_from_PDI:
         for i in molecules:
             string_i = str(molecules.index(i)) + '.pdb'
             mol_pdb_files_dest.append(string_i)
+            i.generate_unique_atom_names()
             i.generate_conformers(n_conformers=1)
             i.to_file(string_i, file_format='pdb')
         self.residual_monomer_actual = residual_monomer_actual
