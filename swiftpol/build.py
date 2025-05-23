@@ -719,6 +719,7 @@ class polymer_system:
                 chain = Molecule.from_rdkit(pol)
                 chains.append(chain)
                 perc_A_actual.append((sequence.count('A')/len(sequence))*100)
+            self.A_target = perc_A_target
             self.B_block_length = None
             self.A_block_length = None
             self.blockiness_list = None
