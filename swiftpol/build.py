@@ -1039,13 +1039,11 @@ class polymer_system:
                 monomer_list = [mono+'[I]' for mono in self.monomers]
                 oligomer_rd = build.build_polymer(oligo_seq, 
                             monomer_list=monomer_list, 
-                            reaction=AllChem.ReactionFromSmarts(self.reaction))
+                            reaction=AllChem.ReactionFromSmarts(self.reaction),
+                            chain_num=len(self.chains)+1+i)
                 oligomer_rd = Chem.AddHs(oligomer_rd)
-                info = Chem.AtomPDBResidueInfo()
-                info.SetResidueName('O' + str(i+1))
-                info.SetResidueNumber(1)
-                [atom.SetMonomerInfo(info)  for  atom  in  oligomer_rd.GetAtoms()]
                 oligomer = Molecule.from_rdkit(oligomer_rd)
+                oligomer.name = 'oligo' + str(len(self.chains)+1+i)
                 oligo_mass = 0
                 oligomers_new = oligomers + [oligomer]
                 for i in oligomers_new:
@@ -1070,14 +1068,11 @@ class polymer_system:
                 monomer_list = [mono+'[I]' for mono in self.monomers]
                 oligomer_rd = build.build_polymer(oligo_seq, 
                             monomer_list=monomer_list, 
-                            reaction=AllChem.ReactionFromSmarts(self.reaction))
+                            reaction=AllChem.ReactionFromSmarts(self.reaction),
+                            chain_num=len(self.chains)+1+i)
                 oligomer_rd = Chem.AddHs(oligomer_rd)
-                info = Chem.AtomPDBResidueInfo()
-                info.SetResidueName('O' + str(i+1))
-                info.SetResidueNumber(1)
-                [atom.SetMonomerInfo(info)  for  atom  in  oligomer_rd.GetAtoms()]
                 oligomer = Molecule.from_rdkit(oligomer_rd)
-                oligomer.name = 'oligo' + str(i+1)
+                oligomer.name = 'oligo' + str(len(self.chains)+1+i)
                 oligo_mass = 0
                 oligomers_new = oligomers + [oligomer]
                 for i in oligomers_new:
@@ -1500,6 +1495,7 @@ class polymer_system_from_PDI:
         for i in molecules:
             string_i = str(molecules.index(i)) + '.pdb'
             mol_pdb_files_dest.append(string_i)
+            i.generate_unique_atom_names()
             i.generate_conformers(n_conformers=1)
             i.to_file(string_i, file_format='pdb')
         self.residual_monomer_actual = residual_monomer_actual
