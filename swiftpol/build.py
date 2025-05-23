@@ -1065,7 +1065,7 @@ class polymer_system:
 
         elif 'A' in sequence and 'B' not in sequence:
             for i in range(1000):
-                oligo_seq = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(self.length_target * 0.1)), p=[self.A_target/100,1-(self.A_target/100)]))
+                oligo_seq = int(50 * 0.1) * 'A'
                 monomer_list = [mono+'[I]' for mono in self.monomers]
                 oligomer_rd = build.build_polymer(oligo_seq, 
                             monomer_list=monomer_list, 
