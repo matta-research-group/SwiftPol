@@ -2,3 +2,10 @@ swiftpol/__pycache__/build.cpython-311.pyc
 swiftpol/__pycache__/parameterize.cpython-311.pyc
 Example_Notebooks/.ipynb_checkpoints
 Example_Notebooks/oe_license.txt
+Example_Notebooks/.model.pt
+.model.pt
+.vscode
+swiftpol/__pycache__/
+swiftpol/.ipynb_checkpoints
+swiftpol/oe_license.txt
+.DS_Store
