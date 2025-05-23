@@ -1082,8 +1082,9 @@ class polymer_system:
                     oligomers.append(oligomer)
                 else:
                     break
+            B_to_add = 0
 
-            monomer_mass = (A_to_add * A_mass.magnitude) + (B_to_add * B_mass.magnitude)
+            monomer_mass = (A_to_add * A_mass.magnitude) + (B_to_add * 0)
             oligomer_mass = 0 * unit.dalton
             for i in oligomers:
                 oligomer_mass += sum(atom.mass for atom in i.atoms)
