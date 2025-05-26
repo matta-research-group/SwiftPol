@@ -16,6 +16,7 @@ try:
 except:
     import warnings
     warnings.warn("OpenEye is not installed. You will not be able to use OpenEye Toolkits for conformer generation.")
+    oechem_imported = False
 
 import openmm
 from openff.toolkit.topology import Molecule, Topology
