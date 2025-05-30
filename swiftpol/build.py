@@ -326,7 +326,7 @@ def blockiness_gen(sequence, wrt='A'):
     else:
         raise ValueError("wrt parameter must be 'A' or 'B'")
 
-def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.0, residual_monomer = 0.00):
+def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.0 * unit.mole / unit.liter, residual_monomer = 0.00, solvated=False):
     """
     Calculates the components required to construct a simulation box for a given set of molecular chains.
     
@@ -340,10 +340,11 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     sequence : str
         A string representing the sequence of the molecular chains. 'G' and 'L' represent different types of monomers.
     salt_concentration : float, optional
-        The desired NaCl concentration in the simulation box in moles/liter.
+        The desired salt concentration in the simulation box. Defaults to 0 M.
     residual_monomer : float, optional
         The desired residual monomer concentration in the simulation box. Defaults to 0.00%.
-
+    solvated : bool, optional
+        Indicates whether the system contains water. Defaults to False.
     
     Returns:
     --------
@@ -368,7 +369,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     water = Molecule.from_smiles('O')
     water.generate_unique_atom_names()
     water.generate_conformers()
-    water_mass = 18.015324000000003
+    water_mass = sum([atom.mass for atom in water.atoms])
     
     #Sodium
     na = Molecule.from_smiles('[Na+]')
@@ -380,37 +381,36 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     cl.generate_unique_atom_names()
     cl.generate_conformers()
     
-    nacl_mass = 22.989769282 + 35.4532
+    nacl_mass = sum([atom.mass for atom in na.atoms]) + sum(
+    [atom.mass for atom in cl.atoms],)
     # Create a topology from the chains
     topology = Topology.from_molecules(chains)
     nacl_conc=salt_concentration
-    padding= 1.0
+    padding= 1.0 * unit.nanometer
     box_shape= UNIT_CUBE
-    target_density= 1.0
+    target_density= 1.0 * unit.gram / unit.milliliter
 
     
     # Compute box vectors from the solute length and requested padding
     if chains[0].n_conformers == 0:
         raise ValueError("The solvate_topology function requires that the solute has at least one conformer.")
     solute_length = max(_max_dist_between_points(chains[i].to_topology().get_positions()) for i in range(len(chains)))
-    image_distance = solute_length.magnitude + padding * 2
+    image_distance = solute_length + padding * 2
     box_vectors = box_shape * image_distance
     
     # Compute target masses of solvent
-    box_volume = np.linalg.det(box_vectors) **3
-    print('box_volume', box_volume)
+    box_volume = np.linalg.det(box_vectors.m) * box_vectors.u**3
     target_mass = box_volume * target_density
-    print('target_mass', target_mass)
-    solvent_mass = target_mass - sum(sum([atom.mass for atom in molecule.atoms]) for molecule in topology.molecules).magnitude
-    print('solvent_mass', solvent_mass)
+    solvent_mass = target_mass - sum(sum([atom.mass for atom in molecule.atoms]) for molecule in topology.molecules)
+    
     # Compute the number of NaCl to add from the mass and concentration
-    nacl_mass_fraction = (nacl_conc * nacl_mass) / (55.5  * water_mass)
-    print('nacl_mass_fraction',nacl_mass_fraction)
-    nacl_to_add = round((solvent_mass * nacl_mass_fraction) / nacl_mass)
-    water_to_add = int(round((solvent_mass - nacl_mass) / water_mass))
-    if water_to_add < 1:
-        warnings.warn('Water to add is less than 1, which may lead to a a packmol failure. Please check the input parameters.')
-    print('water_to_add', water_to_add)
+    nacl_mass_fraction = (nacl_conc * nacl_mass) / (55.5 * unit.mole / unit.liter * water_mass)
+    nacl_to_add = ((solvent_mass * nacl_mass_fraction) / nacl_mass).m_as(unit.dimensionless).round()
+    if solvated:
+        water_to_add = int(round((solvent_mass - nacl_mass) / water_mass).m_as(unit.dimensionless).round())
+    else:
+        water_to_add = 0
+    
     # Neutralise the system by adding and removing salt
     solute_charge = sum([molecule.total_charge for molecule in topology.molecules])
     na_to_add = int(round(np.ceil(nacl_to_add - solute_charge.m / 2.0)))
@@ -476,7 +476,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
         residual_monomer_actual = ((A_to_add * A_mass.magnitude) / rolling_mass.magnitude) * 100
         molecules = [water, na, cl, A, B]
         number_of_copies=[water_to_add, na_to_add, cl_to_add, A_to_add, B_to_add]
-    return molecules, number_of_copies, topology, box_vectors*unit.nanometer, residual_monomer_actual
+    return molecules, number_of_copies, topology, box_vectors, residual_monomer_actual
 
 def introduce_stereoisomers(stereo_monomer, instance, seq):
     """
