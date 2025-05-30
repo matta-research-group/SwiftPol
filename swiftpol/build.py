@@ -476,7 +476,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
         residual_monomer_actual = ((A_to_add * A_mass.magnitude) / rolling_mass.magnitude) * 100
         molecules = [water, na, cl, A, B]
         number_of_copies=[water_to_add, na_to_add, cl_to_add, A_to_add, B_to_add]
-    return molecules, number_of_copies, topology, box_vectors, residual_monomer_actual
+    return molecules, number_of_copies, topology, box_vectors*unit.nanometer, residual_monomer_actual
 
 def introduce_stereoisomers(stereo_monomer, instance, seq):
     """
