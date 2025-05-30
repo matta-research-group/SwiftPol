@@ -241,7 +241,7 @@ class TestCalculateBoxComponents(unittest.TestCase):
         self.assertTrue(isinstance(molecules, list))
         self.assertEqual(len(molecules), 5)
         self.assertEqual(len(number_of_copies), 5)
-        self.assertEqual(number_of_copies[0], 0)
+        self.assertTrue(number_of_copies[0]>1)
         # Check if the returned number_of_copies is an integer
         self.assertTrue(isinstance(number_of_copies, list))
         # Check if the returned topology is a Topology object

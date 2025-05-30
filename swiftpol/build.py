@@ -384,7 +384,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     # Create a topology from the chains
     topology = Topology.from_molecules(chains)
     nacl_conc=salt_concentration
-    padding= 2 
+    padding= 1.0
     box_shape= UNIT_CUBE
     target_density= 1.0
 
@@ -410,7 +410,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     water_to_add = int(round((solvent_mass - nacl_mass) / water_mass))
     if water_to_add < 1:
         warnings.warn('Water to add is less than 1, which may lead to a a packmol failure. Please check the input parameters.')
-    
+    print('water_to_add', water_to_add)
     # Neutralise the system by adding and removing salt
     solute_charge = sum([molecule.total_charge for molecule in topology.molecules])
     na_to_add = int(round(np.ceil(nacl_to_add - solute_charge.m / 2.0)))
