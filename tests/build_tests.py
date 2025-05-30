@@ -216,7 +216,7 @@ class TestCalculateBoxComponents(unittest.TestCase):
         # Check if the returned molecules is a list
         self.assertTrue(isinstance(molecules, list))
         self.assertEqual(len(molecules), 5)
-        prtin(number_of_copies[0])
+        print(number_of_copies[0])
         self.assertTrue(number_of_copies[0]>1)
         # Check if the returned number_of_copies is a list
         self.assertTrue(isinstance(number_of_copies, list))
