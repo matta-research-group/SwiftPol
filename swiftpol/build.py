@@ -822,7 +822,7 @@ class polymer_system:
         df = pd.DataFrame(data)
         df.to_csv(filename, index=False)
 
-    def pack_solvated_system(self, salt_concentration=0.0 * unit.mole / unit.liter, residual_monomer=0.00):
+    def pack_solvated_system(self, salt_concentration=0.0, residual_monomer=0.00):
         """
         Pack a solvated system using Packmol functions, and the OpenFF Packmol wrapper.
     
@@ -901,7 +901,7 @@ class polymer_system:
         from openff.interchange import Interchange
         from openff.toolkit import ForceField
         import warnings
-        box_vectors = calculate_box_components(self.chains, self.monomers, self.sequence, 0.0 * unit.mole / unit.liter, 0.0)[3]
+        box_vectors = calculate_box_components(self.chains, self.monomers, self.sequence, 0.0, 0.0)[3]
         molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual = self.calculate_residuals(residual_monomer, residual_oligomer)
         mol_pdb_files_dest = []
         for i in molecules:
@@ -1410,7 +1410,7 @@ class polymer_system_from_PDI:
         df = pd.DataFrame(data)
         df.to_csv(filename, index=False)
 
-    def pack_solvated_system(self, salt_concentration=0.0 * unit.mole / unit.liter, residual_monomer=0.00):
+    def pack_solvated_system(self, salt_concentration=0.0, residual_monomer=0.00):
         """
         Pack a solvated system using Packmol functions, and the OpenFF Packmol wrapper.
     
@@ -1489,7 +1489,7 @@ class polymer_system_from_PDI:
         from openff.interchange import Interchange
         from openff.toolkit import ForceField
         import warnings
-        box_vectors = calculate_box_components(self.chains, self.monomers, self.sequence, 0.0 * unit.mole / unit.liter, 0.0)[3]
+        box_vectors = calculate_box_components(self.chains, self.monomers, self.sequence, 0.0, 0.0)[3]
         molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual = self.calculate_residuals(residual_monomer, residual_oligomer)
         mol_pdb_files_dest = []
         for i in molecules:
