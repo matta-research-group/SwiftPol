@@ -853,7 +853,7 @@ class polymer_system:
         from swiftpol.build import calculate_box_components
     
         molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = calculate_box_components(
-            self.chains, self.monomers, self.sequence, salt_concentration, residual_monomer, solvated=True
+            self.chains, self.monomers, self.sequence, salt_concentration, residual_monomer
         )
         molecules = [molecules[i] for i in range(len(number_of_copies)) if number_of_copies[i] != 0]
         number_of_copies = [num for num in number_of_copies if num != 0]
@@ -1441,7 +1441,7 @@ class polymer_system_from_PDI:
         from swiftpol.build import calculate_box_components
     
         molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = calculate_box_components(
-            self.chains, self.monomers, self.sequence, salt_concentration, residual_monomer, solvated=True
+            self.chains, self.monomers, self.sequence, salt_concentration, residual_monomer
         )
         molecules = [molecules[i] for i in range(len(number_of_copies)) if number_of_copies[i] != 0]
         number_of_copies = [num for num in number_of_copies if num != 0]

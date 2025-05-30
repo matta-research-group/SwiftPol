@@ -208,15 +208,16 @@ class TestCalculateBoxComponents(unittest.TestCase):
                                                                                                             monomers = x.monomers, 
                                                                                                             sequence = x.sequence, 
                                                                                                             salt_concentration= 0 * unit.mole/unit.litre,
-                                                                                                            residual_monomer = 1.5,
-                                                                                                            solvated=True
+                                                                                                            residual_monomer = 1.5
+                                                                                                            
                                                                                                                 
         )     
 
         # Check if the returned molecules is a list
         self.assertTrue(isinstance(molecules, list))
         self.assertEqual(len(molecules), 5)
-        # Check if the returned number_of_copies is an integer
+        self.assertTrue(number_of_copies[0]>1)
+        # Check if the returned number_of_copies is a list
         self.assertTrue(isinstance(number_of_copies, list))
         # Check if the returned topology is a Topology object
         self.assertTrue(isinstance(topology, Topology))
