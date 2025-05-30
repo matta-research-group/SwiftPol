@@ -872,7 +872,7 @@ class polymer_system:
                             box_vectors = box_vectors,
                             tolerance = 1*unit.angstrom)
 
-    def generate_polyply_files(self, residual_monomer=0.00, residual_oligomer=0.00):
+    def generate_polyply_files(self, residual_monomer=0.00, residual_oligomer=0.00, ):
         """
         Generate input files for Polyply from the system.
 
@@ -903,7 +903,7 @@ class polymer_system:
         from openff.interchange import Interchange
         from openff.toolkit import ForceField
         import warnings
-        box_vectors = calculate_box_components(self.chains, self.monomers, self.sequence, 0.0, 0.0)[3]
+        box_vectors = calculate_box_components(self.chains, self.monomers, self.sequence, salt_concentration = 0.0* unit.mole / unit.liter, residual_monomer = 0.00)[3]
         molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual = self.calculate_residuals(residual_monomer, residual_oligomer)
         mol_pdb_files_dest = []
         for i in molecules:
