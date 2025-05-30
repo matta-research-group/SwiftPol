@@ -326,7 +326,7 @@ def blockiness_gen(sequence, wrt='A'):
     else:
         raise ValueError("wrt parameter must be 'A' or 'B'")
 
-def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.0 * unit.mole / unit.liter, residual_monomer = 0.00, solvated=False):
+def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.0 * unit.mole / unit.liter, residual_monomer = 0.00):
     """
     Calculates the components required to construct a simulation box for a given set of molecular chains.
     
@@ -340,11 +340,10 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     sequence : str
         A string representing the sequence of the molecular chains. 'G' and 'L' represent different types of monomers.
     salt_concentration : float, optional
-        The desired salt concentration in the simulation box. Defaults to 0 M.
+        The desired NaCl concentration in the simulation box. Defaults to 0 M.
     residual_monomer : float, optional
         The desired residual monomer concentration in the simulation box. Defaults to 0.00%.
-    solvated : bool, optional
-        Indicates whether the system contains water. Defaults to False.
+
     
     Returns:
     --------
@@ -406,10 +405,9 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     # Compute the number of NaCl to add from the mass and concentration
     nacl_mass_fraction = (nacl_conc * nacl_mass) / (55.5 * unit.mole / unit.liter * water_mass)
     nacl_to_add = ((solvent_mass * nacl_mass_fraction) / nacl_mass).m_as(unit.dimensionless).round()
-    if solvated:
-        water_to_add = int(round((solvent_mass - nacl_mass) / water_mass).m_as(unit.dimensionless).round())
-    else:
-        water_to_add = 0
+    water_to_add = int(round((solvent_mass - nacl_mass) / water_mass).m_as(unit.dimensionless).round())
+    if water_to_add < 1:
+        warnings.warn('Water to add is less than 1, which may lead to a a packmol failure. Please check the input parameters.')
     
     # Neutralise the system by adding and removing salt
     solute_charge = sum([molecule.total_charge for molecule in topology.molecules])
