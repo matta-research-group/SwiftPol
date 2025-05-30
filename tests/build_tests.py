@@ -207,7 +207,7 @@ class TestCalculateBoxComponents(unittest.TestCase):
         molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = build.calculate_box_components(chains = x.chains, 
                                                                                                             monomers = x.monomers, 
                                                                                                             sequence = x.sequence, 
-                                                                                                            salt_concentration= 0,
+                                                                                                            salt_concentration= 0* unit.mole / unit.liter,
                                                                                                             residual_monomer = 1.5
                                                                                                             
                                                                                                                 
@@ -234,7 +234,7 @@ class TestCalculateBoxComponents(unittest.TestCase):
         molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = build.calculate_box_components(chains = x.chains, 
                                                                                                             monomers = x.monomers, 
                                                                                                             sequence = x.sequence, 
-                                                                                                            salt_concentration= 0,
+                                                                                                            salt_concentration= 0* unit.mole / unit.liter,
                                                                                                             residual_monomer = 0  
         )
         # Check if the returned molecules is a list of 5 objects, and water is not included

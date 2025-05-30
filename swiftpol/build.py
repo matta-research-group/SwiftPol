@@ -326,7 +326,7 @@ def blockiness_gen(sequence, wrt='A'):
     else:
         raise ValueError("wrt parameter must be 'A' or 'B'")
 
-def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.0 * unit.mole / unit.liter, residual_monomer = 0.00, solvated=False):
+def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.0* unit.mole / unit.liter, residual_monomer = 0.00):
     """
     Calculates the components required to construct a simulation box for a given set of molecular chains.
     
@@ -381,11 +381,10 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     cl.generate_unique_atom_names()
     cl.generate_conformers()
     
-    nacl_mass = sum([atom.mass for atom in na.atoms]) + sum(
-    [atom.mass for atom in cl.atoms],)
+    nacl_mass = sum([atom.mass for atom in na.atoms]) + sum([atom.mass for atom in cl.atoms])
     # Create a topology from the chains
     topology = Topology.from_molecules(chains)
-    nacl_conc=salt_concentration
+    nacl_conc=salt_concentration  
     padding= 1.0 * unit.nanometer
     box_shape= UNIT_CUBE
     target_density= 1.0 * unit.gram / unit.milliliter
@@ -406,10 +405,9 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     # Compute the number of NaCl to add from the mass and concentration
     nacl_mass_fraction = (nacl_conc * nacl_mass) / (55.5 * unit.mole / unit.liter * water_mass)
     nacl_to_add = ((solvent_mass * nacl_mass_fraction) / nacl_mass).m_as(unit.dimensionless).round()
-    if solvated:
-        water_to_add = int(round((solvent_mass - nacl_mass) / water_mass).m_as(unit.dimensionless).round())
-    else:
-        water_to_add = 0
+    water_to_add = int(round((solvent_mass) / water_mass).m_as(unit.dimensionless).round())
+
+
     
     # Neutralise the system by adding and removing salt
     solute_charge = sum([molecule.total_charge for molecule in topology.molecules])
