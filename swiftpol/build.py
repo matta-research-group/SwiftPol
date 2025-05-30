@@ -384,7 +384,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     # Create a topology from the chains
     topology = Topology.from_molecules(chains)
     nacl_conc=salt_concentration
-    padding= 0.1 * unit.nanometer
+    padding= 2 
     box_shape= UNIT_CUBE
     target_density= 1.0
 
@@ -393,16 +393,19 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     if chains[0].n_conformers == 0:
         raise ValueError("The solvate_topology function requires that the solute has at least one conformer.")
     solute_length = max(_max_dist_between_points(chains[i].to_topology().get_positions()) for i in range(len(chains)))
-    image_distance = solute_length + padding * 2
+    image_distance = solute_length.magnitude + padding * 2
     box_vectors = box_shape * image_distance
     
     # Compute target masses of solvent
-    box_volume = np.linalg.det(box_vectors.m) * box_vectors.u**3
+    box_volume = np.linalg.det(box_vectors) **3
+    print('box_volume', box_volume)
     target_mass = box_volume * target_density
-    solvent_mass = target_mass.magnitude - sum(sum([atom.mass for atom in molecule.atoms]) for molecule in topology.molecules).magnitude
-    
+    print('target_mass', target_mass)
+    solvent_mass = target_mass - sum(sum([atom.mass for atom in molecule.atoms]) for molecule in topology.molecules).magnitude
+    print('solvent_mass', solvent_mass)
     # Compute the number of NaCl to add from the mass and concentration
     nacl_mass_fraction = (nacl_conc * nacl_mass) / (55.5  * water_mass)
+    print('nacl_mass_fraction',nacl_mass_fraction)
     nacl_to_add = round((solvent_mass * nacl_mass_fraction) / nacl_mass)
     water_to_add = int(round((solvent_mass - nacl_mass) / water_mass))
     if water_to_add < 1:
@@ -863,7 +866,8 @@ class polymer_system:
                             solute=topology,
                             box_vectors=box_vectors,
                             box_shape=UNIT_CUBE,
-                            center_solute = 'BRICK')
+                            center_solute = 'BRICK',
+                            working_directory = '.',)
         else:
             return pack_box(molecules = molecules + self.chains,
                             number_of_copies = number_of_copies+[1 for i in range(len(self.chains))],
