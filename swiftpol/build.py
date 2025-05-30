@@ -368,7 +368,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     water = Molecule.from_smiles('O')
     water.generate_unique_atom_names()
     water.generate_conformers()
-    water_mass = sum([atom.mass for atom in water.atoms])
+    water_mass = sum([atom.mass for atom in water.atoms]).magnitude
     
     #Sodium
     na = Molecule.from_smiles('[Na+]')
@@ -380,8 +380,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     cl.generate_unique_atom_names()
     cl.generate_conformers()
     
-    nacl_mass = sum([atom.mass for atom in na.atoms]) + sum(
-    [atom.mass for atom in cl.atoms],)
+    nacl_mass = sum([atom.mass for atom in na.atoms]) + sum([atom.mass for atom in cl.atoms])
     # Create a topology from the chains
     topology = Topology.from_molecules(chains)
     nacl_conc=salt_concentration
@@ -400,12 +399,12 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     # Compute target masses of solvent
     box_volume = np.linalg.det(box_vectors.m) * box_vectors.u**3
     target_mass = box_volume * target_density
-    solvent_mass = target_mass - sum(sum([atom.mass for atom in molecule.atoms]) for molecule in topology.molecules)
+    solvent_mass = target_mass.magnitude - sum(sum([atom.mass for atom in molecule.atoms]) for molecule in topology.molecules).magnitude
     
     # Compute the number of NaCl to add from the mass and concentration
     nacl_mass_fraction = (nacl_conc * nacl_mass) / (55.5 * unit.mole / unit.liter * water_mass)
     nacl_to_add = ((solvent_mass * nacl_mass_fraction) / nacl_mass).m_as(unit.dimensionless).round()
-    water_to_add = int(round((solvent_mass - nacl_mass) / water_mass).magnitude)
+    water_to_add = int(round((solvent_mass - nacl_mass.magnitude) / water_mass))
     if water_to_add < 1:
         warnings.warn('Water to add is less than 1, which may lead to a a packmol failure. Please check the input parameters.')
     
