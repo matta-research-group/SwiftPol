@@ -405,7 +405,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     # Compute the number of NaCl to add from the mass and concentration
     nacl_mass_fraction = (nacl_conc * nacl_mass) / (55.5 * unit.mole / unit.liter * water_mass)
     nacl_to_add = ((solvent_mass * nacl_mass_fraction) / nacl_mass).m_as(unit.dimensionless).round()
-    water_to_add = int(round((solvent_mass - nacl_mass) / water_mass).m_as(unit.dimensionless).round())
+    water_to_add = int(round((solvent_mass - nacl_mass) / water_mass).magnitude)
     if water_to_add < 1:
         warnings.warn('Water to add is less than 1, which may lead to a a packmol failure. Please check the input parameters.')
     
