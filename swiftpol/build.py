@@ -326,7 +326,7 @@ def blockiness_gen(sequence, wrt='A'):
     else:
         raise ValueError("wrt parameter must be 'A' or 'B'")
 
-def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.0 * unit.mole / unit.liter, residual_monomer = 0.00, solvated=False):
+def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.0* unit.mole / unit.liter, residual_monomer = 0.00):
     """
     Calculates the components required to construct a simulation box for a given set of molecular chains.
     
@@ -381,12 +381,11 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     cl.generate_unique_atom_names()
     cl.generate_conformers()
     
-    nacl_mass = sum([atom.mass for atom in na.atoms]) + sum(
-    [atom.mass for atom in cl.atoms],)
+    nacl_mass = sum([atom.mass for atom in na.atoms]) + sum([atom.mass for atom in cl.atoms])
     # Create a topology from the chains
     topology = Topology.from_molecules(chains)
-    nacl_conc=salt_concentration
-    padding= 0.1 * unit.nanometer
+    nacl_conc=salt_concentration  
+    padding= 1.0 * unit.nanometer
     box_shape= UNIT_CUBE
     target_density= 1.0 * unit.gram / unit.milliliter
 
@@ -406,10 +405,9 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     # Compute the number of NaCl to add from the mass and concentration
     nacl_mass_fraction = (nacl_conc * nacl_mass) / (55.5 * unit.mole / unit.liter * water_mass)
     nacl_to_add = ((solvent_mass * nacl_mass_fraction) / nacl_mass).m_as(unit.dimensionless).round()
-    if solvated:
-        water_to_add = int(round((solvent_mass - nacl_mass) / water_mass).m_as(unit.dimensionless).round())
-    else:
-        water_to_add = 0
+    water_to_add = int(round((solvent_mass) / water_mass).m_as(unit.dimensionless).round())
+
+
     
     # Neutralise the system by adding and removing salt
     solute_charge = sum([molecule.total_charge for molecule in topology.molecules])
@@ -825,7 +823,7 @@ class polymer_system:
         df = pd.DataFrame(data)
         df.to_csv(filename, index=False)
 
-    def pack_solvated_system(self, salt_concentration=0.0 * unit.mole / unit.liter, residual_monomer=0.00):
+    def pack_solvated_system(self, salt_concentration=0.0* unit.mole / unit.liter, residual_monomer=0.00):
         """
         Pack a solvated system using Packmol functions, and the OpenFF Packmol wrapper.
     
@@ -855,7 +853,7 @@ class polymer_system:
         from swiftpol.build import calculate_box_components
     
         molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = calculate_box_components(
-            self.chains, self.monomers, self.sequence, salt_concentration, residual_monomer, solvated=True
+            self.chains, self.monomers, self.sequence, salt_concentration, residual_monomer
         )
         molecules = [molecules[i] for i in range(len(number_of_copies)) if number_of_copies[i] != 0]
         number_of_copies = [num for num in number_of_copies if num != 0]
@@ -866,14 +864,15 @@ class polymer_system:
                             solute=topology,
                             box_vectors=box_vectors,
                             box_shape=UNIT_CUBE,
-                            center_solute = 'BRICK')
+                            center_solute = 'BRICK',
+                            working_directory = '.',)
         else:
             return pack_box(molecules = molecules + self.chains,
                             number_of_copies = number_of_copies+[1 for i in range(len(self.chains))],
                             box_vectors = box_vectors,
                             tolerance = 1*unit.angstrom)
 
-    def generate_polyply_files(self, residual_monomer=0.00, residual_oligomer=0.00):
+    def generate_polyply_files(self, residual_monomer=0.00, residual_oligomer=0.00, ):
         """
         Generate input files for Polyply from the system.
 
@@ -904,7 +903,7 @@ class polymer_system:
         from openff.interchange import Interchange
         from openff.toolkit import ForceField
         import warnings
-        box_vectors = calculate_box_components(self.chains, self.monomers, self.sequence, 0.0 * unit.mole / unit.liter, 0.0)[3]
+        box_vectors = calculate_box_components(self.chains, self.monomers, self.sequence, salt_concentration = 0.0* unit.mole / unit.liter, residual_monomer = 0.00)[3]
         molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual = self.calculate_residuals(residual_monomer, residual_oligomer)
         mol_pdb_files_dest = []
         for i in molecules:
@@ -1413,7 +1412,7 @@ class polymer_system_from_PDI:
         df = pd.DataFrame(data)
         df.to_csv(filename, index=False)
 
-    def pack_solvated_system(self, salt_concentration=0.0 * unit.mole / unit.liter, residual_monomer=0.00):
+    def pack_solvated_system(self, salt_concentration=0.0, residual_monomer=0.00):
         """
         Pack a solvated system using Packmol functions, and the OpenFF Packmol wrapper.
     
@@ -1443,7 +1442,7 @@ class polymer_system_from_PDI:
         from swiftpol.build import calculate_box_components
     
         molecules, number_of_copies, topology, box_vectors, residual_monomer_actual = calculate_box_components(
-            self.chains, self.monomers, self.sequence, salt_concentration, residual_monomer, solvated=True
+            self.chains, self.monomers, self.sequence, salt_concentration, residual_monomer
         )
         molecules = [molecules[i] for i in range(len(number_of_copies)) if number_of_copies[i] != 0]
         number_of_copies = [num for num in number_of_copies if num != 0]
@@ -1492,7 +1491,7 @@ class polymer_system_from_PDI:
         from openff.interchange import Interchange
         from openff.toolkit import ForceField
         import warnings
-        box_vectors = calculate_box_components(self.chains, self.monomers, self.sequence, 0.0 * unit.mole / unit.liter, 0.0)[3]
+        box_vectors = calculate_box_components(self.chains, self.monomers, self.sequence, 0.0, 0.0)[3]
         molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual = self.calculate_residuals(residual_monomer, residual_oligomer)
         mol_pdb_files_dest = []
         for i in molecules:
