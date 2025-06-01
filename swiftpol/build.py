@@ -377,7 +377,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
     # Create a topology from the chains
     topology = Topology.from_molecules(chains)
     nacl_conc=salt_concentration
-    padding= 0.1 * unit.nanometer
+    padding= 1.0 * unit.nanometer
     box_shape= UNIT_CUBE
     target_density= 1.0 * unit.gram / unit.milliliter
 
