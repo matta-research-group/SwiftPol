@@ -90,6 +90,7 @@
 <span class="k">except</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;OpenEye is not installed. You will not be able to use OpenEye Toolkits for conformer generation.&quot;</span><span class="p">)</span>
+    <span class="n">oechem_imported</span> <span class="o">=</span> <span class="kc">False</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">openmm</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit.topology</span><span class="w"> </span><span class="kn">import</span> <span class="n">Molecule</span><span class="p">,</span> <span class="n">Topology</span>
