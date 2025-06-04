@@ -233,8 +233,6 @@ and residual monomer concentration. It is adapted from the OpenFF Toolkit Packmo
 </dd>
 <dt>residual_monomer<span class="classifier">float, optional</span></dt><dd><p>The desired residual monomer concentration in the simulation box. Defaults to 0.00%.</p>
 </dd>
-<dt>solvated<span class="classifier">bool, optional</span></dt><dd><p>Indicates whether the system contains water. Defaults to False.</p>
-</dd>
 </dl>
 </section>
 <section id="returns">
@@ -423,13 +421,14 @@ Assigns % residual monomer value to ensemble under self.residual_monomer_actual<
 
 <dl class="py method">
 <dt class="sig sig-object py" id="swiftpol.build.polymer_system.calculate_residuals">
-<span class="sig-name descname"><span class="pre">calculate_residuals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residual_monomer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_oligomer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.calculate_residuals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.calculate_residuals" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">calculate_residuals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residual_monomer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_oligomer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_rdkit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.calculate_residuals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.calculate_residuals" title="Link to this definition"></a></dt>
 <dd><p>Generate residual monomer and oligomer molecules, and molecule counts.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>residual_monomer</strong> (<em>float</em>) – The desired residual monomer concentration in the simulation box. Default is 0.00.</p></li>
 <li><p><strong>residual_oligomer</strong> (<em>float</em>) – The desired residual oligomer concentration in the simulation box. Default is 0.00.</p></li>
+<li><p><strong>return_rdkit</strong> (<em>bool, optional</em>) – If True, return RDKit molecule objects instead of OpenFF Molecule objects. Default is False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -589,7 +588,7 @@ It iterates over each chain in the <cite>self.chains</cite> list and assigns par
 <dt class="sig sig-object py" id="swiftpol.build.polymer_system_from_PDI.pack_solvated_system">
 <span class="sig-name descname"><span class="pre">pack_solvated_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">salt_concentration</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">residual_monomer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system_from_PDI.pack_solvated_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system_from_PDI.pack_solvated_system" title="Link to this definition"></a></dt>
 <dd><p>Pack a solvated system using Packmol functions, and the OpenFF Packmol wrapper.</p>
-<p>This method uses Packmol to build a solvated system by packing molecules into a simulation box.
+<p>This method uses Packmol to build a solvated system by packing molecules into a simulation box with water.
 It considers the salt concentration and residual monomer concentration to determine the quantity of each molecule type required.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -668,6 +667,7 @@ Assigns % residual monomer value to ensemble under self.residual_monomer_actual<
 <p class="rubric">Notes</p>
 <p>EXPERIMENTAL CAPABILITY. Proceed with caution</p>
 <p>This function works independently of, and is unrelated to, the build.calculate_box_components function.</p>
+<p>Residual oligomers are polydisperse and are generated based on 10% of the target chain length used in ensemble initiation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>UserWarning - If the residual monomer concentration is close to</strong><strong> or </strong><strong>lower than the weight</strong><strong> of </strong><strong>a single monomer.</strong> – </p>
