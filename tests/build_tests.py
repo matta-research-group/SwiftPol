@@ -195,7 +195,7 @@ class TestCalculateBoxComponents(unittest.TestCase):
         # Create a polymer system
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
                         reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
-                        length_target = 20, 
+                        length_target = 30, 
                         terminals = 'hydroxyl', 
                         num_chains = 1, 
                         perc_A_target=75, 
