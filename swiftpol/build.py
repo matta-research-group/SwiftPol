@@ -344,8 +344,7 @@ def calculate_box_components(chains, monomers, sequence, salt_concentration = 0.
         The desired salt concentration in the simulation box. Defaults to 0 M.
     residual_monomer : float, optional
         The desired residual monomer concentration in the simulation box. Defaults to 0.00%.
-    solvated : bool, optional
-        Indicates whether the system contains water. Defaults to False.
+
     
     Returns:
     --------
@@ -521,7 +520,6 @@ def introduce_stereoisomers(stereo_monomer, instance, seq):
     modified_seq = ''.join(seq_list)
     return modified_seq
 
-#Class object for generic polymer system
 
 class polymer_system:
     try:
@@ -936,7 +934,7 @@ class polymer_system:
         print(f'Polyply input files generated! Saved at {return_tuple}')
         return return_tuple
 
-    def calculate_residuals(self, residual_monomer = 0, residual_oligomer = 0):
+    def calculate_residuals(self, residual_monomer = 0, residual_oligomer = 0, return_rdkit = False):
         """
         Generate residual monomer and oligomer molecules, and molecule counts.
 
@@ -946,6 +944,8 @@ class polymer_system:
             The desired residual monomer concentration in the simulation box. Default is 0.00.
         residual_oligomer : float
             The desired residual oligomer concentration in the simulation box. Default is 0.00.
+        return_rdkit : bool, optional
+            If True, return RDKit molecule objects instead of OpenFF Molecule objects. Default is False.
             
         Returns
         -------
@@ -981,7 +981,7 @@ class polymer_system:
         for m in topology.molecules:
             rolling_mass += sum(atom.mass for atom in m.atoms)
         if rolling_mass.magnitude < 1000:
-            warnings.warn('Residual monomer/oligomer calculation may not be accurate for small systems, as the residual mass can be close to or lower than the weight of a single monomer. Please check the output by querying the value of residual_monomer_actual')
+            warnings.warn('Residual monomer/oligomer calculation may not be appropriate for small systems, as the residual mass can be close to or lower than the weight of a single monomer. Please check the output by querying the value of residual_monomer_actual')
         number_of_copies = []
         # residual to add
         monomer_to_add = (rolling_mass.magnitude/100 - residual_monomer - residual_oligomer) * residual_monomer
@@ -1005,6 +1005,7 @@ class polymer_system:
             B = Molecule.from_rdkit(B_rd)
             B_mass = sum([atom.mass for atom in B.atoms])
             B.name = 'B_residual'
+            mon_count = 0
             for r in range(1,100):
                 if (r * A_mass.magnitude) + (r * B_mass.magnitude) >= monomer_to_add:
                     mon_count = r
@@ -1024,6 +1025,7 @@ class polymer_system:
             A.name = 'A_residual'
             B = Molecule.from_smiles('C')
             B.name = 'B_residual'
+            mon_count = 0
             for r in range(1,100):
                 if (r * A_mass.magnitude) >= monomer_to_add:
                     mon_count = r
@@ -1036,7 +1038,11 @@ class polymer_system:
         oligomers = []
         if 'A' in sequence and 'B' in sequence:
             for i in range(1000):
-                oligo_seq = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(self.length_target * 0.1)), p=[self.A_target/100,1-(self.A_target/100)]))
+                sigma = np.sqrt(np.log(1.05))  
+                mu = np.log(self.length_target * 0.1) - 0.5 * sigma**2  
+                chain_lengths = np.random.lognormal(mu, sigma, size=1)
+                chain_lengths = np.round(chain_lengths).astype(int)  
+                oligo_seq = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(chain_lengths)), p=[self.A_target/100,1-(self.A_target/100)]))
                 monomer_list = [mono+'[I]' for mono in self.monomers]
                 oligomer_rd = build.build_polymer(oligo_seq, 
                             monomer_list=monomer_list, 
@@ -1065,6 +1071,10 @@ class polymer_system:
 
         elif 'A' in sequence and 'B' not in sequence:
             for i in range(1000):
+                sigma = np.sqrt(np.log(1.05))  
+                mu = np.log(self.length_target * 0.1) - 0.5 * sigma**2  
+                chain_lengths = np.random.lognormal(mu, sigma, size=1)
+                chain_lengths = np.round(chain_lengths).astype(int)  
                 oligo_seq = int(50 * 0.1) * 'A'
                 monomer_list = [mono+'[I]' for mono in self.monomers]
                 oligomer_rd = build.build_polymer(oligo_seq, 
@@ -1093,8 +1103,13 @@ class polymer_system:
             
             molecules = [A, B] + oligomers
             number_of_copies = [A_to_add, B_to_add] + [1 for c in range(len(oligomers))]
-    
-        return molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual
+        if return_rdkit:
+            molecules = [mol.to_rdkit() for mol in molecules]
+            return molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual
+        else:
+            for i in molecules:
+                i.generate_unique_atom_names() #required for polyply output
+            return molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual
     
 
 class polymer_system_from_PDI:
@@ -1200,7 +1215,6 @@ class polymer_system_from_PDI:
     SwiftPol ensemble of size 50, average chain length = 10.6-mers, PDI = 1.7006109664210667
     """
 
-    # Class implementation here
     try:
         from openeye import oechem
     except:
@@ -1417,7 +1431,7 @@ class polymer_system_from_PDI:
         """
         Pack a solvated system using Packmol functions, and the OpenFF Packmol wrapper.
     
-        This method uses Packmol to build a solvated system by packing molecules into a simulation box.
+        This method uses Packmol to build a solvated system by packing molecules into a simulation box with water.
         It considers the salt concentration and residual monomer concentration to determine the quantity of each molecule type required.
     
         Parameters
@@ -1498,7 +1512,8 @@ class polymer_system_from_PDI:
         for i in molecules:
             string_i = str(molecules.index(i)) + '.pdb'
             mol_pdb_files_dest.append(string_i)
-            i.generate_unique_atom_names()
+            if i.has_unique_atom_names == False:
+                i.generate_unique_atom_names()
             i.generate_conformers(n_conformers=1)
             i.to_file(string_i, file_format='pdb')
         self.residual_monomer_actual = residual_monomer_actual
@@ -1550,6 +1565,8 @@ class polymer_system_from_PDI:
         EXPERIMENTAL CAPABILITY. Proceed with caution
 
         This function works independently of, and is unrelated to, the build.calculate_box_components function.
+
+        Residual oligomers are polydisperse and are generated based on 10% of the target chain length used in ensemble initiation.
         
         Raises
         ------
