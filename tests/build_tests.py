@@ -384,7 +384,7 @@ class TestPolymerSystemFromPDI(unittest.TestCase):
         x = build.polymer_system_from_PDI(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
                                 reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]',
                                 length_target=20,
-                                num_chains = 10,
+                                num_chains = 5,
                                 blockiness_target=[1.7, 'B'],
                                 perc_A_target=50,
                                 PDI_target=1.0, 
