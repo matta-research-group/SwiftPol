@@ -1250,7 +1250,17 @@ class polymer_system_from_PDI:
         if copolymer==True:
             self.blockiness_target = blockiness_target[0]
             self.A_target = perc_A_target
-            
+            def generate_chain_lengths_from_PDI(Mn_target, PDI_target, num_chains, clip_extremes=True):
+                sigma = np.sqrt(np.log(PDI_target*2.5))
+                mu = np.log(Mn_target) - 0.5 * sigma**2
+                lengths = np.random.lognormal(mu, sigma, size=num_chains)
+                if clip_extremes:
+                    min_length = 1
+                    max_length = 5 * Mn_target
+                    lengths = np.clip(lengths, min_length, max_length)
+                scale_factor = Mn_target / np.mean(lengths)
+                lengths *= scale_factor
+                return list(lengths)
             def spec(sequence): #Define limits of A percentage and blockiness from input
                 acceptance_dec = acceptance/100
                 actual_A = (sequence.count('A')/len(sequence))*100
@@ -1277,32 +1287,35 @@ class polymer_system_from_PDI:
         chain_lengths = np.random.lognormal(mu, sigma, size=num_chains)
         chain_lengths = np.round(chain_lengths).astype(int)  
         #First round of building - copolymer
+            #First round of building - copolymer
         if copolymer==True:
             n=0
-            for l in chain_lengths:
+            length_list = generate_chain_lengths_from_PDI(length_target, PDI_target, num_chains, clip_extremes=True)
+            for l in length_list:
                 while True:
-                    sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(l,), p=[perc_A_target/100,1-(perc_A_target/100)]))
+                    sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(l),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                     blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
                     if spec(sequence):
                         break  # Exit the loop if the sequence is valid
-                if stereoisomerism_input is not None:
-                    sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence)
-                    pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
-                else:    
-                    pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
-                lengths.append(int(l))
+                blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
+                if spec(sequence)==True:
+                    if stereoisomerism_input is not None:
+                        sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence)
+                        pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                    else:
+                        pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                    lengths.append(int(l))
                 chains_rdkit.append(pol)
                 chain = Molecule.from_rdkit(pol)
                 chains.append(chain)
+                n+=1
                 perc_A_actual.append((sequence.count('A')/len(sequence))*100)
                 blockiness_list.append(blockiness)
                 BBL.append(blockiness_gen(sequence, blockiness_target[1])[1])
                 ABL.append(blockiness_gen(sequence, blockiness_target[1])[2])
-                n+=1
             self.B_block_length = mean(BBL)
             self.A_block_length = mean(ABL)
             self.blockiness_list = blockiness_list
-            blockiness_list = [i for i in blockiness_list if type(i)!=str]
             self.mean_blockiness = mean(blockiness_list)
             self.perc_A_actual = perc_A_actual
             self.A_actual = mean(perc_A_actual)
