@@ -23,7 +23,7 @@ class TestBuildPolymer(unittest.TestCase):
         polymer = build.build_polymer(sequence = sequence, 
                                         monomer_list=monomer_list, 
                                         reaction = reaction,
-                                        terminal ='hydroxyl')
+                                        terminal ='hydrogen')
         self.assertIsNotNone(polymer)
         # Test with an invalid sequence
         with self.assertRaises(IndexError):
@@ -67,7 +67,17 @@ class TestBuildPolymer(unittest.TestCase):
         self.assertIsNotNone(polymer)
         for atom in polymer.GetAtoms():
             assert atom.GetPDBResidueInfo() is not None
-
+        
+        #Test SMILES terminals
+        sequence = 'AABBAABB'
+        monomer_list = ['OC(=O)COI', 'C[C@@H](C(=O)[OH])OI']
+        reaction = AllChem.ReactionFromSmarts('[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]')
+        # Test the function
+        polymer = build.build_polymer(sequence = sequence, 
+                                        monomer_list=monomer_list, 
+                                        reaction = reaction,
+                                        terminal ='CCCO[H]')
+        self.assertIsNotNone(polymer)
 
 
         #Test with cellulose
@@ -77,13 +87,13 @@ class TestBuildPolymer(unittest.TestCase):
         polymer = build.build_polymer(sequence = sequence,
                                         monomer_list = monomer_list,
                                         reaction = reaction,
-                                        terminal = 'hydroxyl')
+                                        terminal = 'hydrogen')
         self.assertIsNotNone(polymer)
 
         #Test with chitin
         monomer_list=['C([C@@H]1[C@H]([C@@H]([C@H](C(O1)OI)N)O)OI)O']
         reaction=AllChem.ReactionFromSmarts('[I:1][O:2].[I:3][O:4][C:5]>>[C:5][O:2].[I:3][I:1].[O:4]')
-        terminal='hydroxyl'
+        terminal='hydrogen'
         sequence = 'AAA'
         polymer = build.build_polymer(sequence = sequence,
                                         monomer_list = monomer_list,
@@ -94,7 +104,7 @@ class TestBuildPolymer(unittest.TestCase):
         #Test with polyethylene
         monomer_list = ['ICCI']
         reaction = AllChem.ReactionFromSmarts('[C:1][C:2][I:3].[C:4][C:5][I:6]>>[C:1][C:2][C:5][C:4].[I:3][I:6]')
-        terminal='hydroxyl'
+        terminal='hydrogen'
         sequence = 'AAAAAAAA'
         polymer = build.build_polymer(sequence = sequence,
                                         monomer_list = monomer_list,
@@ -105,7 +115,7 @@ class TestBuildPolymer(unittest.TestCase):
         #Test with polythiophene
         monomer_list = ['S1C(CCI)=CC=C(CCI)1']
         reaction = AllChem.ReactionFromSmarts('[H:7]-[C:1]-[C:2]-[I:3].[H:8]-[C:4]-[C:5]-[I:6]>>[C:1]=[C:4].[I:3]-[C:2]([H:7])-[C:5]([H:8])-[I:6]')
-        terminal='hydroxyl'
+        terminal='hydrogen'
         sequence = 'AAAAAAAA'
         polymer = build.build_polymer(sequence = sequence,
                                         monomer_list = monomer_list,
@@ -196,7 +206,7 @@ class TestCalculateBoxComponents(unittest.TestCase):
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
                         reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
                         length_target = 30, 
-                        terminals = 'hydroxyl', 
+                        terminals = 'hydrogen', 
                         num_chains = 1, 
                         perc_A_target=75, 
                         blockiness_target=[1.0, 'A'], 
@@ -260,7 +270,7 @@ class TestPolymerSystem(unittest.TestCase):
         x = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]'], 
                     reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
                     length_target = 30, 
-                    terminals = 'hydroxyl', 
+                    terminals = 'hydrogen', 
                     num_chains = 5, 
                     copolymer=False)
         self.assertTrue(x.num_chains == 5)
@@ -344,7 +354,7 @@ class TestPolymerSystem(unittest.TestCase):
         sys = build.polymer_system(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'], 
                    reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]', 
                    length_target = 50, 
-                   terminals = 'hydroxyl', 
+                   terminals = 'hydrogen', 
                    num_chains = 50, 
                    perc_A_target=75, 
                    copolymer=True,
