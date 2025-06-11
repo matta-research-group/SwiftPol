@@ -546,7 +546,7 @@ class polymer_system:
                  length_target, 
                  num_chains, 
                  stereoisomerism_input=None,
-                 terminals='standard', 
+                 terminals='hydrogen', 
                  perc_A_target=100, 
                  blockiness_target=[1.0, 'A'], 
                  copolymer=False, 
@@ -568,7 +568,7 @@ class polymer_system:
 
         stereoisomerism_input (tuple, optional): A tuple containing the monomer, instance fraction (e.g. 0.5 for 50% stereoisomer), and SMILES string of the stereoisomer to be introduced. Default is None.
 
-        terminals (str, optional): The type of terminal groups to be used. Default is 'standard'.
+        terminals (str, optional): The type of terminal groups to be used. Default is 'hydrogen', adds a hydrogen atom.
 
         perc_A_target (float, optional): The target percentage of monomer A in the copolymer. Default is 100.
 
@@ -1143,7 +1143,7 @@ class polymer_system_from_PDI:
         A tuple containing the stereoisomer monomer, the fraction of stereoisomers 
         to introduce, and the SMILES string of the stereoisomer. Default is None.
     terminals : str, optional
-        The type of terminal groups to use for the polymer chains. Default is 'standard'.
+        The type of terminal groups to use for the polymer chains. Default is 'hydrogen'.
     perc_A_target : float, optional
         The target percentage of monomer 'A' in the copolymer. Default is 100.
     blockiness_target : list, optional
@@ -1240,7 +1240,7 @@ class polymer_system_from_PDI:
                  num_chains,
                  PDI_target, 
                  stereoisomerism_input=None,
-                 terminals='standard',
+                 terminals='hydrogen',
                  perc_A_target=100, 
                  blockiness_target=[1.0, 'A'], 
                  copolymer=False, 
