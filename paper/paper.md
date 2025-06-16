@@ -46,7 +46,7 @@ Here, we will detail the development of SwiftPol - a user-guided Python tool for
 
 The SwiftPol `build` module contains Python functions to build both single polymer chains and polydisperse polymer chain ensembles. 
 
-SwiftPol takes as an input the simplified molecular-input line-entry system (SMILES) string of all co-monomers, as well as values representing the target average properties of the ensemble: monomer % composition (for copolymers), length, number of chains, blockiness (for blocky copolymers), terminals, residual monomer. The user must define the reaction SMARTS which describes the polymerization reaction associated with their polymer chemistry. 
+SwiftPol takes as an input the simplified molecular-input line-entry system (SMILES)[@daylight_chemical_information_systems_inc_daylight_2022-1] string of all co-monomers, as well as values representing the target average properties of the ensemble: monomer % composition (for copolymers), length, number of chains, blockiness (for blocky copolymers), terminals, residual monomer. The user must define the reaction SMARTS [@daylight_chemical_information_systems_inc_daylight_2022] which describes the polymerization reaction associated with their polymer chemistry. 
 
 As depicted in \autoref{Figure 1}, SwiftPol generates an initial polymer chain with a chain length drawn from a normal distribution centered around the specified target length, along with a terminal group that corresponds to the chosen input. In the case of a block copolymer, a probability function is used to determine the ratio of monomers in the chain and the chain is passed to a second function which tests whether the values for blockiness and % monomer are within 10% of the input variable by default. The +/- 10% acceptance margin introduces polydispersity into the ensemble by ensuring a certain level of non-uniformity between polymer chains, without straying too far from the input value. The acceptance margin can be adjusted by the user to control build stringency and polydispersity in the SwiftPol ensemble.
 
@@ -183,7 +183,7 @@ To use SwiftPol please download the following packages:
 
 optional dependencies:
 
-- espaloma charge
+- espaloma-charge
 
 
 for quick dependency and swiftpol install using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), run the following commands in bash
