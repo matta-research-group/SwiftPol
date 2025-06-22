@@ -38,7 +38,7 @@ from openff.interchange import Interchange
 
 
 #Build polymer - generic
-def build_polymer(sequence, monomer_list, reaction, terminal='hydroxyl', chain_num=1):
+def build_polymer(sequence, monomer_list, reaction, terminal='hydrogen', chain_num=1):
     """
     Constructs a polymer from a given sequence of monomers.
 
@@ -51,8 +51,8 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydroxyl', chain_n
     reaction : rdkit.Chem.rdChemReactions.ChemicalReaction
         An RDKit reaction object used to link monomers.
     terminal : str, optional
-        The terminal group to be added to the polymer. Options are 'hydroxyl', 'carboxyl', or 'ester'.
-        Default is 'hydroxyl'.
+        The terminal group to be added to the polymer. Options are 'hydrogen', 'carboxyl', 'ester', or a canonical smiles string to insert as the terminal.
+        Default is 'hydrogen'.
     chain_number : int, optional
         The number of polymer chains to construct. Default is 1. Input used for ensemble build.
 
@@ -119,7 +119,7 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydroxyl', chain_n
                 raise ValueError("Reaction failed. Please check the reaction SMARTS and monomer SMILES. For support with constructing reaction SMARTS, raise an issue at https://github.com/matta-research-group/SwiftPol/issues")
             Chem.SanitizeMol(polymer)
     
-    if terminal == 'hydroxyl':
+    if terminal == 'hydrogen':
         hydrogen = Chem.MolFromSmiles('[H]')
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName(str(chain_num) + sequence[0] + str(1))
@@ -145,12 +145,15 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydroxyl', chain_n
         #Chem.AddHs(polymer)
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), Chem.MolFromSmiles('C'))[0]
     else:
-        hydrogen = Chem.MolFromSmiles('[H]')
+        try:
+            term = Chem.MolFromSmiles(terminal)
+        except:
+            raise ValueError("Terminal must be a valid SMILES string or one of the following options: 'hydrogen', 'carboxyl', 'ester'.")
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName(str(chain_num) + sequence[0] + str(1))
         info.SetResidueNumber(1)
-        [atom.SetMonomerInfo(info)  for  atom  in  hydrogen.GetAtoms()]
-        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), hydrogen)[0] #remove any excess iodine
+        [atom.SetMonomerInfo(info)  for  atom  in  term.GetAtoms()]
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), term)[0]
     hydrogen = Chem.MolFromSmiles('[H]')
     info = Chem.AtomPDBResidueInfo()
     info.SetResidueName(str(chain_num) + sequence[-1] + str(len(sequence)))
@@ -543,7 +546,7 @@ class polymer_system:
                  length_target, 
                  num_chains, 
                  stereoisomerism_input=None,
-                 terminals='standard', 
+                 terminals='hydrogen', 
                  perc_A_target=100, 
                  blockiness_target=[1.0, 'A'], 
                  copolymer=False, 
@@ -565,7 +568,7 @@ class polymer_system:
 
         stereoisomerism_input (tuple, optional): A tuple containing the monomer, instance fraction (e.g. 0.5 for 50% stereoisomer), and SMILES string of the stereoisomer to be introduced. Default is None.
 
-        terminals (str, optional): The type of terminal groups to be used. Default is 'standard'.
+        terminals (str, optional): The type of terminal groups to be used. Default is 'hydrogen', adds a hydrogen atom.
 
         perc_A_target (float, optional): The target percentage of monomer A in the copolymer. Default is 100.
 
@@ -1140,7 +1143,7 @@ class polymer_system_from_PDI:
         A tuple containing the stereoisomer monomer, the fraction of stereoisomers 
         to introduce, and the SMILES string of the stereoisomer. Default is None.
     terminals : str, optional
-        The type of terminal groups to use for the polymer chains. Default is 'standard'.
+        The type of terminal groups to use for the polymer chains. Default is 'hydrogen'.
     perc_A_target : float, optional
         The target percentage of monomer 'A' in the copolymer. Default is 100.
     blockiness_target : list, optional
@@ -1237,7 +1240,7 @@ class polymer_system_from_PDI:
                  num_chains,
                  PDI_target, 
                  stereoisomerism_input=None,
-                 terminals='standard',
+                 terminals='hydrogen',
                  perc_A_target=100, 
                  blockiness_target=[1.0, 'A'], 
                  copolymer=False, 
