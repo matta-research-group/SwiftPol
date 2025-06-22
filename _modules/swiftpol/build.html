@@ -114,7 +114,7 @@
 <span class="c1">#Build polymer - generic</span>
 <div class="viewcode-block" id="build_polymer">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.build_polymer">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">build_polymer</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">monomer_list</span><span class="p">,</span> <span class="n">reaction</span><span class="p">,</span> <span class="n">terminal</span><span class="o">=</span><span class="s1">&#39;hydroxyl&#39;</span><span class="p">,</span> <span class="n">chain_num</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_polymer</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">monomer_list</span><span class="p">,</span> <span class="n">reaction</span><span class="p">,</span> <span class="n">terminal</span><span class="o">=</span><span class="s1">&#39;hydrogen&#39;</span><span class="p">,</span> <span class="n">chain_num</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructs a polymer from a given sequence of monomers.</span>
 
@@ -127,8 +127,8 @@
 <span class="sd">    reaction : rdkit.Chem.rdChemReactions.ChemicalReaction</span>
 <span class="sd">        An RDKit reaction object used to link monomers.</span>
 <span class="sd">    terminal : str, optional</span>
-<span class="sd">        The terminal group to be added to the polymer. Options are &#39;hydroxyl&#39;, &#39;carboxyl&#39;, or &#39;ester&#39;.</span>
-<span class="sd">        Default is &#39;hydroxyl&#39;.</span>
+<span class="sd">        The terminal group to be added to the polymer. Options are &#39;hydrogen&#39;, &#39;carboxyl&#39;, &#39;ester&#39;, or a canonical smiles string to insert as the terminal.</span>
+<span class="sd">        Default is &#39;hydrogen&#39;.</span>
 <span class="sd">    chain_number : int, optional</span>
 <span class="sd">        The number of polymer chains to construct. Default is 1. Input used for ensemble build.</span>
 
@@ -195,7 +195,7 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Reaction failed. Please check the reaction SMARTS and monomer SMILES. For support with constructing reaction SMARTS, raise an issue at https://github.com/matta-research-group/SwiftPol/issues&quot;</span><span class="p">)</span>
             <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
     
-    <span class="k">if</span> <span class="n">terminal</span> <span class="o">==</span> <span class="s1">&#39;hydroxyl&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">terminal</span> <span class="o">==</span> <span class="s1">&#39;hydrogen&#39;</span><span class="p">:</span>
         <span class="n">hydrogen</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="s1">&#39;[H]&#39;</span><span class="p">)</span>
         <span class="n">info</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AtomPDBResidueInfo</span><span class="p">()</span>
         <span class="n">info</span><span class="o">.</span><span class="n">SetResidueName</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">chain_num</span><span class="p">)</span> <span class="o">+</span> <span class="n">sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
@@ -221,12 +221,15 @@
         <span class="c1">#Chem.AddHs(polymer)</span>
         <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s1">&#39;Cl&#39;</span><span class="p">),</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">hydrogen</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="s1">&#39;[H]&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">term</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">terminal</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Terminal must be a valid SMILES string or one of the following options: &#39;hydrogen&#39;, &#39;carboxyl&#39;, &#39;ester&#39;.&quot;</span><span class="p">)</span>
         <span class="n">info</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AtomPDBResidueInfo</span><span class="p">()</span>
         <span class="n">info</span><span class="o">.</span><span class="n">SetResidueName</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">chain_num</span><span class="p">)</span> <span class="o">+</span> <span class="n">sequence</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
         <span class="n">info</span><span class="o">.</span><span class="n">SetResidueNumber</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>  <span class="k">for</span>  <span class="n">atom</span>  <span class="ow">in</span>  <span class="n">hydrogen</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
-        <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s1">&#39;Cl&#39;</span><span class="p">),</span> <span class="n">hydrogen</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="c1">#remove any excess iodine</span>
+        <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>  <span class="k">for</span>  <span class="n">atom</span>  <span class="ow">in</span>  <span class="n">term</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
+        <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s1">&#39;Cl&#39;</span><span class="p">),</span> <span class="n">term</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">hydrogen</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="s1">&#39;[H]&#39;</span><span class="p">)</span>
     <span class="n">info</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AtomPDBResidueInfo</span><span class="p">()</span>
     <span class="n">info</span><span class="o">.</span><span class="n">SetResidueName</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">chain_num</span><span class="p">)</span> <span class="o">+</span> <span class="n">sequence</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">)))</span>
@@ -639,7 +642,7 @@
                  <span class="n">length_target</span><span class="p">,</span> 
                  <span class="n">num_chains</span><span class="p">,</span> 
                  <span class="n">stereoisomerism_input</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">terminals</span><span class="o">=</span><span class="s1">&#39;standard&#39;</span><span class="p">,</span> 
+                 <span class="n">terminals</span><span class="o">=</span><span class="s1">&#39;hydrogen&#39;</span><span class="p">,</span> 
                  <span class="n">perc_A_target</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> 
                  <span class="n">blockiness_target</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">],</span> 
                  <span class="n">copolymer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
@@ -661,7 +664,7 @@
 
 <span class="sd">        stereoisomerism_input (tuple, optional): A tuple containing the monomer, instance fraction (e.g. 0.5 for 50% stereoisomer), and SMILES string of the stereoisomer to be introduced. Default is None.</span>
 
-<span class="sd">        terminals (str, optional): The type of terminal groups to be used. Default is &#39;standard&#39;.</span>
+<span class="sd">        terminals (str, optional): The type of terminal groups to be used. Default is &#39;hydrogen&#39;, adds a hydrogen atom.</span>
 
 <span class="sd">        perc_A_target (float, optional): The target percentage of monomer A in the copolymer. Default is 100.</span>
 
@@ -1258,7 +1261,7 @@
 <span class="sd">        A tuple containing the stereoisomer monomer, the fraction of stereoisomers </span>
 <span class="sd">        to introduce, and the SMILES string of the stereoisomer. Default is None.</span>
 <span class="sd">    terminals : str, optional</span>
-<span class="sd">        The type of terminal groups to use for the polymer chains. Default is &#39;standard&#39;.</span>
+<span class="sd">        The type of terminal groups to use for the polymer chains. Default is &#39;hydrogen&#39;.</span>
 <span class="sd">    perc_A_target : float, optional</span>
 <span class="sd">        The target percentage of monomer &#39;A&#39; in the copolymer. Default is 100.</span>
 <span class="sd">    blockiness_target : list, optional</span>
@@ -1357,7 +1360,7 @@
                  <span class="n">num_chains</span><span class="p">,</span>
                  <span class="n">PDI_target</span><span class="p">,</span> 
                  <span class="n">stereoisomerism_input</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">terminals</span><span class="o">=</span><span class="s1">&#39;standard&#39;</span><span class="p">,</span>
+                 <span class="n">terminals</span><span class="o">=</span><span class="s1">&#39;hydrogen&#39;</span><span class="p">,</span>
                  <span class="n">perc_A_target</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> 
                  <span class="n">blockiness_target</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="s1">&#39;A&#39;</span><span class="p">],</span> 
                  <span class="n">copolymer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> 
