@@ -70,8 +70,7 @@ The input values for the SwiftPol builder, seen in \autoref{tab:Table1}, were ta
 \begin{flushleft}
 \begin{table}[h!]
 \captionsetup{justification=raggedright,singlelinecheck=false}
-\caption{Input parameters for SwiftPol PLGA builder function, for the building of product X.}
-\label{tab:Table1}
+\caption{Input parameters for SwiftPol PLGA builder function, for the building of product X.}\label{tab:Table1}
 \begin{tabular}{|l|l|}
 \hline
 \textbf{INPUT} & \textbf{VALUE} \\
@@ -93,8 +92,7 @@ NACL CONCENTRATION (M) & 0.1 \\
 \begin{flushleft}
 \begin{table}[h!]
 \captionsetup{justification=raggedright,singlelinecheck=false}
-\caption{SwiftPol system build attributes. \( \bar{x}_n \) = mean value of attribute across n chains.}
-\label{tab:Table2}
+\caption{SwiftPol system build attributes. \( \bar{x}_n \) = mean value of attribute across n chains.}\label{tab:Table2}
 \begin{tabular}{|l|l|}
 \hline
 \textbf{ATTRIBUTE} & \textbf{\( \bar{x}_n \)} \\
