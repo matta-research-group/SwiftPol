@@ -23,18 +23,16 @@ test = [
   "pytest-runner"
 ]
 
-[tool.setuptools]
-zip-safe = false
-include-package-data = false
 
-[tool.setuptools.packages.find]
-namespaces = false
-where = ["."]
+[build-system]
+requires = ["setuptools>=64", "setuptools-scm>=8"]
+build-backend = "setuptools.build_meta"
 
-[tool.setuptools.package-data]
-swiftpol = [
-    "py.typed"
-]
+[project]
+name = "swiftpol"
+# version = "0.1.3"
+dynamic = ["version"]
+# more missing
 
 [tool.setuptools_scm]
 write_to = "swiftpol/_version.py"
