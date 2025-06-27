@@ -1,5 +1,5 @@
 --- 
-title: 'SwiftPol: A Python package for building and parameterizing *in silico* polymer systems'
+title: 'SwiftPol: A Python package for building and parameterizing in silico polymer systems'
 tags: 
   - Python 
   - polymer 
