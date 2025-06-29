@@ -130,6 +130,9 @@ We acknowledge the use of a free academic license provided by OpenEye, Candence 
     └── parameterize_tests.py
 ```
 
+### Citing SwiftPol
+If you have used SwiftPol please cite our [paper](https://joss.theoj.org/papers/10.21105/joss.08053)
+
 ### Code of Conduct
 All repository contributors should follow our [code of conduct](CODE_OF_CONDUCT.md)
 
