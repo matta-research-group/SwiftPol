@@ -655,7 +655,9 @@ class polymer_system:
             for n in range(num_chains):
                 sigma = np.sqrt(np.log(1.5*(1+acceptance/100)))
                 mu = np.log(length_target) - 0.5 * sigma**2
-                length_actual = np.random.lognormal(mu, sigma)    
+                length_actual = np.random.lognormal(mu, sigma)
+                if length_actual < 1: 
+                    length_actual = 1    
                 sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                 blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
                 if spec(sequence)==True:
@@ -679,6 +681,8 @@ class polymer_system:
                     sigma = np.sqrt(np.log(1.5*(1+acceptance/100)))
                     mu = np.log(length_target) - 0.5 * sigma**2
                     length_actual = np.random.lognormal(mu, sigma)    
+                    if length_actual < 1: 
+                        length_actual = 1  
                     sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                     blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
                     if spec(sequence)==True:
@@ -707,7 +711,9 @@ class polymer_system:
             for n in range(num_chains):
                 sigma = np.sqrt(np.log(1.5*(1+acceptance/100)))
                 mu = np.log(length_target) - 0.5 * sigma**2
-                length_actual = np.random.lognormal(mu, sigma)    
+                length_actual = np.random.lognormal(mu, sigma)   
+                if length_actual < 1: 
+                    length_actual = 1                   
                 sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                 if stereoisomerism_input is not None:
                     sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence) 
