@@ -150,11 +150,26 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydrogen', chain_n
         except:
             raise ValueError("Terminal must be a valid SMILES string or one of the following options: 'hydrogen', 'carboxyl', 'ester'.")
         term = Chem.AddHs(term)
+        editable_term = Chem.EditableMol(term)
+        target_atom_idx=0
+        for atom in term.GetAtoms():
+            if atom.GetSymbol() == terminal[0]: 
+                target_atom_idx = atom.GetIdx()
+                break
+
+        for neighbor in term.GetAtomWithIdx(target_atom_idx).GetNeighbors():
+            if neighbor.GetSymbol() == "H":  # remove an H to make room for polymer
+                hydrogen_idx = neighbor.GetIdx()
+                editable_term.RemoveAtom(hydrogen_idx)
+                break
+        term_gap = editable_term.GetMol()
+
         info = Chem.AtomPDBResidueInfo()
-        info.SetResidueName(str(chain_num) + sequence[0] + str(1))
+        info.SetResidueName('term' + str(1))
         info.SetResidueNumber(1)
-        [atom.SetMonomerInfo(info)  for  atom  in  term.GetAtoms()]
-        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), term)[0]
+        [atom.SetMonomerInfo(info)  for  atom  in  term_gap.GetAtoms()]
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), term_gap)[0]
+        Chem.SanitizeMol(polymer)
     hydrogen = Chem.MolFromSmiles('[H]')
     info = Chem.AtomPDBResidueInfo()
     info.SetResidueName(str(chain_num) + sequence[-1] + str(len(sequence)))
