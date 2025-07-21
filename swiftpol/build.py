@@ -149,6 +149,7 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydrogen', chain_n
             term = Chem.MolFromSmiles(terminal)
         except:
             raise ValueError("Terminal must be a valid SMILES string or one of the following options: 'hydrogen', 'carboxyl', 'ester'.")
+        term = Chem.AddHs(term)
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName(str(chain_num) + sequence[0] + str(1))
         info.SetResidueNumber(1)
