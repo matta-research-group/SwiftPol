@@ -165,7 +165,7 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydrogen', chain_n
         term_gap = editable_term.GetMol()
 
         info = Chem.AtomPDBResidueInfo()
-        info.SetResidueName('term' + str(1))
+        info.SetResidueName(str(chain_num) + sequence[0] + str(1))
         info.SetResidueNumber(1)
         [atom.SetMonomerInfo(info)  for  atom  in  term_gap.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), term_gap)[0]
