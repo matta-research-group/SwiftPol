@@ -33,8 +33,8 @@ sys.path.insert(0, os.path.abspath('../swiftpol'))
 # -- Project information -----------------------------------------------------
 
 project = 'SwiftPol'
-author = 'Your Name'
-release = '0.1.2'
+author = 'Hannah Turney'
+release = '0.1.3'
 
 # -- General configuration ---------------------------------------------------
 
@@ -78,7 +78,7 @@ autodoc_mock_imports = [
 # -- Project information -----------------------------------------------------
 
 project = 'swiftpol'
-copyright = ("2024, Hannah Turney. Project structure based on the "
+copyright = ("2025, Hannah Turney. Project structure based on the "
              "Computational Molecular Science Python Cookiecutter version 1.1")
 author = 'Hannah Turney'
 
