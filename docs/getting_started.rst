@@ -53,6 +53,12 @@ Contributing
 We welcome contributions from the community. All contributors to SwiftPol should follow our `Code of Conduct <https://github.com/matta-research-group/SwiftPol/tree/main/CODE_OF_CONDUCT.md>`_.
 To submit your feature to be incorporated to the main branch, you should submit a Pull Request. The repository maintainers will review your pull request before accepting your changes.
 
+Citation
+---------
+
+If you have found SwiftPol useful in your research, please cite the following paper:
+Turney, H. N.; Matta, M. SwiftPol: A Python Package for Building and Parameterizing in silico Polymer Systems. Journal of Open Source Software 2025, 10 (110), 8053. https://doi.org/10.21105/joss.08053.
+
 Support
 -------
 
