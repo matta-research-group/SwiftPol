@@ -38,7 +38,7 @@ from openff.interchange import Interchange
 
 
 #Build polymer - generic
-def build_polymer(sequence, monomer_list, reaction, terminal='hydrogen', chain_num=1, chainID='A'):
+def build_polymer(sequence, monomer_list, reaction, terminal='hydrogen', chain_num=1):
     """
     Constructs a polymer from a given sequence of monomers.
 
@@ -76,7 +76,6 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydrogen', chain_n
     info = Chem.AtomPDBResidueInfo()
     info.SetResidueName(str(chain_num) + sequence[0] + str(1))
     info.SetResidueNumber(1)
-    info.SetChainId(chainID)
     [atom.SetMonomerInfo(info)  for  atom  in  polymer.GetAtoms()]
     Chem.SanitizeMol(polymer)
     
@@ -87,7 +86,6 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydrogen', chain_n
             info = Chem.AtomPDBResidueInfo()
             info.SetResidueName(str(chain_num) + 'A' + str(i+1))
             info.SetResidueNumber(i+1)
-            info.SetChainId(chainID)
             [atom.SetMonomerInfo(info)  for  atom  in  A.GetAtoms()]
             try:
                 polymer = reaction.RunReactants((polymer, A))[0][0]
@@ -101,7 +99,6 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydrogen', chain_n
             info = Chem.AtomPDBResidueInfo()
             info.SetResidueName(str(chain_num) + 'B' + str(i+1))
             info.SetResidueNumber(i+1)
-            info.SetChainId(chainID)
             [atom.SetMonomerInfo(info)  for  atom  in  B.GetAtoms()]
             try:
                 polymer = reaction.RunReactants((polymer, B))[0][0]
@@ -115,7 +112,6 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydrogen', chain_n
             info = Chem.AtomPDBResidueInfo()
             info.SetResidueName(str(chain_num) + 'S' + str(i+1))
             info.SetResidueNumber(i+1)
-            info.SetChainId(chainID)
             [atom.SetMonomerInfo(info)  for  atom  in  S.GetAtoms()]
             try:
                 polymer = reaction.RunReactants((polymer, S))[0][0]
@@ -128,7 +124,6 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydrogen', chain_n
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName(str(chain_num) + sequence[0] + str(1))
         info.SetResidueNumber(1)
-        info.SetChainId(chainID)
         [atom.SetMonomerInfo(info)  for  atom  in  hydrogen.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), hydrogen)[0]
         Chem.AddHs(polymer)
@@ -137,7 +132,6 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydrogen', chain_n
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName(str(chain_num) + sequence[0] + str(1))
         info.SetResidueNumber(1)
-        info.SetChainId(chainID)
         [atom.SetMonomerInfo(info)  for  atom  in  carboxyl.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), carboxyl)[0]
     elif terminal == 'ester':
@@ -146,7 +140,6 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydrogen', chain_n
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName(str(chain_num) + sequence[0] + str(1))
         info.SetResidueNumber(1)
-        info.SetChainId(chainID)
         [atom.SetMonomerInfo(info)  for  atom  in  carbon.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), carbon)[0]
         #Chem.AddHs(polymer)
@@ -174,7 +167,6 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydrogen', chain_n
         info = Chem.AtomPDBResidueInfo()
         info.SetResidueName(str(chain_num) + sequence[0] + str(1))
         info.SetResidueNumber(1)
-        info.SetChainId(chainID)
         [atom.SetMonomerInfo(info)  for  atom  in  term_gap.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('Cl'), term_gap)[0]
         Chem.SanitizeMol(polymer)
@@ -182,7 +174,6 @@ def build_polymer(sequence, monomer_list, reaction, terminal='hydrogen', chain_n
     info = Chem.AtomPDBResidueInfo()
     info.SetResidueName(str(chain_num) + sequence[-1] + str(len(sequence)))
     info.SetResidueNumber(len(sequence))
-    info.SetChainId(chainID)
     [atom.SetMonomerInfo(info)  for  atom  in  hydrogen.GetAtoms()]
     polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts('I'), hydrogen)[0] #remove any excess iodine
     Chem.SanitizeMol(polymer)
@@ -564,7 +555,6 @@ class polymer_system:
     from swiftpol.build import build_polymer, PDI, blockiness_gen, calculate_box_components, introduce_stereoisomers
     from openff.units import unit
     from rdkit.Chem import AllChem
-    import string
 
     def __init__(self, 
                  monomer_list, 
@@ -687,12 +677,11 @@ class polymer_system:
                 sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                 blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
                 if spec(sequence)==True:
-                    id_new = string.ascii_uppercase[(n) % 26] 
                     if stereoisomerism_input is not None:
                         sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence)
-                        pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1, chainID=id_new)
+                        pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
                     else:
-                        pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1, chainID=iid_newd)
+                        pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
                     lengths.append(int(length_actual))
                     chains_rdkit.append(pol)
                     chain = Molecule.from_rdkit(pol)
@@ -714,12 +703,10 @@ class polymer_system:
                     blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
                     if spec(sequence)==True:
                         if stereoisomerism_input is not None:
-                            id_new = string.ascii_uppercase[(n) % 26] 
                             sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence) 
-                            pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1, chainID=id_new)
+                            pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
                         else:
-                            id_new = string.ascii_uppercase[(n) % 26] 
-                            pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1, chainID=id_new)                   
+                            pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)                   
                         lengths.append(int(length_actual))
                         chains_rdkit.append(pol)
                         chain = Molecule.from_rdkit(pol)
@@ -745,12 +732,10 @@ class polymer_system:
                     length_actual = 1                   
                 sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(length_actual),), p=[perc_A_target/100,1-(perc_A_target/100)]))
                 if stereoisomerism_input is not None:
-                    id_new = string.ascii_uppercase[(n) % 26] 
                     sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence) 
-                    pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1, chainID=id_new)
+                    pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
                 else:
-                    id_new = string.ascii_uppercase[(n) % 26] 
-                    pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1, chainID=id_new)                   
+                    pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)                   
                 lengths.append(int(length_actual))
                 chains_rdkit.append(pol)
                 chain = Molecule.from_rdkit(pol)

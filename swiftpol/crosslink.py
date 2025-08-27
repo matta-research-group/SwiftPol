@@ -36,119 +36,263 @@ def replace_halogens_with_hydrogens(mol):
 
     """
     halogens = ['F', 'Cl', 'Br', 'I', 'At', 'Ts']
-    for mol in halogens:
-        hydrogen = Chem.MolFromSmiles('[H]')
-        #Extract metadata from halogen to replace?
-        mol_no_halogens = Chem.ReplaceSubstructs(mol, Chem.MolFromSmarts(mol), hydrogen)[0]
-        Chem.SanitizeMol(mol_no_halogens)
-
+    for halogen in halogens:
+        try:
+            matches = mol.GetSubstructMatches(Chem.MolFromSmarts(halogen))
+        except:
+            matches = []
+        if len(matches) > 0:
+            for match in matches:
+                #extract pdb info of neighbouring atom and assign to hydrogen
+                atom = mol.GetAtomWithIdx(match[0])
+                bonded_atom = atom.GetNeighbors()
+                info = bonded_atom[0].GetMonomerInfo()
+                info_new = Chem.AtomPDBResidueInfo()
+                info_new.SetResidueName(info.GetResidueName())
+                info_new.SetResidueNumber(info.GetResidueNumber())
+                info_new.SetChainId(info.GetChainId())
+                hydrogen = Chem.MolFromSmiles('[H]')
+                [atom.SetMonomerInfo(info_new)  for  atom  in  hydrogen.GetAtoms()]
+                #Replace halogen with hydrogen
+                mw = Chem.RWMol(mol)
+                mw.ReplaceAtom(match[0],list(hydrogen.GetAtoms())[0])
+                Chem.SanitizeMol(mw)
+                mw.CommitBatchEdit()
+                mol = Chem.AddHs(mw)
+        
+    mol_no_halogens = mol
+    Chem.SanitizeMol(mol_no_halogens)
     #Add explicit hydrogens
     mol_with_h = Chem.AddHs(mol_no_halogens)
     return mol_with_h
 
+from rdkit import Chem
+
+def validate_linear_reaction(starting_polymer, linear_activate, linear_activate_reactants, linear_react):
+    try:
+        # Test the linear activation reaction
+        activated_pol_test = linear_activate.RunReactants([starting_polymer] + linear_activate_reactants)
+        if not activated_pol_test:
+            raise ValueError("Linear activation reaction produced no results.")
+        activated_pol_test = activated_pol_test[0][0]
+        Chem.SanitizeMol(activated_pol_test)
+    except Exception as e:
+        raise ValueError(
+            "Linear activation reaction SMARTS is invalid or incompatible with the starting polymer or linear activation reactants. "
+            "For support with constructing reaction SMARTS, raise an issue at https://github.com/matta-research-group/SwiftPol/issues"
+        ) from e
+
+    try:
+        # Test the linear polymerization reaction
+        linear_polymer_test = linear_react.RunReactants([activated_pol_test, activated_pol_test])
+        if not linear_polymer_test:
+            raise ValueError("Linear polymerization reaction produced no results.")
+        linear_polymer_test = linear_polymer_test[0][0]
+        Chem.SanitizeMol(linear_polymer_test)
+    except Exception as e:
+        raise ValueError(
+            "Linear reaction SMARTS is invalid or incompatible with the starting polymer. "
+            "For support with constructing reaction SMARTS, raise an issue at https://github.com/matta-research-group/SwiftPol/issues"
+        ) from e
+    
+def validate_branched_reaction(starting_polymer, branched_activate, branched_activate_reactants, branched_react, linear_activate, linear_activate_reactants):
+    try:
+        # Test the branched activation reaction
+        activated_pol_test = branched_activate.RunReactants([starting_polymer] + branched_activate_reactants)
+        if not activated_pol_test:
+            raise ValueError("Branched activation reaction produced no results.")
+        activated_pol_test = activated_pol_test[0][0]
+        Chem.SanitizeMol(activated_pol_test)
+    except Exception as e:
+        raise ValueError(
+            "Branched activation reaction SMARTS is invalid or incompatible with the polymer network or branched activation reactants. "
+            "For support with constructing reaction SMARTS, raise an issue at https://github.com/matta-research-group/SwiftPol/issues"
+        ) from e
+
+    try:
+        # Test the branched polymerization reaction
+        linear_activated = linear_activate.RunReactants([starting_polymer] + linear_activate_reactants)[0][0]
+        Chem.SanitizeMol(linear_activated)
+        branched_polymer_test = branched_react.RunReactants([activated_pol_test, linear_activated])
+        if not branched_polymer_test:
+            raise ValueError("Branched polymerization reaction produced no results.")
+        branched_polymer_test = branched_polymer_test[0][0]
+        Chem.SanitizeMol(branched_polymer_test)
+    except Exception as e:
+        raise ValueError(
+            "Branched reaction SMARTS is invalid or incompatible with the polymer network. "
+            "For support with constructing reaction SMARTS, raise an issue at https://github.com/matta-research-group/SwiftPol/issues"
+        ) from e
+
+def iterative_chainID_update(polymer, last_polymer_added):
+    import string
+    for i in last_polymer_added.GetAtoms():
+        index = i.GetIdx()
+        info = i.GetMonomerInfo()
+        if info is not None:
+            info_new = Chem.AtomPDBResidueInfo()
+            info_new.SetResidueName(f'{int(info.GetResidueName()[0])+1}{info.GetResidueName()[1:]}')
+            info_new.SetResidueNumber(info.GetResidueNumber())
+            info_new.SetChainId(string.ascii_uppercase[(string.ascii_uppercase.index(info.GetChainId()) + 1) % 26])
+            polymer.GetAtomWithIdx(index).SetMonomerInfo(info_new)
+        else:
+            print(f"Warning: Atom {index} ({i.GetSymbol()}) does not have MonomerInfo. Skipping update for this atom.")
+    return polymer
+
 def build_branched_polymer(starting_polymer, 
-                              num_iterations=1, 
-                              probability_of_crosslinked_addition=0.5, 
-                              probability_of_linear_addition=0.5,
-                              reaction_templates=[('[Cl:1]-[*:2]-[*:3](-[I:4])-[*:7].[Cl:8]-[*:9]-[*:10](-[I:11])-[*:12].[F:15].[F:16]>>[*:12]-[*:10](-[F:15])-[*:9]-[*:2]-[*:3](-[F:16])-[*:7].[Cl:1].[I:4].[Cl:8].[I:11]', (Chem.MolFromSmiles('F'), Chem.MolFromSmiles('F'))),
-                                                  ('[*:2]-[*:4](-[F:5])-[*:6]-[*:7]-[*:8](-[F:9])-[*:10].[Cl:13]-[*:14]-[*:15](-[I:16])-[*:17].[Br:20]>>[*:2]-[*:4](-[Br:20])-[*:6]-[*:7]-[*C:8](-[*:10])-[*:14]-[*:15](-[I:16])-[*:17].[Cl:1].[F:9].[F:5]', (Chem.MolFromSmiles('Br'),)),
-                                                  ('[*:2]-[*:4](-[Br:5])-[*:6]-[*:7]-[*:8](-[*:9]-[*:12]-[*:13](-[I:14])-[*:15]).[Cl:18]-[*:19]-[*:20](-[I:21])-[*:22]>>[*:2]-[*:4]-[*:19]-[*:20](-[I:21])-[*:22]-[*:6]-[*:7]-[*:8](-[*:9]-[*:12]-[*:13](-[I:14])-[*:15]).[Br:5].[Cl:18]', ()),
-                                                  ('[*:2]-[*:4](-[F:5])-[*:6]-[*:7]-[*:8](-[F:9])-[*:10].[*:14]-[*:16](-[F:17])-[*:18]-[*:19]-[*:20](-[F:21])-[*:22]>>[*:2]-[*:4](-[*:16](-[*:14])(-[*:18]-[*:19]-[*:20](-[F:21])-[*:22]))-[*:6]-[*:7]-[*:8](-[F:9])-[*:10].[F:5].[F:17]', ()),]
-                                                  ):
-    """
-    Builds a crosslinked polymer network by iteratively applying chemical reactions.
-
-
-    This function builds a branched polymer by either adding linear chains 
-    or crosslinking existing polymer chains. The user can specify the number of iterations 
-    and the probabilities of crosslinking versus linear chain addition.
-
-    Parameters
-    ----------
-    starting_polymer : rdkit.Chem.Mol
-        The initial polymer molecule/monomer to start the crosslinking or chain addition process.
-    num_iterations : int, optional
-        The number of reaction iterations to perform (default is 1).
-    probability_of_crosslinked_addition : float, optional
-        The probability of performing a crosslinking reaction in each iteration (default is 0.5).
-    probability_of_linear_addition : float, optional
-        The probability of performing a linear chain addition reaction in each iteration (default is 0.5).
-
-    Returns
-    -------
-    rdkit.Chem.Mol
-        The final polymer molecule after the specified number of iterations, with halogens replaced by hydrogens.
-
-    Raises
-    ------
-    AssertionError
-        If the sum of `probability_of_crosslinked_addition` and `probability_of_linear_addition` is not equal to 1.
-
-    Notes
-    -----
-    - The function uses predefined reaction templates (SMARTS) for crosslinking and chain addition.
-    - Crosslinking requires at least two polymer chains to be present in the history.
-    - The function randomly selects reactions and reactants based on the specified probabilities.
-    - Halogens in the final polymer are replaced with hydrogens for chemical validity.
-
-    Examples
-    --------
-    >>> from rdkit import Chem
-    >>> starting_polymer = build.build_starting_polymer()
-    >>> final_polymer = build_crosslinked_polymer(starting_polymer, num_iterations=5, 
-    ...                                           probability_of_crosslinked_addition=0.6, 
-    ...                                           probability_of_linear_addition=0.4)
-    """
-#### TO DO:
-#### - rebuild this function with a simpler reaction template system.
-#### - should be 2 types of templates - a dictionary for branched and linear?
-#### - a target Mw for the polymer rather than iterations? - more intuitive. alternatively number of chains
-#### - test reaction smarts first, and throw error if they don't work.
-### - get rid of 'history' stuff
-#### - increase residue number for each added chain/monomer
-
-    from swiftpol.crosslink import replace_halogens_with_hydrogens
+                           reaction_templates,
+                           num_iterations=None,
+                           target_mw=None, 
+                           probability_of_branched_addition=0.5, 
+                           probability_of_linear_addition=0.5):
+    def build_branched_polymer(starting_polymer, 
+                               reaction_templates,
+                               num_iterations=None,
+                               target_mw=None, 
+                               probability_of_branched_addition=0.5, 
+                               probability_of_linear_addition=0.5):
+        """
+        Builds a branched polymer.
+    
+        Parameters:
+        -----------
+        starting_polymer : rdkit.Chem.Mol
+            The initial polymer molecule to which reactions will be applied.
+    
+        reaction_templates : dict
+            A dictionary containing reaction templates for both linear and branched additions.
+            Keys should include:
+                - "branched_activate": Activation reaction for branching.
+                - "branched_react": Reaction for branching.
+                - "linear_activate": Activation reaction for linear addition.
+                - "linear_react": Reaction for linear addition.
+    
+        num_iterations : int, optional
+            The number of iterations to perform. If specified, the process will stop after this many
+            successful reactions, regardless of the target molecular weight.
+    
+        target_mw : float, optional
+            The target molecular weight for the polymer. If specified, the process will stop once
+            the molecular weight of the polymer reaches or exceeds this value.
+    
+        probability_of_branched_addition : float, optional, default=0.5
+            The probability of performing a branched addition at each iteration.
+    
+        probability_of_linear_addition : float, optional, default=0.5
+            The probability of performing a linear addition at each iteration.
+    
+        Returns:
+        --------
+        polymer_network : rdkit.Chem.Mol
+            The resulting polymer molecule after the specified number of iterations or upon reaching
+            the target molecular weight.
+            Random stereochemsitry assigned to each stereocenter.
+    
+        Notes:
+        ------
+        - The function alternates between linear and branched additions based on the specified probabilities.
+        - If both `num_iterations` and `target_mw` are specified, the process will stop as soon as either
+          condition is met.
+        - The reaction templates must be compatible with the starting polymer and follow RDKit's reaction
+          SMARTS format.
+    
+        Raises:
+        -------
+        ValueError
+            If the reaction templates are invalid or incompatible with the starting polymer.
+        AssertionError
+            If the sum of probabilities does not equal 1.
+        ValueError
+            If neither `num_iterations` nor `target_mw` is specified.
+        """
+    from swiftpol.crosslink import validate_linear_reaction, validate_branched_reaction, iterative_chainID_update, assign_random_stereochemistry
     # Check if the probabilities sum to 1
-    if probability_of_crosslinked_addition + probability_of_linear_addition != 1:
+    if probability_of_branched_addition + probability_of_linear_addition != 1:
         raise AssertionError("Probabilities must sum to 1.")
+    # Check that there is either a target Mw or a number of iterations
+    if target_mw is None and num_iterations is None:
+        raise ValueError("Either target_mw or num_iterations must be specified.")
+    if target_mw is not None and num_iterations is not None:
+        raise ValueError("Specify either target_mw or num_iterations, not both.")
 
     #Convert SMARTS strings into RDKit reactions
-    reactions = [(AllChem.ReactionFromSmarts(smarts), reactants) for smarts, reactants in reaction_templates]
-        
-    polymer_network = starting_polymer  #This is the main polymer we modify
-    polymer_history = [polymer_network]  #Stores each iteration of the polymer network
+    rxns = list(reaction_templates.keys()) 
+    linear_activate = AllChem.ReactionFromSmarts(reaction_templates[rxns[0]][0])
+    linear_activate_reactants = [Chem.MolFromSmiles(smiles) for smiles in reaction_templates[rxns[0]][1:]]
+    linear_react = AllChem.ReactionFromSmarts(reaction_templates[rxns[1]][0])
+    validate_linear_reaction(starting_polymer, linear_activate, linear_activate_reactants, linear_react) #validate linear reactions
 
-    successful_reactions = 0
-    while successful_reactions < num_iterations:
-        #Choose whether to add a chain or crosslink
-        action = random.choices(["add_chain", "crosslink"], weights=[probability_of_linear_addition, probability_of_crosslinked_addition], k=1)[0]
+    branched_activate = AllChem.ReactionFromSmarts(reaction_templates[rxns[2]][0])
+    branched_activate_reactants = [Chem.MolFromSmiles(smiles) for smiles in reaction_templates[rxns[2]][1:]]
+    branched_react = AllChem.ReactionFromSmarts(reaction_templates[rxns[3]][0])
+    validate_branched_reaction(starting_polymer, branched_activate, branched_activate_reactants, branched_react, linear_activate, linear_activate_reactants) #validate branched reactions
+    
+    starting_polymer_activated = linear_activate.RunReactants([starting_polymer] + linear_activate_reactants)[0][0]
+    Chem.SanitizeMol(starting_polymer_activated)
+    starting_polymer_activated = linear_activate.RunReactants([starting_polymer_activated] + linear_activate_reactants)[0][0]
+    Chem.SanitizeMol(starting_polymer_activated)
+    Chem.AddHs(starting_polymer_activated)
+    polymer_network = Chem.Mol(starting_polymer_activated)
+    last_polymer_added = Chem.Mol(starting_polymer)
+    if num_iterations is not None:
+        successful_reactions = 0
+        while successful_reactions < num_iterations:
+            # Choose whether to complete a linear addition or crosslink
+            action = random.choices(["linear", "crosslink"], weights=[probability_of_linear_addition, probability_of_branched_addition], k=1)[0]
+            if action == "crosslink":
+                activated_for_branching_results = branched_activate.RunReactants([polymer_network] + branched_activate_reactants)
+                if activated_for_branching_results:  
+                    n = random.randint(0, len(activated_for_branching_results) - 1)
+                    activated_for_branching = activated_for_branching_results[n][0]
+                    Chem.SanitizeMol(activated_for_branching)
+                    starting_polymer_updated = iterative_chainID_update(starting_polymer_activated, last_polymer_added) #Update ChainID
+                    branched_polymer_results = branched_react.RunReactants([activated_for_branching, starting_polymer_updated])
+                    if branched_polymer_results:
+                        last_polymer_added = Chem.Mol(starting_polymer_updated)
+                        branched_polymer = branched_polymer_results[0][0]
+                        Chem.SanitizeMol(branched_polymer)
+                        polymer_network = branched_polymer
+                        successful_reactions += 1
 
-        if action == "crosslink":
-            #Ensure crosslinking only happens when there's something to crosslink with
-            if len(polymer_history) < 2:
-                continue  #Skip this step and retry
+            elif action == "linear":
+                starting_polymer_updated = iterative_chainID_update(starting_polymer_activated, last_polymer_added) #Update ChainID
+                linear_polymer_results = linear_react.RunReactants([polymer_network, starting_polymer_updated])
+                if linear_polymer_results: 
+                    last_polymer_added = Chem.Mol(starting_polymer_updated)
+                    n = random.randint(0, len(linear_polymer_results) - 1)
+                    linear_polymer = linear_polymer_results[n][0]
+                    Chem.SanitizeMol(linear_polymer)
+                    polymer_network = linear_polymer
+                    successful_reactions += 1
 
-            #Choose a previous polymer to crosslink with
-            chosen_polymer = random.choice(polymer_history[:-1])  #Select from earlier polymer versions
-            chosen_reaction, chosen_reactants = random.choices(reactions, weights=[0.0,0.3,0.35,0.35], k=1)[0]
-            reactant_sequence = (polymer_network, chosen_polymer) + chosen_reactants  #Use current and chosen polymer
+    elif target_mw is not None:
+        mol_weight_rolling = Chem.Descriptors.MolWt(polymer_network)
+        while mol_weight_rolling < target_mw:
+            # Choose whether to add a chain or crosslink
+            action = random.choices(["linear", "crosslink"], weights=[probability_of_linear_addition, probability_of_branched_addition], k=1)[0]
+    
+            if action == "crosslink":
+                activated_for_branching_results = branched_activate.RunReactants([polymer_network] + branched_activate_reactants)
+                if activated_for_branching_results:  
+                    n = random.randint(0, len(activated_for_branching_results) - 1)
+                    activated_for_branching = activated_for_branching_results[n][0]
+                    Chem.SanitizeMol(activated_for_branching)
+                    branched_polymer_results = branched_react.RunReactants([activated_for_branching, polymer_network])
+                    if branched_polymer_results: 
+                        branched_polymer = branched_polymer_results[0][0]
+                        Chem.SanitizeMol(branched_polymer)
+                        polymer_network = branched_polymer
+    
+            elif action == "linear":
+                linear_polymer_results = linear_react.RunReactants([polymer_network, starting_polymer])
+                if linear_polymer_results: 
+                    n = random.randint(0, len(linear_polymer_results) - 1)
+                    linear_polymer = linear_polymer_results[n][0]
+                    Chem.SanitizeMol(linear_polymer)
+                    polymer_network = linear_polymer
+            mol_weight_rolling = Chem.Descriptors.MolWt(polymer_network)
 
-        else:  #Adding a chain
-            chosen_reaction, chosen_reactants = reactions[0]
-            reactant_sequence = (polymer_network, starting_polymer) + chosen_reactants  #Add chain to current polymer
-
-        #Apply the reaction
-        reactant_sets = chosen_reaction.RunReactants(reactant_sequence)
-
-        if not reactant_sets:
-            continue  #Retry without counting this attempt
-
-        #Choose one of the successful products
-        polymer_network = random.choice(reactant_sets)[0]
-        polymer_history.append(polymer_network)  #Save the new polymer version
-        successful_reactions += 1  #Count successful reactions
-
-    return replace_halogens_with_hydrogens(polymer_history[-1])  #Return last polymer in the history
+    return assign_random_stereochemistry(polymer_network) 
 
 
 def assign_random_stereochemistry(mol):
@@ -159,15 +303,12 @@ def assign_random_stereochemistry(mol):
     from rdkit.Chem.EnumerateStereoisomers import EnumerateStereoisomers
     from rdkit.Chem.EnumerateStereoisomers import StereoEnumerationOptions
     opts = StereoEnumerationOptions(
-        onlyUnassigned = True,              #"Only look at stereocenters that don't have a defined configuration (i.e. ambiguous centers)."
-        unique = True                       #"Don't generate redundant stereoisomers - give me distinct ones."
+        onlyUnassigned = True,              
+        unique = True                      
     )
 
     isomers = list(EnumerateStereoisomers(mol, options = opts))   
-    #Runs a stereo enumeration algorithm ---> If there are 'n' undefined stereocenters, this could generate up to 2^n stereoisomers.
-    #Prepares the list of all the options.
     
-    #If any isomers were generated -> Randomly pick one. Else return the original molecule unchanged.
     return random.choice(isomers) if isomers else mol
 
 ###To do here:
@@ -193,7 +334,7 @@ def filter_close_pairs(cl_sites, max_index_diff = 150):
             if abs(c1 - c2) <= max_index_diff]                                 #For each pair it checks the distance between the two atoms
 
 def crosslink_cl_sites(mol, max_pairs = None):
-    rw = Chem.RWMol(mol)                       #Let's us add/remove atoms and bonds
+    rw = Chem.RWMol(mol)        
     cl_sites = find_terminal_cl_sites(rw)
 
     pairs = list(zip(cl_sites[::2], cl_sites[1::2]))               #As above
@@ -202,7 +343,7 @@ def crosslink_cl_sites(mol, max_pairs = None):
 
     removed_indices = set()
 
-    #Step 1: Add all bonds first
+    #Add all bonds first
     for (cl1, c1), (cl2, c2) in pairs:                                 #Creates a bond between carbon atoms
         #Skip any atoms that are already deleted in this loop
         if cl1 in removed_indices or cl2 in removed_indices:
@@ -212,7 +353,7 @@ def crosslink_cl_sites(mol, max_pairs = None):
         except:
             print(f"Failed to add bond between atoms {c1} and {c2}")
         
-    #Step 2: Remove Cl atoms after all bonds
+    #Remove Cl atoms after all bonds
     atoms_to_remove = sorted([cl for (cl1, _), (cl2, _) in pairs for cl in (cl1, cl2)], reverse = True)
     for cl in atoms_to_remove:
         if cl not in removed_indices:
@@ -221,19 +362,20 @@ def crosslink_cl_sites(mol, max_pairs = None):
             removed_indices.add(cl)
 
     Chem.SanitizeMol(rw)
-    return rw
+    rw.CommitBatchEdit()
+    mol = Chem.AddHs(rw)
+    return mol
 
 def iterative_crosslink(mol, max_cycles = 10):
+    from swiftpol.crosslink import find_terminal_cl_sites, crosslink_cl_sites
     cycles = 0
-    history = [mol]
     while cycles < max_cycles:
         cl_sites = find_terminal_cl_sites(mol)
         if len(cl_sites) < 2:
             break
         mol = crosslink_cl_sites(mol)
-        history.append(mol)
         cycles += 1
-    return mol, history
+    return mol
 
 
 def crosslink_polymer(branched_polymer):
