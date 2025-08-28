@@ -112,6 +112,59 @@ class TestCrosslink(unittest.TestCase):
             validate_linear_reaction(starting_polymer, linear_activate, linear_activate_reactants, linear_react)
 
 
+    def test_build_branched_polymer(self):
+        monomer = ["IC=CC(=O)OI", "IOCCOI"] # PEGDA monomers with iodinated polymerization points
+        reaction = AllChem.ReactionFromSmarts('[C:1]-[O:2]-[I:3].[C:4]-[O:5]-[I:6]>>[C:1]-[O:2]-[C:4].[I:3]-[I:6].[O:5]')
+        sequence = 'ABBBBBBBBBA' # SwiftPol can easily build irregular sequence motifs
+        polymer = build.build_polymer(sequence = sequence,
+                                        monomer_list = monomer,
+                                        reaction = reaction,
+                                        terminal = 'hydrogen',
+                                        chainID='A')
+        
+        reaction_templates = {'linear_activate' : ['[C:1]=[C:2].[Cl:3].[I:4]>>[C:1](-[I:4])-[C:2]-[Cl:3]', 'Cl', 'I'],
+                      'linear_react' : ['[C:1][I:2].[C:3][Cl:4]>>[C:1][C:3].[I:2].[Cl:4]'],
+                      'branched_activate' : ['[O:1][C:2][C:3](-[C:4][Cl:5])[C:6][C:7][C:8].[Br:9]>>[O:1][C:2][C:3](-[C:4][Br:9])[C:6][C:7][C:8].[Cl:5]', 'Br'],
+                      'branched_react' : ['[C:1][Br:2].[C:3][Cl:4]>>[C:1][C:3].[Br:2].[Cl:4]']}
+        
+        branched_polymer = crosslink.build_branched_polymer(starting_polymer = polymer,
+                                                            reaction_templates = reaction_templates,
+                                                            num_iterations=4, 
+                                                            probability_of_branched_addition=0.5, 
+                                                            probability_of_linear_addition=0.5)
+        
+        self.assertIsNotNone(branched_polymer, "Failed to create branched polymer.")
+
+        branched_polymer_mw = crosslink.build_branched_polymer(starting_polymer = polymer,
+                                                                reaction_templates = reaction_templates,
+                                                                target_mw=10000, 
+                                                                probability_of_branched_addition=0.5, 
+                                                                probability_of_linear_addition=0.5)
+
+        self.assertIsNotNone(branched_polymer_mw, "Failed to create branched polymer with target MW.")
+
+        def test_build_crosslinked_polymer(self):
+            polymer = build.build_polymer(sequence = sequence,
+                                        monomer_list = monomer,
+                                        reaction = reaction,
+                                        terminal = 'hydrogen',
+                                        chainID='A')
+        
+        
+            reaction_templates = {'linear_activate' : ['[C:1]=[C:2].[Cl:3].[I:4]>>[C:1](-[I:4])-[C:2]-[Cl:3]', 'Cl', 'I'],
+                                'linear_react' : ['[C:1][I:2].[C:3][Cl:4]>>[C:1][C:3].[I:2].[Cl:4]'],
+                                'branched_activate' : ['[O:1][C:2][C:3](-[C:4][Cl:5])[C:6][C:7][C:8].[Br:9]>>[O:1][C:2][C:3](-[C:4][Br:9])[C:6][C:7][C:8].[Cl:5]', 'Br'],
+                                'branched_react' : ['[C:1][Br:2].[C:3][Cl:4]>>[C:1][C:3].[Br:2].[Cl:4]']}
+        
+            branched_polymer = crosslink.build_branched_polymer(starting_polymer = polymer,
+                                                                reaction_templates = reaction_templates,
+                                                                num_iterations=4, 
+                                                                probability_of_branched_addition=0.5, 
+                                                                probability_of_linear_addition=0.5)
+
+            crosslinked_network = crosslink.crosslink_polymer(branched_mw, percentage_to_crosslink=80)
+            self.assertIsNotNone(crosslinked_network, "Failed to create crosslinked polymer network.")
+        
 
 
 if __name__ == "__main__":
