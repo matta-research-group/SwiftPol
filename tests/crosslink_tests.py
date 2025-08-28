@@ -114,9 +114,9 @@ class TestCrosslink(unittest.TestCase):
 
 
     def test_build_branched_polymer(self):
-        monomer = ["IC=CC(=O)OI", "IOCCOI"] # PEGDA monomers with iodinated polymerization points
+        monomer = ["IC=CC(=O)OI", "IOCCOI"]
         reaction = AllChem.ReactionFromSmarts('[C:1]-[O:2]-[I:3].[C:4]-[O:5]-[I:6]>>[C:1]-[O:2]-[C:4].[I:3]-[I:6].[O:5]')
-        sequence = 'ABBBBBBBBBA' # SwiftPol can easily build irregular sequence motifs
+        sequence = 'ABBBBBBBBBA' 
         polymer = build.build_polymer(sequence = sequence,
                                         monomer_list = monomer,
                                         reaction = reaction,
@@ -145,6 +145,9 @@ class TestCrosslink(unittest.TestCase):
         self.assertIsNotNone(branched_polymer_mw, "Failed to create branched polymer with target MW.")
 
     def test_build_crosslinked_polymer(self):
+        monomer = ["IC=CC(=O)OI", "IOCCOI"] 
+        reaction = AllChem.ReactionFromSmarts('[C:1]-[O:2]-[I:3].[C:4]-[O:5]-[I:6]>>[C:1]-[O:2]-[C:4].[I:3]-[I:6].[O:5]')
+        sequence = 'ABBBBBBBBBA' 
         polymer = build.build_polymer(sequence = sequence,
                                     monomer_list = monomer,
                                     reaction = reaction,
