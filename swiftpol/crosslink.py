@@ -378,11 +378,75 @@ def iterative_crosslink(mol, max_cycles = 10):
     return mol
 
 
-def crosslink_polymer(branched_polymer):
-    '''
-    docstring
-    '''
-### remember to add imports
-    return crosslinked_polymer
+from rdkit import Chem
+from swiftpol.crosslink import replace_halogens_with_hydrogens
 
-# crosslinked_polymer class?
+def crosslink_polymer(mol, percentage_to_crosslink=50):
+    """
+    Crosslinks a specified percentage of terminal chlorine atoms in a polymer 
+    and replaces the remaining halogens with hydrogens.
+
+    Parameters:
+    -----------
+    mol : rdkit.Chem.Mol
+        The input molecule representing the polymer.
+
+    percentage_to_crosslink : float, optional, default=50
+        The percentage (0-100) of terminal chlorine atoms to crosslink. 
+        The remaining halogens will be replaced with hydrogens.
+
+    Returns:
+    --------
+    mol : rdkit.Chem.Mol
+        The modified molecule with the specified percentage of crosslinks 
+        and the remaining halogens replaced by hydrogens.
+
+    Notes:
+    ------
+    - The function identifies terminal chlorine atoms bonded to carbon atoms.
+    - Crosslinking is performed by creating single bonds between carbon atoms 
+      of selected chlorine sites.
+    - Remaining halogens are replaced with hydrogens using the 
+      `replace_halogens_with_hydrogens` function.
+    - The `percentage_to_crosslink` parameter determines the proportion of 
+      chlorine atoms to crosslink.
+
+    Raises:
+    -------
+    ValueError
+        If `percentage_to_crosslink` is not between 0 and 100.
+    """
+    if not (0 <= percentage_to_crosslink <= 100):
+        raise ValueError("percentage_to_crosslink must be between 0 and 100.")
+
+    rw = Chem.RWMol(mol)
+    cl_sites = find_terminal_cl_sites(rw)
+
+    # Determine the number of pairs to crosslink based on the percentage
+    num_pairs = int((percentage_to_crosslink / 100) * (len(cl_sites) // 2))
+    pairs = list(zip(cl_sites[::2], cl_sites[1::2]))[:num_pairs]
+
+    removed_indices = set()
+
+    # Add bonds for the selected pairs
+    for (cl1, c1), (cl2, c2) in pairs:
+        if cl1 in removed_indices or cl2 in removed_indices:
+            continue
+        try:
+            rw.AddBond(c1, c2, Chem.BondType.SINGLE)
+        except:
+            print(f"Failed to add bond between atoms {c1} and {c2}")
+        
+    # Remove the chlorine atoms involved in crosslinking
+    atoms_to_remove = sorted([cl for (cl1, _), (cl2, _) in pairs for cl in (cl1, cl2)], reverse=True)
+    for cl in atoms_to_remove:
+        if cl not in removed_indices:
+            rw.RemoveAtom(cl)
+            removed_indices.add(cl)
+
+    Chem.SanitizeMol(rw)
+    rw.CommitBatchEdit()
+
+    # Replace remaining halogens with hydrogens
+    mol = replace_halogens_with_hydrogens(rw)
+    return mol
