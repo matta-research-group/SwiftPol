@@ -45,6 +45,8 @@ from statistics import mean
 from rdkit.Chem.Descriptors import ExactMolWt
 from openff.interchange import Interchange
 
+import string
+
 
 # Build polymer - generic
 def build_polymer(
