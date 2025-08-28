@@ -43,3 +43,13 @@ swiftpol.parameterize
    :undoc-members:
    :show-inheritance:
    :no-imported-members:
+
+
+swiftpol.crosslink
+=====================
+
+.. automodule:: swiftpol.crosslink
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :no-imported-members:
