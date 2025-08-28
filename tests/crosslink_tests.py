@@ -145,7 +145,7 @@ class TestCrosslink(unittest.TestCase):
         self.assertIsNotNone(branched_polymer_mw, "Failed to create branched polymer with target MW.")
 
     def test_build_crosslinked_polymer(self):
-        monomer = ["IC=CC(=O)OI", "IOCCOI"] 
+        monomer = ["IC=CC(=O)OI", "IOCCOI"]
         reaction = AllChem.ReactionFromSmarts('[C:1]-[O:2]-[I:3].[C:4]-[O:5]-[I:6]>>[C:1]-[O:2]-[C:4].[I:3]-[I:6].[O:5]')
         sequence = 'ABBBBBBBBBA' 
         polymer = build.build_polymer(sequence = sequence,
