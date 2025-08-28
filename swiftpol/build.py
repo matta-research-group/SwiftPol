@@ -692,7 +692,7 @@ class polymer_system:
                         sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence)
                         pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1, chainID=id_new)
                     else:
-                        pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1, chainID=iid_newd)
+                        pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1, chainID=id_newd)
                     lengths.append(int(length_actual))
                     chains_rdkit.append(pol)
                     chain = Molecule.from_rdkit(pol)
@@ -1339,11 +1339,12 @@ class polymer_system_from_PDI:
                         break  # Exit the loop if the sequence is valid
                 blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
                 if spec(sequence)==True:
+                    id_new = string.ascii_uppercase[(n) % 26] 
                     if stereoisomerism_input is not None:
                         sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence)
-                        pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                        pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1, chainID=id_new)
                     else:
-                        pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                        pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1, chainID=id_new)
                     lengths.append(int(l))
                 chains_rdkit.append(pol)
                 chain = Molecule.from_rdkit(pol)
@@ -1363,11 +1364,12 @@ class polymer_system_from_PDI:
             n=0
             for l in chain_lengths:
                 sequence = reduce(lambda x, y: x + y, np.random.choice(['A', 'B'], size=(int(l),), p=[perc_A_target/100,1-(perc_A_target/100)]))
+                id_new = string.ascii_uppercase[(n) % 26]
                 if stereoisomerism_input is not None:
                     sequence_stereo = introduce_stereoisomers(stereo_monomer, instance, sequence) 
-                    pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)
+                    pol = build_polymer(sequence=sequence_stereo, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1, chainID=id_new)
                 else:
-                    pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1)                   
+                    pol = build_polymer(sequence=sequence, monomer_list = monomer_list, reaction = reaction, terminal=terminals, chain_num=n+1, chainID=id_new)                   
                 lengths.append(int(l))
                 chains_rdkit.append(pol)
                 chain = Molecule.from_rdkit(pol)
