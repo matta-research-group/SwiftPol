@@ -44,6 +44,7 @@ from functools import reduce
 from statistics import mean
 from rdkit.Chem.Descriptors import ExactMolWt
 from openff.interchange import Interchange
+import string
 
 
 
@@ -809,7 +810,7 @@ class polymer_system:
                             reaction=reaction,
                             terminal=terminals,
                             chain_num=n + 1,
-                            chainID=id_newd,
+                            chainID=id_new,
                         )
                     lengths.append(int(length_actual))
                     chains_rdkit.append(pol)
