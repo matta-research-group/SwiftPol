@@ -1,10 +1,8 @@
 ##Functions for building crosslinked polymers
 
 #Init
-import rdkit
 from rdkit import Chem
 from rdkit.Chem import AllChem
-import os
 import random
 import numpy as np
 try:
@@ -66,9 +64,35 @@ def replace_halogens_with_hydrogens(mol):
     mol_with_h = Chem.AddHs(mol_no_halogens)
     return mol_with_h
 
-from rdkit import Chem
 
 def validate_linear_reaction(starting_polymer, linear_activate, linear_activate_reactants, linear_react):
+    """
+    Validates the linear activation and polymerization reactions for compatibility 
+    with the starting polymer and reactants.
+
+    Note:
+    -----
+    This function is not recommended for standalone use.
+
+    Parameters:
+    -----------
+    starting_polymer : rdkit.Chem.Mol
+        The initial polymer molecule to validate against the reactions.
+
+    linear_activate : rdkit.Chem.rdChemReactions.ChemicalReaction
+        The reaction template for linear activation.
+
+    linear_activate_reactants : list of rdkit.Chem.Mol
+        The reactants required for the linear activation reaction.
+
+    linear_react : rdkit.Chem.rdChemReactions.ChemicalReaction
+        The reaction template for linear polymerization.
+
+    Raises:
+    -------
+    ValueError
+        If the reactions are invalid or incompatible with the starting polymer.
+    """
     try:
         # Test the linear activation reaction
         activated_pol_test = linear_activate.RunReactants([starting_polymer] + linear_activate_reactants)
@@ -95,10 +119,50 @@ def validate_linear_reaction(starting_polymer, linear_activate, linear_activate_
             "For support with constructing reaction SMARTS, raise an issue at https://github.com/matta-research-group/SwiftPol/issues"
         ) from e
     
-def validate_branched_reaction(starting_polymer, branched_activate, branched_activate_reactants, branched_react, linear_activate, linear_activate_reactants):
+def validate_branched_reaction(starting_polymer, branched_activate, branched_activate_reactants, branched_react, linear_activate, linear_activate_reactants, linear_react):
+    """
+    Validates the branched and linear activation and polymerization reactions 
+    for compatibility with the starting polymer and reactants.
+
+    Note:
+    -----
+    This function is not recommended for standalone use.
+
+    Parameters:
+    -----------
+    starting_polymer : rdkit.Chem.Mol
+        The initial polymer molecule to validate against the reactions.
+
+    branched_activate : rdkit.Chem.rdChemReactions.ChemicalReaction
+        The reaction template for branched activation.
+
+    branched_activate_reactants : list of rdkit.Chem.Mol
+        The reactants required for the branched activation reaction.
+
+    branched_react : rdkit.Chem.rdChemReactions.ChemicalReaction
+        The reaction template for branched polymerization.
+
+    linear_activate : rdkit.Chem.rdChemReactions.ChemicalReaction
+        The reaction template for linear activation.
+
+    linear_activate_reactants : list of rdkit.Chem.Mol
+        The reactants required for the linear activation reaction.
+
+    linear_react : rdkit.Chem.rdChemReactions.ChemicalReaction
+        The reaction template for linear polymerization.
+
+    Raises:
+    -------
+    ValueError
+        If the reactions are invalid or incompatible with the starting polymer.
+    """
+    linear_activated = linear_activate.RunReactants([starting_polymer] + linear_activate_reactants)[0][0]
+    Chem.SanitizeMol(linear_activated)
+    linear_polymer = linear_react.RunReactants([linear_activated, linear_activated])[0][0]
+    Chem.SanitizeMol(linear_polymer)
     try:
         # Test the branched activation reaction
-        activated_pol_test = branched_activate.RunReactants([starting_polymer] + branched_activate_reactants)
+        activated_pol_test = branched_activate.RunReactants([linear_polymer] + branched_activate_reactants)
         if not activated_pol_test:
             raise ValueError("Branched activation reaction produced no results.")
         activated_pol_test = activated_pol_test[0][0]
@@ -111,8 +175,6 @@ def validate_branched_reaction(starting_polymer, branched_activate, branched_act
 
     try:
         # Test the branched polymerization reaction
-        linear_activated = linear_activate.RunReactants([starting_polymer] + linear_activate_reactants)[0][0]
-        Chem.SanitizeMol(linear_activated)
         branched_polymer_test = branched_react.RunReactants([activated_pol_test, linear_activated])
         if not branched_polymer_test:
             raise ValueError("Branched polymerization reaction produced no results.")
@@ -125,6 +187,34 @@ def validate_branched_reaction(starting_polymer, branched_activate, branched_act
         ) from e
 
 def iterative_chainID_update(polymer, last_polymer_added):
+    """
+    Updates the chain IDs of atoms in a polymer molecule iteratively based on the last polymer added.
+
+    This function modifies the `polymer` molecule by updating the chain IDs of its atoms. The chain IDs
+    are incremented sequentially, starting from the chain ID of the `last_polymer_added`. The function
+    ensures that the chain IDs wrap around using the English alphabet (A-Z).
+
+    Parameters:
+    -----------
+    polymer : rdkit.Chem.Mol
+        The polymer molecule whose chain IDs will be updated.
+
+    last_polymer_added : rdkit.Chem.Mol
+        The last polymer molecule added to the network. The chain IDs of this molecule are used as
+        the starting point for updating the chain IDs in the `polymer`.
+
+    Returns:
+    --------
+    polymer : rdkit.Chem.Mol
+        The updated polymer molecule with modified chain IDs.
+
+    Notes:
+    ------
+    - Not recommended for standalone use.
+    - The function uses the `AtomPDBResidueInfo` object to access and modify chain IDs during the network building process.
+    - Chain IDs are updated using the English alphabet (A-Z) and wrap around if they exceed 'Z'.
+    - Atoms without `MonomerInfo` are skipped, and a warning is printed for each skipped atom. For polymers build with SwiftPol, this should not occur.
+    """
     import string
     for i in last_polymer_added.GetAtoms():
         index = i.GetIdx()
@@ -145,66 +235,61 @@ def build_branched_polymer(starting_polymer,
                            target_mw=None, 
                            probability_of_branched_addition=0.5, 
                            probability_of_linear_addition=0.5):
-    def build_branched_polymer(starting_polymer, 
-                               reaction_templates,
-                               num_iterations=None,
-                               target_mw=None, 
-                               probability_of_branched_addition=0.5, 
-                               probability_of_linear_addition=0.5):
-        """
-        Builds a branched polymer.
-    
-        Parameters:
-        -----------
-        starting_polymer : rdkit.Chem.Mol
-            The initial polymer molecule to which reactions will be applied.
-    
-        reaction_templates : dict
-            A dictionary containing reaction templates for both linear and branched additions.
-            Keys should include:
-                - "branched_activate": Activation reaction for branching.
-                - "branched_react": Reaction for branching.
-                - "linear_activate": Activation reaction for linear addition.
-                - "linear_react": Reaction for linear addition.
-    
-        num_iterations : int, optional
-            The number of iterations to perform. If specified, the process will stop after this many
-            successful reactions, regardless of the target molecular weight.
-    
-        target_mw : float, optional
-            The target molecular weight for the polymer. If specified, the process will stop once
-            the molecular weight of the polymer reaches or exceeds this value.
-    
-        probability_of_branched_addition : float, optional, default=0.5
-            The probability of performing a branched addition at each iteration.
-    
-        probability_of_linear_addition : float, optional, default=0.5
-            The probability of performing a linear addition at each iteration.
-    
-        Returns:
-        --------
-        polymer_network : rdkit.Chem.Mol
-            The resulting polymer molecule after the specified number of iterations or upon reaching
-            the target molecular weight.
-            Random stereochemsitry assigned to each stereocenter.
-    
-        Notes:
-        ------
-        - The function alternates between linear and branched additions based on the specified probabilities.
-        - If both `num_iterations` and `target_mw` are specified, the process will stop as soon as either
-          condition is met.
-        - The reaction templates must be compatible with the starting polymer and follow RDKit's reaction
-          SMARTS format.
-    
-        Raises:
-        -------
-        ValueError
-            If the reaction templates are invalid or incompatible with the starting polymer.
-        AssertionError
-            If the sum of probabilities does not equal 1.
-        ValueError
-            If neither `num_iterations` nor `target_mw` is specified.
-        """
+
+    """
+    Builds a branched polymer.
+
+    Parameters:
+    -----------
+    starting_polymer : rdkit.Chem.Mol
+        The initial polymer molecule to which reactions will be applied.
+
+    reaction_templates : dict
+        A dictionary containing reaction templates for both linear and branched additions.
+        Keys should include:
+            - "branched_activate": Activation reaction for branching.
+            - "branched_react": Reaction for branching.
+            - "linear_activate": Activation reaction for linear addition.
+            - "linear_react": Reaction for linear addition.
+
+    num_iterations : int, optional
+        The number of iterations to perform. If specified, the process will stop after this many
+        successful reactions, regardless of the target molecular weight.
+
+    target_mw : float, optional
+        The target molecular weight for the polymer. If specified, the process will stop once
+        the molecular weight of the polymer reaches or exceeds this value.
+
+    probability_of_branched_addition : float, optional, default=0.5
+        The probability of performing a branched addition at each iteration.
+
+    probability_of_linear_addition : float, optional, default=0.5
+        The probability of performing a linear addition at each iteration.
+
+    Returns:
+    --------
+    polymer_network : rdkit.Chem.Mol
+        The resulting polymer molecule after the specified number of iterations or upon reaching
+        the target molecular weight.
+        Random stereochemsitry assigned to each stereocenter.
+
+    Notes:
+    ------
+    - The function alternates between linear and branched additions based on the specified probabilities.
+    - If both `num_iterations` and `target_mw` are specified, the process will stop as soon as either
+        condition is met.
+    - The reaction templates must be compatible with the starting polymer and follow RDKit's reaction
+        SMARTS format.
+
+    Raises:
+    -------
+    ValueError
+        If the reaction templates are invalid or incompatible with the starting polymer.
+    AssertionError
+        If the sum of probabilities does not equal 1.
+    ValueError
+        If neither `num_iterations` nor `target_mw` is specified.
+    """
     from swiftpol.crosslink import validate_linear_reaction, validate_branched_reaction, iterative_chainID_update, assign_random_stereochemistry
     # Check if the probabilities sum to 1
     if probability_of_branched_addition + probability_of_linear_addition != 1:
@@ -225,8 +310,8 @@ def build_branched_polymer(starting_polymer,
     branched_activate = AllChem.ReactionFromSmarts(reaction_templates[rxns[2]][0])
     branched_activate_reactants = [Chem.MolFromSmiles(smiles) for smiles in reaction_templates[rxns[2]][1:]]
     branched_react = AllChem.ReactionFromSmarts(reaction_templates[rxns[3]][0])
-    validate_branched_reaction(starting_polymer, branched_activate, branched_activate_reactants, branched_react, linear_activate, linear_activate_reactants) #validate branched reactions
-    
+    validate_branched_reaction(starting_polymer, branched_activate, branched_activate_reactants, branched_react, linear_activate, linear_activate_reactants, linear_react) #validate branched reactions
+
     starting_polymer_activated = linear_activate.RunReactants([starting_polymer] + linear_activate_reactants)[0][0]
     Chem.SanitizeMol(starting_polymer_activated)
     starting_polymer_activated = linear_activate.RunReactants([starting_polymer_activated] + linear_activate_reactants)[0][0]
@@ -268,24 +353,27 @@ def build_branched_polymer(starting_polymer,
     elif target_mw is not None:
         mol_weight_rolling = Chem.Descriptors.MolWt(polymer_network)
         while mol_weight_rolling < target_mw:
-            # Choose whether to add a chain or crosslink
+            # Choose whether to complete a linear addition or crosslink
             action = random.choices(["linear", "crosslink"], weights=[probability_of_linear_addition, probability_of_branched_addition], k=1)[0]
-    
             if action == "crosslink":
                 activated_for_branching_results = branched_activate.RunReactants([polymer_network] + branched_activate_reactants)
                 if activated_for_branching_results:  
                     n = random.randint(0, len(activated_for_branching_results) - 1)
                     activated_for_branching = activated_for_branching_results[n][0]
                     Chem.SanitizeMol(activated_for_branching)
-                    branched_polymer_results = branched_react.RunReactants([activated_for_branching, polymer_network])
-                    if branched_polymer_results: 
+                    starting_polymer_updated = iterative_chainID_update(starting_polymer_activated, last_polymer_added) #Update ChainID
+                    branched_polymer_results = branched_react.RunReactants([activated_for_branching, starting_polymer_updated])
+                    if branched_polymer_results:
+                        last_polymer_added = Chem.Mol(starting_polymer_updated)
                         branched_polymer = branched_polymer_results[0][0]
                         Chem.SanitizeMol(branched_polymer)
                         polymer_network = branched_polymer
-    
+
             elif action == "linear":
-                linear_polymer_results = linear_react.RunReactants([polymer_network, starting_polymer])
+                starting_polymer_updated = iterative_chainID_update(starting_polymer_activated, last_polymer_added) #Update ChainID
+                linear_polymer_results = linear_react.RunReactants([polymer_network, starting_polymer_updated])
                 if linear_polymer_results: 
+                    last_polymer_added = Chem.Mol(starting_polymer_updated)
                     n = random.randint(0, len(linear_polymer_results) - 1)
                     linear_polymer = linear_polymer_results[n][0]
                     Chem.SanitizeMol(linear_polymer)
@@ -308,7 +396,7 @@ def assign_random_stereochemistry(mol):
     )
 
     isomers = list(EnumerateStereoisomers(mol, options = opts))   
-    
+
     return random.choice(isomers) if isomers else mol
 
 ###To do here:
