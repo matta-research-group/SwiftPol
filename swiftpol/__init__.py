@@ -1,6 +1,6 @@
 """A Python package for building in silico polymer systems"""
 
-#Init
+# Init
 import rdkit
 from rdkit import Chem
 from rdkit.Chem import AllChem
@@ -9,12 +9,17 @@ import random
 import numpy as np
 import numpy as np
 import time
+
 try:
     from openeye import oechem
+
     oechem_imported = True
 except:
     import warnings
-    warnings.warn("OpenEye is not installed. You will not be able to use OpenEye Toolkits for conformer generation.")
+
+    warnings.warn(
+        "OpenEye is not installed. You will not be able to use OpenEye Toolkits for conformer generation."
+    )
 
 
 import openmm
@@ -39,5 +44,3 @@ from openff.interchange.components._packmol import UNIT_CUBE, pack_box
 from swiftpol import build
 from swiftpol import parameterize
 from swiftpol import __version__
-
-
