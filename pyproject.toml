@@ -5,6 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "swiftpol"
 description = "Tools for polymer molecular dynamics simulations."
+version = "0.1.4"
 dynamic = ["version"]
 readme = "README.md"
 authors = [
