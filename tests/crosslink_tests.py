@@ -3,6 +3,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 from swiftpol import build
 from swiftpol.crosslink import replace_halogens_with_hydrogens, validate_linear_reaction
+from swiftpol import crosslink
 
 
 class TestCrosslink(unittest.TestCase):
@@ -164,7 +165,7 @@ class TestCrosslink(unittest.TestCase):
 
             crosslinked_network = crosslink.crosslink_polymer(branched_mw, percentage_to_crosslink=80)
             self.assertIsNotNone(crosslinked_network, "Failed to create crosslinked polymer network.")
-        
+
 
 
 if __name__ == "__main__":
