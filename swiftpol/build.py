@@ -44,6 +44,8 @@ from functools import reduce
 from statistics import mean
 from rdkit.Chem.Descriptors import ExactMolWt
 from openff.interchange import Interchange
+import string
+
 
 import string
 
@@ -52,6 +54,7 @@ import string
 def build_polymer(
     sequence, monomer_list, reaction, terminal="hydrogen", chain_num=1, chainID="A"
 ):
+
     """
     Constructs a polymer from a given sequence of monomers.
 
@@ -94,6 +97,7 @@ def build_polymer(
     info.SetResidueNumber(1)
     info.SetChainId(chainID)
     [atom.SetMonomerInfo(info) for atom in polymer.GetAtoms()]
+
     Chem.SanitizeMol(polymer)
 
     for i in range(len(sequence))[1:]:
@@ -105,6 +109,7 @@ def build_polymer(
             info.SetResidueNumber(i + 1)
             info.SetChainId(chainID)
             [atom.SetMonomerInfo(info) for atom in A.GetAtoms()]
+
             try:
                 polymer = reaction.RunReactants((polymer, A))[0][0]
             except IndexError:
@@ -651,7 +656,6 @@ class polymer_system:
     from openff.units import unit
     from rdkit.Chem import AllChem
     import string
-
     def __init__(
         self,
         monomer_list,
@@ -1648,6 +1652,7 @@ class polymer_system_from_PDI:
                             chain_num=n + 1,
                             chainID=id_new,
                         )
+
                     lengths.append(int(l))
                 chains_rdkit.append(pol)
                 chain = Molecule.from_rdkit(pol)
