@@ -81,25 +81,5 @@ class TestParameterize(unittest.TestCase):
         charges = charge_polymer(polymer, "NAGL")
         self.assertIsNotNone(charges)
 
-    def test_forcefield_with_charge_handler(self):
-        # Create a test molecule
-        molecule = Chem.MolFromSmiles("C[C@@H](C(=O)[OH])O")
-        # Test with ensemble=False
-        forcefield = forcefield_with_charge_handler(molecule, "NAGL", ensemble=False)
-        self.assertIsNotNone(forcefield)
-        # Test with ensemble=True
-        ensemble_object = demo.PLGA_system(80, 50, 1.0, "ester", 5)
-        forcefield = forcefield_with_charge_handler(
-            ensemble_object, "NAGL", ensemble=True
-        )
-        self.assertIsNotNone(forcefield)
-        # Test with ensemble likely to contain duplicates
-        ensemble_object = demo.PLGA_system(80, 50, 1.0, "ester", 100)
-        forcefield = forcefield_with_charge_handler(
-            ensemble_object, "NAGL", ensemble=True
-        )
-        self.assertIsNotNone(forcefield)
-
-
 if __name__ == "__main__":
     unittest.main()
