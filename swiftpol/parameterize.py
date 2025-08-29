@@ -153,5 +153,3 @@ def charge_openff_polymer(openff_chain, charge_scheme, overwrite=True):
         raise AttributeError(
             "This function takes either 'AM1_BCC', 'NAGL', or 'espaloma' as charge_scheme input"
         )
-
-    return forcefield
