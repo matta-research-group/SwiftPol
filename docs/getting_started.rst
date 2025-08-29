@@ -33,12 +33,14 @@ Installing With a Docker Container
 To install SwiftPol as a docker container, install `docker desktop <https://docs.docker.com/desktop/>`_ and run the following command in the terminal
 
 .. code-block:: bash
+
     docker build --no-cache --platform=linux/amd64 -f Dockerfile -t my-image -t setup/swiftpol:latest .
 
 
 to open a jupyter notebook run
 
 .. code-block:: bash
+    
     docker run --rm -it -p 8888:8888 setup/swiftpol:latest
 
 
