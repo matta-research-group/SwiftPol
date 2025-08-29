@@ -106,7 +106,13 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 <section id="installing-with-a-docker-container">
 <h2>Installing With a Docker Container<a class="headerlink" href="#installing-with-a-docker-container" title="Link to this heading"></a></h2>
 <p>To install SwiftPol as a docker container, install <a class="reference external" href="https://docs.docker.com/desktop/">docker desktop</a> and run the following command in the terminal</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>build<span class="w"> </span>--no-cache<span class="w"> </span>--platform<span class="o">=</span>linux/amd64<span class="w"> </span>-f<span class="w"> </span>Dockerfile<span class="w"> </span>-t<span class="w"> </span>my-image<span class="w"> </span>-t<span class="w"> </span>setup/swiftpol:latest<span class="w"> </span>.
+</pre></div>
+</div>
 <p>to open a jupyter notebook run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-it<span class="w"> </span>-p<span class="w"> </span><span class="m">8888</span>:8888<span class="w"> </span>setup/swiftpol:latest
+</pre></div>
+</div>
 </section>
 <section id="basic-usage">
 <h2>Basic Usage<a class="headerlink" href="#basic-usage" title="Link to this heading"></a></h2>
