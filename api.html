@@ -87,6 +87,20 @@
 <li class="toctree-l2"><a class="reference internal" href="#swiftpol.parameterize.forcefield_with_charge_handler"><code class="docutils literal notranslate"><span class="pre">forcefield_with_charge_handler()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="#module-swiftpol.crosslink">swiftpol.crosslink</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.replace_halogens_with_hydrogens"><code class="docutils literal notranslate"><span class="pre">replace_halogens_with_hydrogens()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.validate_linear_reaction"><code class="docutils literal notranslate"><span class="pre">validate_linear_reaction()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.validate_branched_reaction"><code class="docutils literal notranslate"><span class="pre">validate_branched_reaction()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.iterative_chainID_update"><code class="docutils literal notranslate"><span class="pre">iterative_chainID_update()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.build_branched_polymer"><code class="docutils literal notranslate"><span class="pre">build_branched_polymer()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.assign_random_stereochemistry"><code class="docutils literal notranslate"><span class="pre">assign_random_stereochemistry()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.find_terminal_cl_sites"><code class="docutils literal notranslate"><span class="pre">find_terminal_cl_sites()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.filter_close_pairs"><code class="docutils literal notranslate"><span class="pre">filter_close_pairs()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.crosslink_cl_sites"><code class="docutils literal notranslate"><span class="pre">crosslink_cl_sites()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.iterative_crosslink"><code class="docutils literal notranslate"><span class="pre">iterative_crosslink()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.crosslink_polymer"><code class="docutils literal notranslate"><span class="pre">crosslink_polymer()</span></code></a></li>
+</ul>
+</li>
 </ul>
 
         </div>
@@ -764,6 +778,272 @@ Assigns % residual monomer value to ensemble under self.residual_monomer_actual<
 <dd class="field-even"><p><strong>Exception</strong> – If the charge method is not supported.</p>
 </dd>
 </dl>
+</dd></dl>
+
+</section>
+<section id="module-swiftpol.crosslink">
+<span id="swiftpol-crosslink"></span><h1>swiftpol.crosslink<a class="headerlink" href="#module-swiftpol.crosslink" title="Link to this heading"></a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.crosslink.replace_halogens_with_hydrogens">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">replace_halogens_with_hydrogens</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#replace_halogens_with_hydrogens"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.replace_halogens_with_hydrogens" title="Link to this definition"></a></dt>
+<dd><p>Replaces all halogen atoms (F, Cl, Br, I) in an RDKit molecule with hydrogen atoms.</p>
+<p>This function iterates through the atoms in the given molecule, identifies halogen atoms
+(fluorine, chlorine, bromine, iodine etc.), removes them, and replaces them with explicit hydrogens.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mol</strong> (<em>rdkit.Chem.Mol</em>) – The input RDKit molecule from which halogens will be replaced with hydrogens.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A new RDKit molecule with all halogens replaced by explicit hydrogens.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>rdkit.Chem.Mol</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.crosslink.validate_linear_reaction">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">validate_linear_reaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">starting_polymer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_activate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_activate_reactants</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_react</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#validate_linear_reaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.validate_linear_reaction" title="Link to this definition"></a></dt>
+<dd><p>Validates the linear activation and polymerization reactions for compatibility
+with the starting polymer and reactants.</p>
+<section id="note">
+<h2>Note:<a class="headerlink" href="#note" title="Link to this heading"></a></h2>
+<p>This function is not recommended for standalone use.</p>
+</section>
+<section id="id2">
+<h2>Parameters:<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>starting_polymer<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The initial polymer molecule to validate against the reactions.</p>
+</dd>
+<dt>linear_activate<span class="classifier">rdkit.Chem.rdChemReactions.ChemicalReaction</span></dt><dd><p>The reaction template for linear activation.</p>
+</dd>
+<dt>linear_activate_reactants<span class="classifier">list of rdkit.Chem.Mol</span></dt><dd><p>The reactants required for the linear activation reaction.</p>
+</dd>
+<dt>linear_react<span class="classifier">rdkit.Chem.rdChemReactions.ChemicalReaction</span></dt><dd><p>The reaction template for linear polymerization.</p>
+</dd>
+</dl>
+</section>
+<section id="raises">
+<h2>Raises:<a class="headerlink" href="#raises" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the reactions are invalid or incompatible with the starting polymer.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.crosslink.validate_branched_reaction">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">validate_branched_reaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">starting_polymer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branched_activate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branched_activate_reactants</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branched_react</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_activate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_activate_reactants</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_react</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#validate_branched_reaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.validate_branched_reaction" title="Link to this definition"></a></dt>
+<dd><p>Validates the branched and linear activation and polymerization reactions
+for compatibility with the starting polymer and reactants.</p>
+<section id="id3">
+<h2>Note:<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<p>This function is not recommended for standalone use.</p>
+</section>
+<section id="id4">
+<h2>Parameters:<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>starting_polymer<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The initial polymer molecule to validate against the reactions.</p>
+</dd>
+<dt>branched_activate<span class="classifier">rdkit.Chem.rdChemReactions.ChemicalReaction</span></dt><dd><p>The reaction template for branched activation.</p>
+</dd>
+<dt>branched_activate_reactants<span class="classifier">list of rdkit.Chem.Mol</span></dt><dd><p>The reactants required for the branched activation reaction.</p>
+</dd>
+<dt>branched_react<span class="classifier">rdkit.Chem.rdChemReactions.ChemicalReaction</span></dt><dd><p>The reaction template for branched polymerization.</p>
+</dd>
+<dt>linear_activate<span class="classifier">rdkit.Chem.rdChemReactions.ChemicalReaction</span></dt><dd><p>The reaction template for linear activation.</p>
+</dd>
+<dt>linear_activate_reactants<span class="classifier">list of rdkit.Chem.Mol</span></dt><dd><p>The reactants required for the linear activation reaction.</p>
+</dd>
+<dt>linear_react<span class="classifier">rdkit.Chem.rdChemReactions.ChemicalReaction</span></dt><dd><p>The reaction template for linear polymerization.</p>
+</dd>
+</dl>
+</section>
+<section id="id5">
+<h2>Raises:<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the reactions are invalid or incompatible with the starting polymer.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.crosslink.iterative_chainID_update">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">iterative_chainID_update</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polymer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_polymer_added</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#iterative_chainID_update"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.iterative_chainID_update" title="Link to this definition"></a></dt>
+<dd><p>Updates the chain IDs of atoms in a polymer molecule iteratively based on the last polymer added.</p>
+<p>This function modifies the <cite>polymer</cite> molecule by updating the chain IDs of its atoms. The chain IDs
+are incremented sequentially, starting from the chain ID of the <cite>last_polymer_added</cite>. The function
+ensures that the chain IDs wrap around using the English alphabet (A-Z).</p>
+<section id="id6">
+<h2>Parameters:<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>polymer<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The polymer molecule whose chain IDs will be updated.</p>
+</dd>
+<dt>last_polymer_added<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The last polymer molecule added to the network. The chain IDs of this molecule are used as
+the starting point for updating the chain IDs in the <cite>polymer</cite>.</p>
+</dd>
+</dl>
+</section>
+<section id="id7">
+<h2>Returns:<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>polymer<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The updated polymer molecule with modified chain IDs.</p>
+</dd>
+</dl>
+</section>
+<section id="id8">
+<h2>Notes:<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>Not recommended for standalone use.</p></li>
+<li><p>The function uses the <cite>AtomPDBResidueInfo</cite> object to access and modify chain IDs during the network building process.</p></li>
+<li><p>Chain IDs are updated using the English alphabet (A-Z) and wrap around if they exceed ‘Z’.</p></li>
+<li><p>Atoms without <cite>MonomerInfo</cite> are skipped, and a warning is printed for each skipped atom. For polymers build with SwiftPol, this should not occur.</p></li>
+</ul>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.crosslink.build_branched_polymer">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">build_branched_polymer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">starting_polymer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction_templates</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_mw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability_of_branched_addition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability_of_linear_addition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#build_branched_polymer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.build_branched_polymer" title="Link to this definition"></a></dt>
+<dd><p>Builds a branched polymer.</p>
+<section id="id9">
+<h2>Parameters:<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
+<dl>
+<dt>starting_polymer<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The initial polymer molecule to which reactions will be applied.</p>
+</dd>
+<dt>reaction_templates<span class="classifier">dict</span></dt><dd><p>A dictionary containing reaction templates for both linear and branched additions.
+Keys should include:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>“branched_activate”: Activation reaction for branching.</p></li>
+<li><p>“branched_react”: Reaction for branching.</p></li>
+<li><p>“linear_activate”: Activation reaction for linear addition.</p></li>
+<li><p>“linear_react”: Reaction for linear addition.</p></li>
+</ul>
+</div></blockquote>
+</dd>
+<dt>num_iterations<span class="classifier">int, optional</span></dt><dd><p>The number of iterations to perform. If specified, the process will stop after this many
+successful reactions, regardless of the target molecular weight.</p>
+</dd>
+<dt>target_mw<span class="classifier">float, optional</span></dt><dd><p>The target molecular weight for the polymer. If specified, the process will stop once
+the molecular weight of the polymer reaches or exceeds this value.</p>
+</dd>
+<dt>probability_of_branched_addition<span class="classifier">float, optional, default=0.5</span></dt><dd><p>The probability of performing a branched addition at each iteration.</p>
+</dd>
+<dt>probability_of_linear_addition<span class="classifier">float, optional, default=0.5</span></dt><dd><p>The probability of performing a linear addition at each iteration.</p>
+</dd>
+</dl>
+</section>
+<section id="id10">
+<h2>Returns:<a class="headerlink" href="#id10" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>polymer_network<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The resulting polymer molecule after the specified number of iterations or upon reaching
+the target molecular weight.
+Random stereochemsitry assigned to each stereocenter.</p>
+</dd>
+</dl>
+</section>
+<section id="id11">
+<h2>Notes:<a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>The function alternates between linear and branched additions based on the specified probabilities.</p></li>
+<li><dl class="simple">
+<dt>If both <cite>num_iterations</cite> and <cite>target_mw</cite> are specified, the process will stop as soon as either</dt><dd><p>condition is met.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>The reaction templates must be compatible with the starting polymer and follow RDKit’s reaction</dt><dd><p>SMARTS format.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</section>
+<section id="id12">
+<h2>Raises:<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If the reaction templates are invalid or incompatible with the starting polymer.</p>
+</dd>
+<dt>AssertionError</dt><dd><p>If the sum of probabilities does not equal 1.</p>
+</dd>
+<dt>ValueError</dt><dd><p>If neither <cite>num_iterations</cite> nor <cite>target_mw</cite> is specified.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.crosslink.assign_random_stereochemistry">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">assign_random_stereochemistry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#assign_random_stereochemistry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.assign_random_stereochemistry" title="Link to this definition"></a></dt>
+<dd><p>Takes an RDKit Mol with undefined stereocenters and returns a copy
+with random stereochemistry assigned to all stereocenters.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.crosslink.find_terminal_cl_sites">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">find_terminal_cl_sites</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#find_terminal_cl_sites"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.find_terminal_cl_sites" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.crosslink.filter_close_pairs">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">filter_close_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cl_sites</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_index_diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#filter_close_pairs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.filter_close_pairs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.crosslink.crosslink_cl_sites">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">crosslink_cl_sites</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pairs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#crosslink_cl_sites"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.crosslink_cl_sites" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.crosslink.iterative_crosslink">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">iterative_crosslink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_cycles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#iterative_crosslink"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.iterative_crosslink" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="swiftpol.crosslink.crosslink_polymer">
+<span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">crosslink_polymer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentage_to_crosslink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#crosslink_polymer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.crosslink_polymer" title="Link to this definition"></a></dt>
+<dd><p>Crosslinks a specified percentage of terminal chlorine atoms in a polymer
+and replaces the remaining halogens with hydrogens.</p>
+<section id="id13">
+<h2>Parameters:<a class="headerlink" href="#id13" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>mol<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The input molecule representing the polymer.</p>
+</dd>
+<dt>percentage_to_crosslink<span class="classifier">float, optional, default=50</span></dt><dd><p>The percentage (0-100) of terminal chlorine atoms to crosslink.
+The remaining halogens will be replaced with hydrogens.</p>
+</dd>
+</dl>
+</section>
+<section id="id14">
+<h2>Returns:<a class="headerlink" href="#id14" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>mol<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The modified molecule with the specified percentage of crosslinks
+and the remaining halogens replaced by hydrogens.</p>
+</dd>
+</dl>
+</section>
+<section id="id15">
+<h2>Notes:<a class="headerlink" href="#id15" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p>The function identifies terminal chlorine atoms bonded to carbon atoms.</p></li>
+<li><p>Crosslinking is performed by creating single bonds between carbon atoms
+of selected chlorine sites.</p></li>
+<li><p>Remaining halogens are replaced with hydrogens using the
+<cite>replace_halogens_with_hydrogens</cite> function.</p></li>
+<li><p>The <cite>percentage_to_crosslink</cite> parameter determines the proportion of
+chlorine atoms to crosslink.</p></li>
+</ul>
+</section>
+<section id="id16">
+<h2>Raises:<a class="headerlink" href="#id16" title="Link to this heading"></a></h2>
+<dl class="simple">
+<dt>ValueError</dt><dd><p>If <cite>percentage_to_crosslink</cite> is not between 0 and 100.</p>
+</dd>
+</dl>
+</section>
 </dd></dl>
 
 </section>

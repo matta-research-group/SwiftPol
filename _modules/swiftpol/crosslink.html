@@ -1,0 +1,764 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>swiftpol.crosslink &mdash; swiftpol  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            swiftpol
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started with Swiftpol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">swiftpol</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html#module-swiftpol.build">swiftpol.build</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html#module-swiftpol.parameterize">swiftpol.parameterize</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html#module-swiftpol.crosslink">swiftpol.crosslink</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">swiftpol</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">swiftpol.crosslink</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for swiftpol.crosslink</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Functions for building crosslinked polymers</span>
+
+<span class="c1"># Init</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rdkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">Chem</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem</span><span class="w"> </span><span class="kn">import</span> <span class="n">AllChem</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
+
+
+<div class="viewcode-block" id="replace_halogens_with_hydrogens">
+<a class="viewcode-back" href="../../api.html#swiftpol.crosslink.replace_halogens_with_hydrogens">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">replace_halogens_with_hydrogens</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Replaces all halogen atoms (F, Cl, Br, I) in an RDKit molecule with hydrogen atoms.</span>
+
+<span class="sd">    This function iterates through the atoms in the given molecule, identifies halogen atoms</span>
+<span class="sd">    (fluorine, chlorine, bromine, iodine etc.), removes them, and replaces them with explicit hydrogens.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mol : rdkit.Chem.Mol</span>
+<span class="sd">        The input RDKit molecule from which halogens will be replaced with hydrogens.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    rdkit.Chem.Mol</span>
+<span class="sd">        A new RDKit molecule with all halogens replaced by explicit hydrogens.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">halogens</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="s2">&quot;Cl&quot;</span><span class="p">,</span> <span class="s2">&quot;Br&quot;</span><span class="p">,</span> <span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;At&quot;</span><span class="p">,</span> <span class="s2">&quot;Ts&quot;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">halogen</span> <span class="ow">in</span> <span class="n">halogens</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">matches</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetSubstructMatches</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="n">halogen</span><span class="p">))</span>
+        <span class="k">except</span><span class="p">:</span>  <span class="c1"># Catch specific exceptions</span>
+            <span class="n">matches</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">match</span> <span class="ow">in</span> <span class="n">matches</span><span class="p">:</span>
+                <span class="c1"># extract pdb info of neighbouring atom and assign to hydrogen</span>
+                <span class="n">atom</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">bonded_atom</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetNeighbors</span><span class="p">()</span>
+                <span class="n">info</span> <span class="o">=</span> <span class="n">bonded_atom</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">GetMonomerInfo</span><span class="p">()</span>
+                <span class="n">info_new</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AtomPDBResidueInfo</span><span class="p">()</span>
+                <span class="n">info_new</span><span class="o">.</span><span class="n">SetResidueName</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">GetResidueName</span><span class="p">())</span>
+                <span class="n">info_new</span><span class="o">.</span><span class="n">SetResidueNumber</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">GetResidueNumber</span><span class="p">())</span>
+                <span class="n">info_new</span><span class="o">.</span><span class="n">SetChainId</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">GetChainId</span><span class="p">())</span>
+                <span class="n">hydrogen</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="s2">&quot;[H]&quot;</span><span class="p">)</span>
+                <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info_new</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">hydrogen</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
+                <span class="c1"># Replace halogen with hydrogen</span>
+                <span class="n">mw</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">RWMol</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+                <span class="n">mw</span><span class="o">.</span><span class="n">ReplaceAtom</span><span class="p">(</span><span class="n">match</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="nb">list</span><span class="p">(</span><span class="n">hydrogen</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">mw</span><span class="p">)</span>
+                <span class="n">mw</span><span class="o">.</span><span class="n">CommitBatchEdit</span><span class="p">()</span>
+                <span class="n">mol</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">mw</span><span class="p">)</span>
+
+    <span class="n">mol_no_halogens</span> <span class="o">=</span> <span class="n">mol</span>
+    <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">mol_no_halogens</span><span class="p">)</span>
+    <span class="c1"># Add explicit hydrogens</span>
+    <span class="n">mol_with_h</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">mol_no_halogens</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mol_with_h</span></div>
+
+
+
+<div class="viewcode-block" id="validate_linear_reaction">
+<a class="viewcode-back" href="../../api.html#swiftpol.crosslink.validate_linear_reaction">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_linear_reaction</span><span class="p">(</span>
+    <span class="n">starting_polymer</span><span class="p">,</span> <span class="n">linear_activate</span><span class="p">,</span> <span class="n">linear_activate_reactants</span><span class="p">,</span> <span class="n">linear_react</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validates the linear activation and polymerization reactions for compatibility</span>
+<span class="sd">    with the starting polymer and reactants.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function is not recommended for standalone use.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    starting_polymer : rdkit.Chem.Mol</span>
+<span class="sd">        The initial polymer molecule to validate against the reactions.</span>
+
+<span class="sd">    linear_activate : rdkit.Chem.rdChemReactions.ChemicalReaction</span>
+<span class="sd">        The reaction template for linear activation.</span>
+
+<span class="sd">    linear_activate_reactants : list of rdkit.Chem.Mol</span>
+<span class="sd">        The reactants required for the linear activation reaction.</span>
+
+<span class="sd">    linear_react : rdkit.Chem.rdChemReactions.ChemicalReaction</span>
+<span class="sd">        The reaction template for linear polymerization.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">    -------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the reactions are invalid or incompatible with the starting polymer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Test the linear activation reaction</span>
+        <span class="n">activated_pol_test</span> <span class="o">=</span> <span class="n">linear_activate</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">starting_polymer</span><span class="p">]</span> <span class="o">+</span> <span class="n">linear_activate_reactants</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">activated_pol_test</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Linear activation reaction produced no results.&quot;</span><span class="p">)</span>
+        <span class="n">activated_pol_test</span> <span class="o">=</span> <span class="n">activated_pol_test</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">activated_pol_test</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Linear activation reaction SMARTS is invalid or incompatible with the starting polymer or linear activation reactants. &quot;</span>
+            <span class="s2">&quot;For support with constructing reaction SMARTS, raise an issue at https://github.com/matta-research-group/SwiftPol/issues&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Test the linear polymerization reaction</span>
+        <span class="n">linear_polymer_test</span> <span class="o">=</span> <span class="n">linear_react</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">activated_pol_test</span><span class="p">,</span> <span class="n">activated_pol_test</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">linear_polymer_test</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Linear polymerization reaction produced no results.&quot;</span><span class="p">)</span>
+        <span class="n">linear_polymer_test</span> <span class="o">=</span> <span class="n">linear_polymer_test</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">linear_polymer_test</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Linear reaction SMARTS is invalid or incompatible with the starting polymer. &quot;</span>
+            <span class="s2">&quot;For support with constructing reaction SMARTS, raise an issue at https://github.com/matta-research-group/SwiftPol/issues&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
+
+
+
+<div class="viewcode-block" id="validate_branched_reaction">
+<a class="viewcode-back" href="../../api.html#swiftpol.crosslink.validate_branched_reaction">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">validate_branched_reaction</span><span class="p">(</span>
+    <span class="n">starting_polymer</span><span class="p">,</span>
+    <span class="n">branched_activate</span><span class="p">,</span>
+    <span class="n">branched_activate_reactants</span><span class="p">,</span>
+    <span class="n">branched_react</span><span class="p">,</span>
+    <span class="n">linear_activate</span><span class="p">,</span>
+    <span class="n">linear_activate_reactants</span><span class="p">,</span>
+    <span class="n">linear_react</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validates the branched and linear activation and polymerization reactions</span>
+<span class="sd">    for compatibility with the starting polymer and reactants.</span>
+
+<span class="sd">    Note:</span>
+<span class="sd">    -----</span>
+<span class="sd">    This function is not recommended for standalone use.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    starting_polymer : rdkit.Chem.Mol</span>
+<span class="sd">        The initial polymer molecule to validate against the reactions.</span>
+
+<span class="sd">    branched_activate : rdkit.Chem.rdChemReactions.ChemicalReaction</span>
+<span class="sd">        The reaction template for branched activation.</span>
+
+<span class="sd">    branched_activate_reactants : list of rdkit.Chem.Mol</span>
+<span class="sd">        The reactants required for the branched activation reaction.</span>
+
+<span class="sd">    branched_react : rdkit.Chem.rdChemReactions.ChemicalReaction</span>
+<span class="sd">        The reaction template for branched polymerization.</span>
+
+<span class="sd">    linear_activate : rdkit.Chem.rdChemReactions.ChemicalReaction</span>
+<span class="sd">        The reaction template for linear activation.</span>
+
+<span class="sd">    linear_activate_reactants : list of rdkit.Chem.Mol</span>
+<span class="sd">        The reactants required for the linear activation reaction.</span>
+
+<span class="sd">    linear_react : rdkit.Chem.rdChemReactions.ChemicalReaction</span>
+<span class="sd">        The reaction template for linear polymerization.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">    -------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the reactions are invalid or incompatible with the starting polymer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">linear_activated</span> <span class="o">=</span> <span class="n">linear_activate</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">starting_polymer</span><span class="p">]</span> <span class="o">+</span> <span class="n">linear_activate_reactants</span>
+    <span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">linear_activated</span><span class="p">)</span>
+    <span class="n">linear_polymer</span> <span class="o">=</span> <span class="n">linear_react</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">([</span><span class="n">linear_activated</span><span class="p">,</span> <span class="n">linear_activated</span><span class="p">])[</span><span class="mi">0</span><span class="p">][</span>
+        <span class="mi">0</span>
+    <span class="p">]</span>
+    <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">linear_polymer</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Test the branched activation reaction</span>
+        <span class="n">activated_pol_test</span> <span class="o">=</span> <span class="n">branched_activate</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">linear_polymer</span><span class="p">]</span> <span class="o">+</span> <span class="n">branched_activate_reactants</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">activated_pol_test</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Branched activation reaction produced no results.&quot;</span><span class="p">)</span>
+        <span class="n">activated_pol_test</span> <span class="o">=</span> <span class="n">activated_pol_test</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">activated_pol_test</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Branched activation reaction SMARTS is invalid or incompatible with the polymer network or branched activation reactants. &quot;</span>
+            <span class="s2">&quot;For support with constructing reaction SMARTS, raise an issue at https://github.com/matta-research-group/SwiftPol/issues&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Test the branched polymerization reaction</span>
+        <span class="n">branched_polymer_test</span> <span class="o">=</span> <span class="n">branched_react</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">activated_pol_test</span><span class="p">,</span> <span class="n">linear_activated</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">branched_polymer_test</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Branched polymerization reaction produced no results.&quot;</span><span class="p">)</span>
+        <span class="n">branched_polymer_test</span> <span class="o">=</span> <span class="n">branched_polymer_test</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">branched_polymer_test</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Branched reaction SMARTS is invalid or incompatible with the polymer network. &quot;</span>
+            <span class="s2">&quot;For support with constructing reaction SMARTS, raise an issue at https://github.com/matta-research-group/SwiftPol/issues&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
+
+
+
+<div class="viewcode-block" id="iterative_chainID_update">
+<a class="viewcode-back" href="../../api.html#swiftpol.crosslink.iterative_chainID_update">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">iterative_chainID_update</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">last_polymer_added</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Updates the chain IDs of atoms in a polymer molecule iteratively based on the last polymer added.</span>
+
+<span class="sd">    This function modifies the `polymer` molecule by updating the chain IDs of its atoms. The chain IDs</span>
+<span class="sd">    are incremented sequentially, starting from the chain ID of the `last_polymer_added`. The function</span>
+<span class="sd">    ensures that the chain IDs wrap around using the English alphabet (A-Z).</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    polymer : rdkit.Chem.Mol</span>
+<span class="sd">        The polymer molecule whose chain IDs will be updated.</span>
+
+<span class="sd">    last_polymer_added : rdkit.Chem.Mol</span>
+<span class="sd">        The last polymer molecule added to the network. The chain IDs of this molecule are used as</span>
+<span class="sd">        the starting point for updating the chain IDs in the `polymer`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    polymer : rdkit.Chem.Mol</span>
+<span class="sd">        The updated polymer molecule with modified chain IDs.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">    ------</span>
+<span class="sd">    - Not recommended for standalone use.</span>
+<span class="sd">    - The function uses the `AtomPDBResidueInfo` object to access and modify chain IDs during the network building process.</span>
+<span class="sd">    - Chain IDs are updated using the English alphabet (A-Z) and wrap around if they exceed &#39;Z&#39;.</span>
+<span class="sd">    - Atoms without `MonomerInfo` are skipped, and a warning is printed for each skipped atom. For polymers build with SwiftPol, this should not occur.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">string</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">last_polymer_added</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">i</span><span class="o">.</span><span class="n">GetMonomerInfo</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">info_new</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AtomPDBResidueInfo</span><span class="p">()</span>
+            <span class="n">info_new</span><span class="o">.</span><span class="n">SetResidueName</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">GetResidueName</span><span class="p">()[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="mi">1</span><span class="si">}{</span><span class="n">info</span><span class="o">.</span><span class="n">GetResidueName</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">info_new</span><span class="o">.</span><span class="n">SetResidueNumber</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">GetResidueNumber</span><span class="p">())</span>
+            <span class="n">info_new</span><span class="o">.</span><span class="n">SetChainId</span><span class="p">(</span>
+                <span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span><span class="p">[</span>
+                    <span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">GetChainId</span><span class="p">())</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">polymer</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info_new</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Warning: Atom </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">i</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span><span class="si">}</span><span class="s2">) does not have MonomerInfo. Skipping update for this atom.&quot;</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">polymer</span></div>
+
+
+
+<div class="viewcode-block" id="build_branched_polymer">
+<a class="viewcode-back" href="../../api.html#swiftpol.crosslink.build_branched_polymer">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_branched_polymer</span><span class="p">(</span>
+    <span class="n">starting_polymer</span><span class="p">,</span>
+    <span class="n">reaction_templates</span><span class="p">,</span>
+    <span class="n">num_iterations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">target_mw</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">probability_of_branched_addition</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">probability_of_linear_addition</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Builds a branched polymer.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    starting_polymer : rdkit.Chem.Mol</span>
+<span class="sd">        The initial polymer molecule to which reactions will be applied.</span>
+
+<span class="sd">    reaction_templates : dict</span>
+<span class="sd">        A dictionary containing reaction templates for both linear and branched additions.</span>
+<span class="sd">        Keys should include:</span>
+<span class="sd">            - &quot;branched_activate&quot;: Activation reaction for branching.</span>
+<span class="sd">            - &quot;branched_react&quot;: Reaction for branching.</span>
+<span class="sd">            - &quot;linear_activate&quot;: Activation reaction for linear addition.</span>
+<span class="sd">            - &quot;linear_react&quot;: Reaction for linear addition.</span>
+
+<span class="sd">    num_iterations : int, optional</span>
+<span class="sd">        The number of iterations to perform. If specified, the process will stop after this many</span>
+<span class="sd">        successful reactions, regardless of the target molecular weight.</span>
+
+<span class="sd">    target_mw : float, optional</span>
+<span class="sd">        The target molecular weight for the polymer. If specified, the process will stop once</span>
+<span class="sd">        the molecular weight of the polymer reaches or exceeds this value.</span>
+
+<span class="sd">    probability_of_branched_addition : float, optional, default=0.5</span>
+<span class="sd">        The probability of performing a branched addition at each iteration.</span>
+
+<span class="sd">    probability_of_linear_addition : float, optional, default=0.5</span>
+<span class="sd">        The probability of performing a linear addition at each iteration.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    polymer_network : rdkit.Chem.Mol</span>
+<span class="sd">        The resulting polymer molecule after the specified number of iterations or upon reaching</span>
+<span class="sd">        the target molecular weight.</span>
+<span class="sd">        Random stereochemsitry assigned to each stereocenter.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">    ------</span>
+<span class="sd">    - The function alternates between linear and branched additions based on the specified probabilities.</span>
+<span class="sd">    - If both `num_iterations` and `target_mw` are specified, the process will stop as soon as either</span>
+<span class="sd">        condition is met.</span>
+<span class="sd">    - The reaction templates must be compatible with the starting polymer and follow RDKit&#39;s reaction</span>
+<span class="sd">        SMARTS format.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">    -------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the reaction templates are invalid or incompatible with the starting polymer.</span>
+<span class="sd">    AssertionError</span>
+<span class="sd">        If the sum of probabilities does not equal 1.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If neither `num_iterations` nor `target_mw` is specified.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.crosslink</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+        <span class="n">validate_linear_reaction</span><span class="p">,</span>
+        <span class="n">validate_branched_reaction</span><span class="p">,</span>
+        <span class="n">iterative_chainID_update</span><span class="p">,</span>
+        <span class="n">assign_random_stereochemistry</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Check if the probabilities sum to 1</span>
+    <span class="k">if</span> <span class="n">probability_of_branched_addition</span> <span class="o">+</span> <span class="n">probability_of_linear_addition</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AssertionError</span><span class="p">(</span><span class="s2">&quot;Probabilities must sum to 1.&quot;</span><span class="p">)</span>
+    <span class="c1"># Check that there is either a target Mw or a number of iterations</span>
+    <span class="k">if</span> <span class="n">target_mw</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">num_iterations</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Either target_mw or num_iterations must be specified.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">target_mw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">num_iterations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Specify either target_mw or num_iterations, not both.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Convert SMARTS strings into RDKit reactions</span>
+    <span class="n">rxns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">reaction_templates</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">linear_activate</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">ReactionFromSmarts</span><span class="p">(</span><span class="n">reaction_templates</span><span class="p">[</span><span class="n">rxns</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">linear_activate_reactants</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span> <span class="k">for</span> <span class="n">smiles</span> <span class="ow">in</span> <span class="n">reaction_templates</span><span class="p">[</span><span class="n">rxns</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="p">]</span>
+    <span class="n">linear_react</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">ReactionFromSmarts</span><span class="p">(</span><span class="n">reaction_templates</span><span class="p">[</span><span class="n">rxns</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">validate_linear_reaction</span><span class="p">(</span>
+        <span class="n">starting_polymer</span><span class="p">,</span> <span class="n">linear_activate</span><span class="p">,</span> <span class="n">linear_activate_reactants</span><span class="p">,</span> <span class="n">linear_react</span>
+    <span class="p">)</span>  <span class="c1"># validate linear reactions</span>
+
+    <span class="n">branched_activate</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">ReactionFromSmarts</span><span class="p">(</span><span class="n">reaction_templates</span><span class="p">[</span><span class="n">rxns</span><span class="p">[</span><span class="mi">2</span><span class="p">]][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">branched_activate_reactants</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="n">smiles</span><span class="p">)</span> <span class="k">for</span> <span class="n">smiles</span> <span class="ow">in</span> <span class="n">reaction_templates</span><span class="p">[</span><span class="n">rxns</span><span class="p">[</span><span class="mi">2</span><span class="p">]][</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="p">]</span>
+    <span class="n">branched_react</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">ReactionFromSmarts</span><span class="p">(</span><span class="n">reaction_templates</span><span class="p">[</span><span class="n">rxns</span><span class="p">[</span><span class="mi">3</span><span class="p">]][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">validate_branched_reaction</span><span class="p">(</span>
+        <span class="n">starting_polymer</span><span class="p">,</span>
+        <span class="n">branched_activate</span><span class="p">,</span>
+        <span class="n">branched_activate_reactants</span><span class="p">,</span>
+        <span class="n">branched_react</span><span class="p">,</span>
+        <span class="n">linear_activate</span><span class="p">,</span>
+        <span class="n">linear_activate_reactants</span><span class="p">,</span>
+        <span class="n">linear_react</span><span class="p">,</span>
+    <span class="p">)</span>  <span class="c1"># validate branched reactions</span>
+
+    <span class="n">starting_polymer_activated</span> <span class="o">=</span> <span class="n">linear_activate</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">starting_polymer</span><span class="p">]</span> <span class="o">+</span> <span class="n">linear_activate_reactants</span>
+    <span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">starting_polymer_activated</span><span class="p">)</span>
+    <span class="n">starting_polymer_activated</span> <span class="o">=</span> <span class="n">linear_activate</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">starting_polymer_activated</span><span class="p">]</span> <span class="o">+</span> <span class="n">linear_activate_reactants</span>
+    <span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">starting_polymer_activated</span><span class="p">)</span>
+    <span class="n">Chem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">starting_polymer_activated</span><span class="p">)</span>
+    <span class="n">polymer_network</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">(</span><span class="n">starting_polymer_activated</span><span class="p">)</span>
+    <span class="n">last_polymer_added</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">(</span><span class="n">starting_polymer</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">num_iterations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">successful_reactions</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">successful_reactions</span> <span class="o">&lt;</span> <span class="n">num_iterations</span><span class="p">:</span>
+            <span class="c1"># Choose whether to complete a linear addition or crosslink</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choices</span><span class="p">(</span>
+                <span class="p">[</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="s2">&quot;crosslink&quot;</span><span class="p">],</span>
+                <span class="n">weights</span><span class="o">=</span><span class="p">[</span>
+                    <span class="n">probability_of_linear_addition</span><span class="p">,</span>
+                    <span class="n">probability_of_branched_addition</span><span class="p">,</span>
+                <span class="p">],</span>
+                <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;crosslink&quot;</span><span class="p">:</span>
+                <span class="n">activated_for_branching_results</span> <span class="o">=</span> <span class="n">branched_activate</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">polymer_network</span><span class="p">]</span> <span class="o">+</span> <span class="n">branched_activate_reactants</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">activated_for_branching_results</span><span class="p">:</span>
+                    <span class="n">n</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">activated_for_branching_results</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">activated_for_branching</span> <span class="o">=</span> <span class="n">activated_for_branching_results</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">activated_for_branching</span><span class="p">)</span>
+                    <span class="n">starting_polymer_updated</span> <span class="o">=</span> <span class="n">iterative_chainID_update</span><span class="p">(</span>
+                        <span class="n">starting_polymer_activated</span><span class="p">,</span> <span class="n">last_polymer_added</span>
+                    <span class="p">)</span>  <span class="c1"># Update ChainID</span>
+                    <span class="n">branched_polymer_results</span> <span class="o">=</span> <span class="n">branched_react</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">activated_for_branching</span><span class="p">,</span> <span class="n">starting_polymer_updated</span><span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">branched_polymer_results</span><span class="p">:</span>
+                        <span class="n">last_polymer_added</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">(</span><span class="n">starting_polymer_updated</span><span class="p">)</span>
+                        <span class="n">branched_polymer</span> <span class="o">=</span> <span class="n">branched_polymer_results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">branched_polymer</span><span class="p">)</span>
+                        <span class="n">polymer_network</span> <span class="o">=</span> <span class="n">branched_polymer</span>
+                        <span class="n">successful_reactions</span> <span class="o">+=</span> <span class="mi">1</span>
+
+            <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
+                <span class="n">starting_polymer_updated</span> <span class="o">=</span> <span class="n">iterative_chainID_update</span><span class="p">(</span>
+                    <span class="n">starting_polymer_activated</span><span class="p">,</span> <span class="n">last_polymer_added</span>
+                <span class="p">)</span>  <span class="c1"># Update ChainID</span>
+                <span class="n">linear_polymer_results</span> <span class="o">=</span> <span class="n">linear_react</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">polymer_network</span><span class="p">,</span> <span class="n">starting_polymer_updated</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">linear_polymer_results</span><span class="p">:</span>
+                    <span class="n">last_polymer_added</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">(</span><span class="n">starting_polymer_updated</span><span class="p">)</span>
+                    <span class="n">n</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">linear_polymer_results</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">linear_polymer</span> <span class="o">=</span> <span class="n">linear_polymer_results</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">linear_polymer</span><span class="p">)</span>
+                    <span class="n">polymer_network</span> <span class="o">=</span> <span class="n">linear_polymer</span>
+                    <span class="n">successful_reactions</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">elif</span> <span class="n">target_mw</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mol_weight_rolling</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Descriptors</span><span class="o">.</span><span class="n">MolWt</span><span class="p">(</span><span class="n">polymer_network</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">mol_weight_rolling</span> <span class="o">&lt;</span> <span class="n">target_mw</span><span class="p">:</span>
+            <span class="c1"># Choose whether to complete a linear addition or crosslink</span>
+            <span class="n">action</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choices</span><span class="p">(</span>
+                <span class="p">[</span><span class="s2">&quot;linear&quot;</span><span class="p">,</span> <span class="s2">&quot;crosslink&quot;</span><span class="p">],</span>
+                <span class="n">weights</span><span class="o">=</span><span class="p">[</span>
+                    <span class="n">probability_of_linear_addition</span><span class="p">,</span>
+                    <span class="n">probability_of_branched_addition</span><span class="p">,</span>
+                <span class="p">],</span>
+                <span class="n">k</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;crosslink&quot;</span><span class="p">:</span>
+                <span class="n">activated_for_branching_results</span> <span class="o">=</span> <span class="n">branched_activate</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">polymer_network</span><span class="p">]</span> <span class="o">+</span> <span class="n">branched_activate_reactants</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">activated_for_branching_results</span><span class="p">:</span>
+                    <span class="n">n</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">activated_for_branching_results</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">activated_for_branching</span> <span class="o">=</span> <span class="n">activated_for_branching_results</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">activated_for_branching</span><span class="p">)</span>
+                    <span class="n">starting_polymer_updated</span> <span class="o">=</span> <span class="n">iterative_chainID_update</span><span class="p">(</span>
+                        <span class="n">starting_polymer_activated</span><span class="p">,</span> <span class="n">last_polymer_added</span>
+                    <span class="p">)</span>  <span class="c1"># Update ChainID</span>
+                    <span class="n">branched_polymer_results</span> <span class="o">=</span> <span class="n">branched_react</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">activated_for_branching</span><span class="p">,</span> <span class="n">starting_polymer_updated</span><span class="p">]</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">branched_polymer_results</span><span class="p">:</span>
+                        <span class="n">last_polymer_added</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">(</span><span class="n">starting_polymer_updated</span><span class="p">)</span>
+                        <span class="n">branched_polymer</span> <span class="o">=</span> <span class="n">branched_polymer_results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">branched_polymer</span><span class="p">)</span>
+                        <span class="n">polymer_network</span> <span class="o">=</span> <span class="n">branched_polymer</span>
+
+            <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s2">&quot;linear&quot;</span><span class="p">:</span>
+                <span class="n">starting_polymer_updated</span> <span class="o">=</span> <span class="n">iterative_chainID_update</span><span class="p">(</span>
+                    <span class="n">starting_polymer_activated</span><span class="p">,</span> <span class="n">last_polymer_added</span>
+                <span class="p">)</span>  <span class="c1"># Update ChainID</span>
+                <span class="n">linear_polymer_results</span> <span class="o">=</span> <span class="n">linear_react</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">polymer_network</span><span class="p">,</span> <span class="n">starting_polymer_updated</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">linear_polymer_results</span><span class="p">:</span>
+                    <span class="n">last_polymer_added</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Mol</span><span class="p">(</span><span class="n">starting_polymer_updated</span><span class="p">)</span>
+                    <span class="n">n</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">linear_polymer_results</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">linear_polymer</span> <span class="o">=</span> <span class="n">linear_polymer_results</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">linear_polymer</span><span class="p">)</span>
+                    <span class="n">polymer_network</span> <span class="o">=</span> <span class="n">linear_polymer</span>
+            <span class="n">mol_weight_rolling</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Descriptors</span><span class="o">.</span><span class="n">MolWt</span><span class="p">(</span><span class="n">polymer_network</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">assign_random_stereochemistry</span><span class="p">(</span><span class="n">polymer_network</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="assign_random_stereochemistry">
+<a class="viewcode-back" href="../../api.html#swiftpol.crosslink.assign_random_stereochemistry">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">assign_random_stereochemistry</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Takes an RDKit Mol with undefined stereocenters and returns a copy</span>
+<span class="sd">    with random stereochemistry assigned to all stereocenters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem.EnumerateStereoisomers</span><span class="w"> </span><span class="kn">import</span> <span class="n">EnumerateStereoisomers</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem.EnumerateStereoisomers</span><span class="w"> </span><span class="kn">import</span> <span class="n">StereoEnumerationOptions</span>
+
+    <span class="n">opts</span> <span class="o">=</span> <span class="n">StereoEnumerationOptions</span><span class="p">(</span><span class="n">onlyUnassigned</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">unique</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="n">isomers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">EnumerateStereoisomers</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">opts</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">isomers</span><span class="p">)</span> <span class="k">if</span> <span class="n">isomers</span> <span class="k">else</span> <span class="n">mol</span></div>
+
+
+
+<div class="viewcode-block" id="find_terminal_cl_sites">
+<a class="viewcode-back" href="../../api.html#swiftpol.crosslink.find_terminal_cl_sites">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">find_terminal_cl_sites</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
+    <span class="n">cl_sites</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Cl&quot;</span><span class="p">:</span>
+            <span class="n">neighbor</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetNeighbors</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">neighbor</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span>
+                <span class="n">cl_sites</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">(),</span> <span class="n">neighbor</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()))</span>
+    <span class="k">return</span> <span class="n">cl_sites</span></div>
+
+
+
+<div class="viewcode-block" id="filter_close_pairs">
+<a class="viewcode-back" href="../../api.html#swiftpol.crosslink.filter_close_pairs">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">filter_close_pairs</span><span class="p">(</span><span class="n">cl_sites</span><span class="p">,</span> <span class="n">max_index_diff</span><span class="o">=</span><span class="mi">150</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[</span>
+        <span class="p">((</span><span class="n">cl1</span><span class="p">,</span> <span class="n">c1</span><span class="p">),</span> <span class="p">(</span><span class="n">cl2</span><span class="p">,</span> <span class="n">c2</span><span class="p">))</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">cl1</span><span class="p">,</span> <span class="n">c1</span><span class="p">),</span> <span class="p">(</span><span class="n">cl2</span><span class="p">,</span> <span class="n">c2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="n">cl_sites</span><span class="p">[::</span><span class="mi">2</span><span class="p">],</span> <span class="n">cl_sites</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span>
+        <span class="p">)</span>  <span class="c1"># Pairs up adjacent elements [(0, 1), (2, 3)] -&gt; [((0,1), (2,3))]</span>
+        <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">c1</span> <span class="o">-</span> <span class="n">c2</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_index_diff</span>
+    <span class="p">]</span>  <span class="c1"># For each pair it checks the distance between the two atoms</span></div>
+
+
+
+<div class="viewcode-block" id="crosslink_cl_sites">
+<a class="viewcode-back" href="../../api.html#swiftpol.crosslink.crosslink_cl_sites">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">crosslink_cl_sites</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">max_pairs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">rw</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">RWMol</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+    <span class="n">cl_sites</span> <span class="o">=</span> <span class="n">find_terminal_cl_sites</span><span class="p">(</span><span class="n">rw</span><span class="p">)</span>
+
+    <span class="n">pairs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">cl_sites</span><span class="p">[::</span><span class="mi">2</span><span class="p">],</span> <span class="n">cl_sites</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]))</span>  <span class="c1"># As above</span>
+    <span class="k">if</span> <span class="n">max_pairs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># If max pairs is provided we override pairing</span>
+        <span class="n">pairs</span> <span class="o">=</span> <span class="n">filter_close_pairs</span><span class="p">(</span><span class="n">cl_sites</span><span class="p">,</span> <span class="n">max_index_diff</span><span class="o">=</span><span class="mi">150</span><span class="p">)</span>
+
+    <span class="n">removed_indices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="c1"># Add all bonds first</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">cl1</span><span class="p">,</span> <span class="n">c1</span><span class="p">),</span> <span class="p">(</span><span class="n">cl2</span><span class="p">,</span> <span class="n">c2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>  <span class="c1"># Creates a bond between carbon atoms</span>
+        <span class="c1"># Skip any atoms that are already deleted in this loop</span>
+        <span class="k">if</span> <span class="n">cl1</span> <span class="ow">in</span> <span class="n">removed_indices</span> <span class="ow">or</span> <span class="n">cl2</span> <span class="ow">in</span> <span class="n">removed_indices</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rw</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">BondType</span><span class="o">.</span><span class="n">SINGLE</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to add bond between atoms </span><span class="si">{</span><span class="n">c1</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">c2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+    <span class="c1"># Remove Cl atoms after all bonds</span>
+    <span class="n">atoms_to_remove</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">cl</span> <span class="k">for</span> <span class="p">(</span><span class="n">cl1</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="p">(</span><span class="n">cl2</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">pairs</span> <span class="k">for</span> <span class="n">cl</span> <span class="ow">in</span> <span class="p">(</span><span class="n">cl1</span><span class="p">,</span> <span class="n">cl2</span><span class="p">)],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">cl</span> <span class="ow">in</span> <span class="n">atoms_to_remove</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cl</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">removed_indices</span><span class="p">:</span>
+            <span class="c1"># Remove Cl atoms first</span>
+            <span class="n">rw</span><span class="o">.</span><span class="n">RemoveAtom</span><span class="p">(</span><span class="n">cl</span><span class="p">)</span>
+            <span class="n">removed_indices</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cl</span><span class="p">)</span>
+
+    <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">rw</span><span class="p">)</span>
+    <span class="n">rw</span><span class="o">.</span><span class="n">CommitBatchEdit</span><span class="p">()</span>
+    <span class="n">mol</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">rw</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mol</span></div>
+
+
+
+<div class="viewcode-block" id="iterative_crosslink">
+<a class="viewcode-back" href="../../api.html#swiftpol.crosslink.iterative_crosslink">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">iterative_crosslink</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">max_cycles</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.crosslink</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_terminal_cl_sites</span><span class="p">,</span> <span class="n">crosslink_cl_sites</span>
+
+    <span class="n">cycles</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">cycles</span> <span class="o">&lt;</span> <span class="n">max_cycles</span><span class="p">:</span>
+        <span class="n">cl_sites</span> <span class="o">=</span> <span class="n">find_terminal_cl_sites</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cl_sites</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">mol</span> <span class="o">=</span> <span class="n">crosslink_cl_sites</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+        <span class="n">cycles</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">mol</span></div>
+
+
+
+<div class="viewcode-block" id="crosslink_polymer">
+<a class="viewcode-back" href="../../api.html#swiftpol.crosslink.crosslink_polymer">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">crosslink_polymer</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">percentage_to_crosslink</span><span class="o">=</span><span class="mi">50</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Crosslinks a specified percentage of terminal chlorine atoms in a polymer</span>
+<span class="sd">    and replaces the remaining halogens with hydrogens.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    mol : rdkit.Chem.Mol</span>
+<span class="sd">        The input molecule representing the polymer.</span>
+
+<span class="sd">    percentage_to_crosslink : float, optional, default=50</span>
+<span class="sd">        The percentage (0-100) of terminal chlorine atoms to crosslink.</span>
+<span class="sd">        The remaining halogens will be replaced with hydrogens.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    mol : rdkit.Chem.Mol</span>
+<span class="sd">        The modified molecule with the specified percentage of crosslinks</span>
+<span class="sd">        and the remaining halogens replaced by hydrogens.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">    ------</span>
+<span class="sd">    - The function identifies terminal chlorine atoms bonded to carbon atoms.</span>
+<span class="sd">    - Crosslinking is performed by creating single bonds between carbon atoms</span>
+<span class="sd">      of selected chlorine sites.</span>
+<span class="sd">    - Remaining halogens are replaced with hydrogens using the</span>
+<span class="sd">      `replace_halogens_with_hydrogens` function.</span>
+<span class="sd">    - The `percentage_to_crosslink` parameter determines the proportion of</span>
+<span class="sd">      chlorine atoms to crosslink.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">    -------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If `percentage_to_crosslink` is not between 0 and 100.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.crosslink</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_terminal_cl_sites</span><span class="p">,</span> <span class="n">replace_halogens_with_hydrogens</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">percentage_to_crosslink</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;percentage_to_crosslink must be between 0 and 100.&quot;</span><span class="p">)</span>
+
+    <span class="n">rw</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">RWMol</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
+    <span class="n">cl_sites</span> <span class="o">=</span> <span class="n">find_terminal_cl_sites</span><span class="p">(</span><span class="n">rw</span><span class="p">)</span>
+
+    <span class="c1"># Determine the number of pairs to crosslink based on the percentage</span>
+    <span class="n">num_pairs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">percentage_to_crosslink</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">cl_sites</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">pairs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">cl_sites</span><span class="p">[::</span><span class="mi">2</span><span class="p">],</span> <span class="n">cl_sites</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]))[:</span><span class="n">num_pairs</span><span class="p">]</span>
+
+    <span class="n">removed_indices</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="c1"># Add bonds for the selected pairs</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">cl1</span><span class="p">,</span> <span class="n">c1</span><span class="p">),</span> <span class="p">(</span><span class="n">cl2</span><span class="p">,</span> <span class="n">c2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">pairs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cl1</span> <span class="ow">in</span> <span class="n">removed_indices</span> <span class="ow">or</span> <span class="n">cl2</span> <span class="ow">in</span> <span class="n">removed_indices</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rw</span><span class="o">.</span><span class="n">AddBond</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span> <span class="n">c2</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">BondType</span><span class="o">.</span><span class="n">SINGLE</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to add bond between atoms </span><span class="si">{</span><span class="n">c1</span><span class="si">}</span><span class="s2"> and </span><span class="si">{</span><span class="n">c2</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Remove the chlorine atoms involved in crosslinking</span>
+    <span class="n">atoms_to_remove</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">cl</span> <span class="k">for</span> <span class="p">(</span><span class="n">cl1</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="p">(</span><span class="n">cl2</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">pairs</span> <span class="k">for</span> <span class="n">cl</span> <span class="ow">in</span> <span class="p">(</span><span class="n">cl1</span><span class="p">,</span> <span class="n">cl2</span><span class="p">)],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">cl</span> <span class="ow">in</span> <span class="n">atoms_to_remove</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">cl</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">removed_indices</span><span class="p">:</span>
+            <span class="n">rw</span><span class="o">.</span><span class="n">RemoveAtom</span><span class="p">(</span><span class="n">cl</span><span class="p">)</span>
+            <span class="n">removed_indices</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cl</span><span class="p">)</span>
+
+    <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">rw</span><span class="p">)</span>
+    <span class="n">rw</span><span class="o">.</span><span class="n">CommitBatchEdit</span><span class="p">()</span>
+
+    <span class="c1"># Replace remaining halogens with hydrogens</span>
+    <span class="n">mol</span> <span class="o">=</span> <span class="n">replace_halogens_with_hydrogens</span><span class="p">(</span><span class="n">rw</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mol</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Hannah Turney. Project structure based on the Computational Molecular Science Python Cookiecutter version 1.1.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

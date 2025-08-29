@@ -45,6 +45,7 @@
 <li class="toctree-l1"><a class="reference internal" href="api.html">swiftpol</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#module-swiftpol.build">swiftpol.build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html#module-swiftpol.parameterize">swiftpol.parameterize</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#module-swiftpol.crosslink">swiftpol.crosslink</a></li>
 </ul>
 
         </div>
@@ -75,6 +76,7 @@
 
 <div class="genindex-jumpbox">
  <a href="#_"><strong>_</strong></a>
+ | <a href="#A"><strong>A</strong></a>
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#E"><strong>E</strong></a>
@@ -83,7 +85,9 @@
  | <a href="#I"><strong>I</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
+ | <a href="#V"><strong>V</strong></a>
  
 </div>
 <h2 id="_">_</h2>
@@ -98,10 +102,20 @@
   </ul></td>
 </tr></table>
 
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#swiftpol.crosslink.assign_random_stereochemistry">assign_random_stereochemistry() (in module swiftpol.crosslink)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#swiftpol.build.blockiness_gen">blockiness_gen() (in module swiftpol.build)</a>
+</li>
+      <li><a href="api.html#swiftpol.crosslink.build_branched_polymer">build_branched_polymer() (in module swiftpol.crosslink)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -123,10 +137,10 @@
         <li><a href="api.html#swiftpol.build.polymer_system_from_PDI.calculate_residuals">(swiftpol.build.polymer_system_from_PDI method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#swiftpol.parameterize.charge_openff_polymer">charge_openff_polymer() (in module swiftpol.parameterize)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api.html#swiftpol.parameterize.charge_polymer">charge_polymer() (in module swiftpol.parameterize)</a>
 </li>
       <li><a href="api.html#swiftpol.build.polymer_system.charge_system">charge_system() (swiftpol.build.polymer_system method)</a>
@@ -135,6 +149,10 @@
         <li><a href="api.html#swiftpol.build.polymer_system_from_PDI.charge_system">(swiftpol.build.polymer_system_from_PDI method)</a>
 </li>
       </ul></li>
+      <li><a href="api.html#swiftpol.crosslink.crosslink_cl_sites">crosslink_cl_sites() (in module swiftpol.crosslink)</a>
+</li>
+      <li><a href="api.html#swiftpol.crosslink.crosslink_polymer">crosslink_polymer() (in module swiftpol.crosslink)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -153,6 +171,12 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#swiftpol.crosslink.filter_close_pairs">filter_close_pairs() (in module swiftpol.crosslink)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#swiftpol.crosslink.find_terminal_cl_sites">find_terminal_cl_sites() (in module swiftpol.crosslink)</a>
+</li>
       <li><a href="api.html#swiftpol.parameterize.forcefield_with_charge_handler">forcefield_with_charge_handler() (in module swiftpol.parameterize)</a>
 </li>
   </ul></td>
@@ -184,6 +208,12 @@
       <li><a href="api.html#swiftpol.build.introduce_stereoisomers">introduce_stereoisomers() (in module swiftpol.build)</a>
 </li>
   </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#swiftpol.crosslink.iterative_chainID_update">iterative_chainID_update() (in module swiftpol.crosslink)</a>
+</li>
+      <li><a href="api.html#swiftpol.crosslink.iterative_crosslink">iterative_crosslink() (in module swiftpol.crosslink)</a>
+</li>
+  </ul></td>
 </tr></table>
 
 <h2 id="M">M</h2>
@@ -196,6 +226,8 @@
         <li><a href="api.html#module-swiftpol">swiftpol</a>
 </li>
         <li><a href="api.html#module-swiftpol.build">swiftpol.build</a>
+</li>
+        <li><a href="api.html#module-swiftpol.crosslink">swiftpol.crosslink</a>
 </li>
         <li><a href="api.html#module-swiftpol.parameterize">swiftpol.parameterize</a>
 </li>
@@ -223,6 +255,14 @@
   </ul></td>
 </tr></table>
 
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#swiftpol.crosslink.replace_halogens_with_hydrogens">replace_halogens_with_hydrogens() (in module swiftpol.crosslink)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -235,13 +275,20 @@
         <li><a href="api.html#module-swiftpol">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     swiftpol.build
 
       <ul>
         <li><a href="api.html#module-swiftpol.build">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    swiftpol.crosslink
+
+      <ul>
+        <li><a href="api.html#module-swiftpol.crosslink">module</a>
 </li>
       </ul></li>
       <li>
@@ -251,6 +298,18 @@
         <li><a href="api.html#module-swiftpol.parameterize">module</a>
 </li>
       </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#swiftpol.crosslink.validate_branched_reaction">validate_branched_reaction() (in module swiftpol.crosslink)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api.html#swiftpol.crosslink.validate_linear_reaction">validate_linear_reaction() (in module swiftpol.crosslink)</a>
+</li>
   </ul></td>
 </tr></table>
 

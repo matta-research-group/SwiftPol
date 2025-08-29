@@ -45,6 +45,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">swiftpol</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html#module-swiftpol.build">swiftpol.build</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html#module-swiftpol.parameterize">swiftpol.parameterize</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html#module-swiftpol.crosslink">swiftpol.crosslink</a></li>
 </ul>
 
         </div>
@@ -118,6 +119,8 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">statistics</span><span class="w"> </span><span class="kn">import</span> <span class="n">mean</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem.Descriptors</span><span class="w"> </span><span class="kn">import</span> <span class="n">ExactMolWt</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange</span><span class="w"> </span><span class="kn">import</span> <span class="n">Interchange</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">string</span>
+
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">string</span>
 
@@ -128,6 +131,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">build_polymer</span><span class="p">(</span>
     <span class="n">sequence</span><span class="p">,</span> <span class="n">monomer_list</span><span class="p">,</span> <span class="n">reaction</span><span class="p">,</span> <span class="n">terminal</span><span class="o">=</span><span class="s2">&quot;hydrogen&quot;</span><span class="p">,</span> <span class="n">chain_num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">chainID</span><span class="o">=</span><span class="s2">&quot;A&quot;</span>
 <span class="p">):</span>
+
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Constructs a polymer from a given sequence of monomers.</span>
 
@@ -170,6 +174,7 @@
     <span class="n">info</span><span class="o">.</span><span class="n">SetResidueNumber</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">info</span><span class="o">.</span><span class="n">SetChainId</span><span class="p">(</span><span class="n">chainID</span><span class="p">)</span>
     <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">polymer</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
+
     <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))[</span><span class="mi">1</span><span class="p">:]:</span>
@@ -181,6 +186,7 @@
             <span class="n">info</span><span class="o">.</span><span class="n">SetResidueNumber</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">info</span><span class="o">.</span><span class="n">SetChainId</span><span class="p">(</span><span class="n">chainID</span><span class="p">)</span>
             <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">A</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
+
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">polymer</span> <span class="o">=</span> <span class="n">reaction</span><span class="o">.</span><span class="n">RunReactants</span><span class="p">((</span><span class="n">polymer</span><span class="p">,</span> <span class="n">A</span><span class="p">))[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
@@ -745,7 +751,6 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">openff.units</span><span class="w"> </span><span class="kn">import</span> <span class="n">unit</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem</span><span class="w"> </span><span class="kn">import</span> <span class="n">AllChem</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">string</span>
-
 <div class="viewcode-block" id="polymer_system.__init__">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1768,6 +1773,7 @@
                             <span class="n">chain_num</span><span class="o">=</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
                             <span class="n">chainID</span><span class="o">=</span><span class="n">id_new</span><span class="p">,</span>
                         <span class="p">)</span>
+
                     <span class="n">lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
                 <span class="n">chains_rdkit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
                 <span class="n">chain</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
