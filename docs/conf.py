@@ -64,6 +64,7 @@ autodoc_default_options = {
     'private-members': False,
     'show-inheritance': True,
 }
+autodoc_typehints = 'description'
 autodoc_member_order = 'bysource'
 
 # Mock imports for external dependencies
