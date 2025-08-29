@@ -2,7 +2,6 @@ import unittest
 from rdkit import Chem
 from swiftpol.parameterize import (
     charge_polymer,
-    forcefield_with_charge_handler,
     charge_openff_polymer,
 )
 from openff.toolkit.typing.engines.smirnoff import ForceField
