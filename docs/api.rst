@@ -53,3 +53,4 @@ swiftpol.crosslink
    :undoc-members:
    :show-inheritance:
    :no-imported-members:
+   :exclude-members: find_terminal_cl_sites, filter_close_pairs, crosslink_cl_sites, iterative_crosslink, assign_random_stereochemistry
