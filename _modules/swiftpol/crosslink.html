@@ -557,8 +557,6 @@
 
 
 
-<div class="viewcode-block" id="assign_random_stereochemistry">
-<a class="viewcode-back" href="../../api.html#swiftpol.crosslink.assign_random_stereochemistry">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">assign_random_stereochemistry</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Takes an RDKit Mol with undefined stereocenters and returns a copy</span>
@@ -571,12 +569,9 @@
 
     <span class="n">isomers</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">EnumerateStereoisomers</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">opts</span><span class="p">))</span>
 
-    <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">isomers</span><span class="p">)</span> <span class="k">if</span> <span class="n">isomers</span> <span class="k">else</span> <span class="n">mol</span></div>
+    <span class="k">return</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">isomers</span><span class="p">)</span> <span class="k">if</span> <span class="n">isomers</span> <span class="k">else</span> <span class="n">mol</span>
 
 
-
-<div class="viewcode-block" id="find_terminal_cl_sites">
-<a class="viewcode-back" href="../../api.html#swiftpol.crosslink.find_terminal_cl_sites">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">find_terminal_cl_sites</span><span class="p">(</span><span class="n">mol</span><span class="p">):</span>
     <span class="n">cl_sites</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">():</span>
@@ -584,12 +579,9 @@
             <span class="n">neighbor</span> <span class="o">=</span> <span class="n">atom</span><span class="o">.</span><span class="n">GetNeighbors</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">neighbor</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;C&quot;</span><span class="p">:</span>
                 <span class="n">cl_sites</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">atom</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">(),</span> <span class="n">neighbor</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()))</span>
-    <span class="k">return</span> <span class="n">cl_sites</span></div>
+    <span class="k">return</span> <span class="n">cl_sites</span>
 
 
-
-<div class="viewcode-block" id="filter_close_pairs">
-<a class="viewcode-back" href="../../api.html#swiftpol.crosslink.filter_close_pairs">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">filter_close_pairs</span><span class="p">(</span><span class="n">cl_sites</span><span class="p">,</span> <span class="n">max_index_diff</span><span class="o">=</span><span class="mi">150</span><span class="p">):</span>
     <span class="k">return</span> <span class="p">[</span>
         <span class="p">((</span><span class="n">cl1</span><span class="p">,</span> <span class="n">c1</span><span class="p">),</span> <span class="p">(</span><span class="n">cl2</span><span class="p">,</span> <span class="n">c2</span><span class="p">))</span>
@@ -597,12 +589,9 @@
             <span class="n">cl_sites</span><span class="p">[::</span><span class="mi">2</span><span class="p">],</span> <span class="n">cl_sites</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span>
         <span class="p">)</span>  <span class="c1"># Pairs up adjacent elements [(0, 1), (2, 3)] -&gt; [((0,1), (2,3))]</span>
         <span class="k">if</span> <span class="nb">abs</span><span class="p">(</span><span class="n">c1</span> <span class="o">-</span> <span class="n">c2</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">max_index_diff</span>
-    <span class="p">]</span>  <span class="c1"># For each pair it checks the distance between the two atoms</span></div>
+    <span class="p">]</span>  <span class="c1"># For each pair it checks the distance between the two atoms</span>
 
 
-
-<div class="viewcode-block" id="crosslink_cl_sites">
-<a class="viewcode-back" href="../../api.html#swiftpol.crosslink.crosslink_cl_sites">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">crosslink_cl_sites</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">max_pairs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="n">rw</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">RWMol</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
     <span class="n">cl_sites</span> <span class="o">=</span> <span class="n">find_terminal_cl_sites</span><span class="p">(</span><span class="n">rw</span><span class="p">)</span>
@@ -637,12 +626,9 @@
     <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">rw</span><span class="p">)</span>
     <span class="n">rw</span><span class="o">.</span><span class="n">CommitBatchEdit</span><span class="p">()</span>
     <span class="n">mol</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">rw</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">mol</span></div>
+    <span class="k">return</span> <span class="n">mol</span>
 
 
-
-<div class="viewcode-block" id="iterative_crosslink">
-<a class="viewcode-back" href="../../api.html#swiftpol.crosslink.iterative_crosslink">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">iterative_crosslink</span><span class="p">(</span><span class="n">mol</span><span class="p">,</span> <span class="n">max_cycles</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.crosslink</span><span class="w"> </span><span class="kn">import</span> <span class="n">find_terminal_cl_sites</span><span class="p">,</span> <span class="n">crosslink_cl_sites</span>
 
@@ -653,8 +639,7 @@
             <span class="k">break</span>
         <span class="n">mol</span> <span class="o">=</span> <span class="n">crosslink_cl_sites</span><span class="p">(</span><span class="n">mol</span><span class="p">)</span>
         <span class="n">cycles</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="k">return</span> <span class="n">mol</span></div>
-
+    <span class="k">return</span> <span class="n">mol</span>
 
 
 <div class="viewcode-block" id="crosslink_polymer">

@@ -84,7 +84,6 @@
 <li class="toctree-l1"><a class="reference internal" href="#module-swiftpol.parameterize">swiftpol.parameterize</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#swiftpol.parameterize.charge_polymer"><code class="docutils literal notranslate"><span class="pre">charge_polymer()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#swiftpol.parameterize.charge_openff_polymer"><code class="docutils literal notranslate"><span class="pre">charge_openff_polymer()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#swiftpol.parameterize.forcefield_with_charge_handler"><code class="docutils literal notranslate"><span class="pre">forcefield_with_charge_handler()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#module-swiftpol.crosslink">swiftpol.crosslink</a><ul>
@@ -93,11 +92,6 @@
 <li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.validate_branched_reaction"><code class="docutils literal notranslate"><span class="pre">validate_branched_reaction()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.iterative_chainID_update"><code class="docutils literal notranslate"><span class="pre">iterative_chainID_update()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.build_branched_polymer"><code class="docutils literal notranslate"><span class="pre">build_branched_polymer()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.assign_random_stereochemistry"><code class="docutils literal notranslate"><span class="pre">assign_random_stereochemistry()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.find_terminal_cl_sites"><code class="docutils literal notranslate"><span class="pre">find_terminal_cl_sites()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.filter_close_pairs"><code class="docutils literal notranslate"><span class="pre">filter_close_pairs()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.crosslink_cl_sites"><code class="docutils literal notranslate"><span class="pre">crosslink_cl_sites()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.iterative_crosslink"><code class="docutils literal notranslate"><span class="pre">iterative_crosslink()</span></code></a></li>
 <li class="toctree-l2"><a class="reference internal" href="#swiftpol.crosslink.crosslink_polymer"><code class="docutils literal notranslate"><span class="pre">crosslink_polymer()</span></code></a></li>
 </ul>
 </li>
@@ -754,32 +748,6 @@ Assigns % residual monomer value to ensemble under self.residual_monomer_actual<
 </dl>
 </dd></dl>
 
-<dl class="py function">
-<dt class="sig sig-object py" id="swiftpol.parameterize.forcefield_with_charge_handler">
-<span class="sig-prename descclassname"><span class="pre">swiftpol.parameterize.</span></span><span class="sig-name descname"><span class="pre">forcefield_with_charge_handler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecule</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge_method</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">forcefield</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'openff-2.2.0.offxml'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ensemble</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/parameterize.html#forcefield_with_charge_handler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.parameterize.forcefield_with_charge_handler" title="Link to this definition"></a></dt>
-<dd><p>Create a forcefield with a charge handler for a given molecule and charge method.</p>
-<p>The function can handle both individual molecules and ensembles of molecules.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>molecule</strong> (<em>rdkit.Chem.rdchem.Mol or list of rdkit.Chem.rdchem.Mol</em>) – An RDKit molecule object or a list of RDKit molecule objects for which the forcefield is to be created.</p></li>
-<li><p><strong>charge_method</strong> (<em>str</em>) – A string that specifies the charge method to be used for the molecule.</p></li>
-<li><p><strong>forcefield</strong> (<em>str, optional</em>) – A string that specifies the forcefield to be used. Default is “openff-2.2.0.offxml”.</p></li>
-<li><p><strong>ensemble</strong> (<em>bool, optional</em>) – A boolean that specifies whether the input molecule is an ensemble of molecules. Default is False.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>An OpenFF ForceField object with the specified molecule’s charges added to the LibraryCharges parameter.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>openff.toolkit.typing.engines.smirnoff.ForceField</p>
-</dd>
-<dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>Exception</strong> – If the charge method is not supported.</p>
-</dd>
-</dl>
-</dd></dl>
-
 </section>
 <section id="module-swiftpol.crosslink">
 <span id="swiftpol-crosslink"></span><h1>swiftpol.crosslink<a class="headerlink" href="#module-swiftpol.crosslink" title="Link to this heading"></a></h1>
@@ -974,33 +942,6 @@ Random stereochemsitry assigned to each stereocenter.</p>
 </dl>
 </section>
 </dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="swiftpol.crosslink.assign_random_stereochemistry">
-<span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">assign_random_stereochemistry</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#assign_random_stereochemistry"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.assign_random_stereochemistry" title="Link to this definition"></a></dt>
-<dd><p>Takes an RDKit Mol with undefined stereocenters and returns a copy
-with random stereochemistry assigned to all stereocenters.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="swiftpol.crosslink.find_terminal_cl_sites">
-<span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">find_terminal_cl_sites</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#find_terminal_cl_sites"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.find_terminal_cl_sites" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="swiftpol.crosslink.filter_close_pairs">
-<span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">filter_close_pairs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cl_sites</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_index_diff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">150</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#filter_close_pairs"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.filter_close_pairs" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="swiftpol.crosslink.crosslink_cl_sites">
-<span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">crosslink_cl_sites</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pairs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#crosslink_cl_sites"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.crosslink_cl_sites" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="swiftpol.crosslink.iterative_crosslink">
-<span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">iterative_crosslink</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_cycles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#iterative_crosslink"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.iterative_crosslink" title="Link to this definition"></a></dt>
-<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="swiftpol.crosslink.crosslink_polymer">
