@@ -10,3 +10,4 @@ swiftpol/.ipynb_checkpoints
 swiftpol/oe_license.txt
 .DS_Store
 swiftpol.egg-info/
+build/
