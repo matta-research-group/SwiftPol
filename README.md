@@ -42,9 +42,10 @@ To submit your feature to be incorporated to the main branch, you should submit 
 
 ### Example Notebooks
 Examples of using SwiftPol code to build different polymers can be found at [Example Notebooks](Example_Notebooks/)
--  [Building a PLGA system](Example_Notebooks/PLGA_demo.ipynb)
+-  [Building a PLGA System](Example_Notebooks/PLGA_demo.ipynb)
 -  [Building Chitin](Example_Notebooks/Chitin.ipynb)
 -  [Constructing Reaction SMARTS](Example_Notebooks/rxn_smarts.ipynb)
+-  [Building Crosslinked PEGDA Networks](Example_Notebooks/Crosslinking_demo.ipynb)
 
 ### Dependencies
 [YAML environment file listing all required packages to use SwiftPol](https://github.com/matta-research-group/SwiftPol/blob/main/Dev_tools/swiftpol.yml)
