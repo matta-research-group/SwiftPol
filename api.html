@@ -231,34 +231,29 @@ It also calculates the average block length of ‘A’ and ‘B’ monomers in t
 <dd><p>Calculates the components required to construct a simulation box for a given set of molecular chains.</p>
 <p>This function determines the quantity of each molecule type required, considering the salt concentration
 and residual monomer concentration. It is adapted from the OpenFF Toolkit Packmol wrapper’s solvate_topology function.</p>
-<section id="parameters">
-<h2>Parameters:<a class="headerlink" href="#parameters" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>chains<span class="classifier">list</span></dt><dd><p>A list of molecular chains to be included in the simulation box.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>chains</strong> (<em>list</em>) – A list of molecular chains to be included in the simulation box.</p></li>
+<li><p><strong>sequence</strong> (<em>str</em>) – A string representing the sequence of the molecular chains. ‘G’ and ‘L’ represent different types of monomers.</p></li>
+<li><p><strong>salt_concentration</strong> (<em>float, optional</em>) – The desired salt concentration in the simulation box. Defaults to 0 M.</p></li>
+<li><p><strong>residual_monomer</strong> (<em>float, optional</em>) – The desired residual monomer concentration in the simulation box. Defaults to 0.00%.</p></li>
+</ul>
 </dd>
-<dt>sequence<span class="classifier">str</span></dt><dd><p>A string representing the sequence of the molecular chains. ‘G’ and ‘L’ represent different types of monomers.</p>
-</dd>
-<dt>salt_concentration<span class="classifier">float, optional</span></dt><dd><p>The desired salt concentration in the simulation box. Defaults to 0 M.</p>
-</dd>
-<dt>residual_monomer<span class="classifier">float, optional</span></dt><dd><p>The desired residual monomer concentration in the simulation box. Defaults to 0.00%.</p>
-</dd>
-</dl>
-</section>
-<section id="returns">
-<h2>Returns:<a class="headerlink" href="#returns" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>tuple</dt><dd><p>A tuple containing the following elements:
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><em>tuple</em> – A tuple containing the following elements:
 - molecules (list): A list of molecules to be included in the simulation box.
 - number_of_copies (list): A list indicating the quantity of each molecule to be included in the simulation box.
 - topology (openff.toolkit.topology.Topology): The topology of the simulation box.
-- box_vectors (numpy.ndarray): The vectors defining the dimensions of the simulation box.</p>
+- box_vectors (numpy.ndarray): The vectors defining the dimensions of the simulation box.</p></li>
+<li><p><em>Notes</em></p></li>
+<li><p><em>——</em></p></li>
+<li><p><em>This function is adapted from the OpenFF Toolkit Packmol wrapper’s solvate_topology function.</em></p></li>
+</ul>
+</p>
 </dd>
 </dl>
-</section>
-<section id="notes">
-<h2>Notes:<a class="headerlink" href="#notes" title="Link to this heading"></a></h2>
-<p>This function is adapted from the OpenFF Toolkit Packmol wrapper’s solvate_topology function.</p>
-</section>
 </dd></dl>
 
 <dl class="py function">
@@ -299,42 +294,46 @@ are made in pairs of ‘A’ monomers to ensure stereoisomerism.</p>
 <dt class="sig sig-object py" id="swiftpol.build.polymer_system.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monomer_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_chains</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stereoisomerism_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hydrogen'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perc_A_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blockiness_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">'A']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copolymer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acceptance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initialize the polymer system and build the polymer chains.</p>
-<section id="id1">
-<h3><strong>Parameters:</strong><a class="headerlink" href="#id1" title="Link to this heading"></a></h3>
-<p>monomer_list (list): List of monomers to be used in the polymerization.</p>
-<p>reaction (str): The type of reaction to be used for polymerization.</p>
-<p>length_target (float): The target length of the polymer chains.</p>
-<p>num_chains (int): The number of polymer chains to be generated.</p>
-<p>stereoisomerism_input (tuple, optional): A tuple containing the monomer, instance fraction (e.g. 0.5 for 50% stereoisomer), and SMILES string of the stereoisomer to be introduced. Default is None.</p>
-<p>terminals (str, optional): The type of terminal groups to be used. Default is ‘hydrogen’, adds a hydrogen atom.</p>
-<p>perc_A_target (float, optional): The target percentage of monomer A in the copolymer. Default is 100.</p>
-<p>blockiness_target (float, optional): The target blockiness of the copolymer, and indication of method calculation. Default is 1.0, with reference to ‘A’ monomer linkages.</p>
-<p>copolymer (bool, optional): Flag to indicate if the system is a copolymer. Default is False.</p>
-<p>acceptance = % deviation of blockiness and A percentage from target values. Default is 10%</p>
-</section>
-<section id="attributes">
-<h3><strong>Attributes:</strong><a class="headerlink" href="#attributes" title="Link to this heading"></a></h3>
-<p>length_target (float): The target length of the polymer chains.</p>
-<p>terminals (str): The type of terminal groups used.</p>
-<p>blockiness_target (float): The target blockiness of the copolymer.</p>
-<p>A_target (float): The target percentage of monomer A in the copolymer.</p>
-<p>chains (list): List of polymer chains as OpenFF Molecule objects.</p>
-<p>chain_rdkit (list): List of polymer chains as RDKit molecule objects.</p>
-<p>lengths (list): List of lengths of the polymer chains.</p>
-<p>perc_A_actual (list): List of actual percentages of monomer A in the polymer chains.</p>
-<p>B_block_length (float): The average block length of monomer B in the copolymer.</p>
-<p>A_block_length (float): The average block length of monomer A in the copolymer.</p>
-<p>blockiness_list (list): List of blockiness values for the polymer chains.</p>
-<p>mean_blockiness (float): The mean blockiness of the polymer chains.</p>
-<p>mol_weight_average (float): The average molecular weight of the polymer chains.</p>
-<p>PDI (float): The polydispersity index of the polymer chains.</p>
-<p>Mn (float): The number-average molecular weight of the polymer chains.</p>
-<p>Mw (float): The weight-average molecular weight of the polymer chains.</p>
-<p>num_chains (int): The number of polymer chains generated.</p>
-<p>length_average (float): The average length of the polymer chains.</p>
-<p>min_length (float): The minimum length of the polymer chains.</p>
-<p>max_length (float): The maximum length of the polymer chains.</p>
-</section>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>monomer_list (list)</strong> (<em>List of monomers to be used in the polymerization.</em>)</p></li>
+<li><p><strong>reaction (str)</strong> (<em>The type of reaction to be used for polymerization.</em>)</p></li>
+<li><p><strong>length_target (float)</strong> (<em>The target length of the polymer chains.</em>)</p></li>
+<li><p><strong>num_chains (int)</strong> (<em>The number of polymer chains to be generated.</em>)</p></li>
+<li><p><strong>stereoisomerism_input (tuple, optional)</strong> (<em>A tuple containing the monomer, instance fraction (e.g. 0.5 for 50% stereoisomer), and SMILES string of the stereoisomer to be introduced. Default is None.</em>)</p></li>
+<li><p><strong>terminals (str, optional)</strong> (<em>The type of terminal groups to be used. Default is ‘hydrogen’, adds a hydrogen atom.</em>)</p></li>
+<li><p><strong>perc_A_target (float, optional)</strong> (<em>The target percentage of monomer A in the copolymer. Default is 100.</em>)</p></li>
+<li><p><strong>blockiness_target (float, optional)</strong> (<em>The target blockiness of the copolymer, and indication of method calculation. Default is 1.0, with reference to ‘A’ monomer linkages.</em>)</p></li>
+<li><p><strong>copolymer (bool, optional)</strong> (<em>Flag to indicate if the system is a copolymer. Default is False.</em>)</p></li>
+<li><p><strong>acceptance = % deviation of blockiness and A percentage from target values. Default is 10%</strong></p></li>
+</ul>
+</dd>
+<dt class="field-even">Variables<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>(</strong><strong>float</strong><strong>)</strong> (<em>max_length</em>)</p></li>
+<li><p><strong>(</strong><strong>str</strong><strong>)</strong> (<em>terminals</em>)</p></li>
+<li><p><strong>(</strong><strong>float</strong><strong>)</strong></p></li>
+<li><p><strong>(</strong><strong>float</strong><strong>)</strong></p></li>
+<li><p><strong>(</strong><strong>list</strong><strong>)</strong> (<em>blockiness_list</em>)</p></li>
+<li><p><strong>(</strong><strong>list</strong><strong>)</strong></p></li>
+<li><p><strong>(</strong><strong>list</strong><strong>)</strong></p></li>
+<li><p><strong>(</strong><strong>list</strong><strong>)</strong></p></li>
+<li><p><strong>(</strong><strong>float</strong><strong>)</strong></p></li>
+<li><p><strong>(</strong><strong>float</strong><strong>)</strong></p></li>
+<li><p><strong>(</strong><strong>list</strong><strong>)</strong></p></li>
+<li><p><strong>(</strong><strong>float</strong><strong>)</strong></p></li>
+<li><p><strong>(</strong><strong>float</strong><strong>)</strong></p></li>
+<li><p><strong>(</strong><strong>float</strong><strong>)</strong></p></li>
+<li><p><strong>(</strong><strong>float</strong><strong>)</strong></p></li>
+<li><p><strong>(</strong><strong>float</strong><strong>)</strong></p></li>
+<li><p><strong>(</strong><strong>int</strong><strong>)</strong> (<em>num_chains</em>)</p></li>
+<li><p><strong>(</strong><strong>float</strong><strong>)</strong></p></li>
+<li><p><strong>(</strong><strong>float</strong><strong>)</strong></p></li>
+<li><p><strong>(</strong><strong>float</strong><strong>)</strong></p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -775,30 +774,23 @@ Assigns % residual monomer value to ensemble under self.residual_monomer_actual<
 <span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">validate_linear_reaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">starting_polymer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_activate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_activate_reactants</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_react</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#validate_linear_reaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.validate_linear_reaction" title="Link to this definition"></a></dt>
 <dd><p>Validates the linear activation and polymerization reactions for compatibility
 with the starting polymer and reactants.</p>
-<section id="note">
-<h2>Note:<a class="headerlink" href="#note" title="Link to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>This function is not recommended for standalone use.</p>
-</section>
-<section id="id2">
-<h2>Parameters:<a class="headerlink" href="#id2" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>starting_polymer<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The initial polymer molecule to validate against the reactions.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>starting_polymer</strong> (<em>rdkit.Chem.Mol</em>) – The initial polymer molecule to validate against the reactions.</p></li>
+<li><p><strong>linear_activate</strong> (<em>rdkit.Chem.rdChemReactions.ChemicalReaction</em>) – The reaction template for linear activation.</p></li>
+<li><p><strong>linear_activate_reactants</strong> (<em>list of rdkit.Chem.Mol</em>) – The reactants required for the linear activation reaction.</p></li>
+<li><p><strong>linear_react</strong> (<em>rdkit.Chem.rdChemReactions.ChemicalReaction</em>) – The reaction template for linear polymerization.</p></li>
+</ul>
 </dd>
-<dt>linear_activate<span class="classifier">rdkit.Chem.rdChemReactions.ChemicalReaction</span></dt><dd><p>The reaction template for linear activation.</p>
-</dd>
-<dt>linear_activate_reactants<span class="classifier">list of rdkit.Chem.Mol</span></dt><dd><p>The reactants required for the linear activation reaction.</p>
-</dd>
-<dt>linear_react<span class="classifier">rdkit.Chem.rdChemReactions.ChemicalReaction</span></dt><dd><p>The reaction template for linear polymerization.</p>
-</dd>
-</dl>
-</section>
-<section id="raises">
-<h2>Raises:<a class="headerlink" href="#raises" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If the reactions are invalid or incompatible with the starting polymer.</p>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the reactions are invalid or incompatible with the starting polymer.</p>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
 <dl class="py function">
@@ -806,36 +798,26 @@ with the starting polymer and reactants.</p>
 <span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">validate_branched_reaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">starting_polymer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branched_activate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branched_activate_reactants</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">branched_react</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_activate</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_activate_reactants</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linear_react</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#validate_branched_reaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.validate_branched_reaction" title="Link to this definition"></a></dt>
 <dd><p>Validates the branched and linear activation and polymerization reactions
 for compatibility with the starting polymer and reactants.</p>
-<section id="id3">
-<h2>Note:<a class="headerlink" href="#id3" title="Link to this heading"></a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>This function is not recommended for standalone use.</p>
-</section>
-<section id="id4">
-<h2>Parameters:<a class="headerlink" href="#id4" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>starting_polymer<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The initial polymer molecule to validate against the reactions.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>starting_polymer</strong> (<em>rdkit.Chem.Mol</em>) – The initial polymer molecule to validate against the reactions.</p></li>
+<li><p><strong>branched_activate</strong> (<em>rdkit.Chem.rdChemReactions.ChemicalReaction</em>) – The reaction template for branched activation.</p></li>
+<li><p><strong>branched_activate_reactants</strong> (<em>list of rdkit.Chem.Mol</em>) – The reactants required for the branched activation reaction.</p></li>
+<li><p><strong>branched_react</strong> (<em>rdkit.Chem.rdChemReactions.ChemicalReaction</em>) – The reaction template for branched polymerization.</p></li>
+<li><p><strong>linear_activate</strong> (<em>rdkit.Chem.rdChemReactions.ChemicalReaction</em>) – The reaction template for linear activation.</p></li>
+<li><p><strong>linear_activate_reactants</strong> (<em>list of rdkit.Chem.Mol</em>) – The reactants required for the linear activation reaction.</p></li>
+<li><p><strong>linear_react</strong> (<em>rdkit.Chem.rdChemReactions.ChemicalReaction</em>) – The reaction template for linear polymerization.</p></li>
+</ul>
 </dd>
-<dt>branched_activate<span class="classifier">rdkit.Chem.rdChemReactions.ChemicalReaction</span></dt><dd><p>The reaction template for branched activation.</p>
-</dd>
-<dt>branched_activate_reactants<span class="classifier">list of rdkit.Chem.Mol</span></dt><dd><p>The reactants required for the branched activation reaction.</p>
-</dd>
-<dt>branched_react<span class="classifier">rdkit.Chem.rdChemReactions.ChemicalReaction</span></dt><dd><p>The reaction template for branched polymerization.</p>
-</dd>
-<dt>linear_activate<span class="classifier">rdkit.Chem.rdChemReactions.ChemicalReaction</span></dt><dd><p>The reaction template for linear activation.</p>
-</dd>
-<dt>linear_activate_reactants<span class="classifier">list of rdkit.Chem.Mol</span></dt><dd><p>The reactants required for the linear activation reaction.</p>
-</dd>
-<dt>linear_react<span class="classifier">rdkit.Chem.rdChemReactions.ChemicalReaction</span></dt><dd><p>The reaction template for linear polymerization.</p>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If the reactions are invalid or incompatible with the starting polymer.</p>
 </dd>
 </dl>
-</section>
-<section id="id5">
-<h2>Raises:<a class="headerlink" href="#id5" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If the reactions are invalid or incompatible with the starting polymer.</p>
-</dd>
-</dl>
-</section>
 </dd></dl>
 
 <dl class="py function">
@@ -845,44 +827,39 @@ for compatibility with the starting polymer and reactants.</p>
 <p>This function modifies the <cite>polymer</cite> molecule by updating the chain IDs of its atoms. The chain IDs
 are incremented sequentially, starting from the chain ID of the <cite>last_polymer_added</cite>. The function
 ensures that the chain IDs wrap around using the English alphabet (A-Z).</p>
-<section id="id6">
-<h2>Parameters:<a class="headerlink" href="#id6" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>polymer<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The polymer molecule whose chain IDs will be updated.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>polymer</strong> (<em>rdkit.Chem.Mol</em>) – The polymer molecule whose chain IDs will be updated.</p></li>
+<li><p><strong>last_polymer_added</strong> (<em>rdkit.Chem.Mol</em>) – The last polymer molecule added to the network. The chain IDs of this molecule are used as
+the starting point for updating the chain IDs in the <cite>polymer</cite>.</p></li>
+</ul>
 </dd>
-<dt>last_polymer_added<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The last polymer molecule added to the network. The chain IDs of this molecule are used as
-the starting point for updating the chain IDs in the <cite>polymer</cite>.</p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>polymer</strong> – The updated polymer molecule with modified chain IDs.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>rdkit.Chem.Mol</p>
 </dd>
 </dl>
-</section>
-<section id="id7">
-<h2>Returns:<a class="headerlink" href="#id7" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>polymer<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The updated polymer molecule with modified chain IDs.</p>
-</dd>
-</dl>
-</section>
-<section id="id8">
-<h2>Notes:<a class="headerlink" href="#id8" title="Link to this heading"></a></h2>
+<p class="rubric">Notes</p>
 <ul class="simple">
 <li><p>Not recommended for standalone use.</p></li>
 <li><p>The function uses the <cite>AtomPDBResidueInfo</cite> object to access and modify chain IDs during the network building process.</p></li>
 <li><p>Chain IDs are updated using the English alphabet (A-Z) and wrap around if they exceed ‘Z’.</p></li>
 <li><p>Atoms without <cite>MonomerInfo</cite> are skipped, and a warning is printed for each skipped atom. For polymers build with SwiftPol, this should not occur.</p></li>
 </ul>
-</section>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="swiftpol.crosslink.build_branched_polymer">
 <span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">build_branched_polymer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">starting_polymer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction_templates</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_iterations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_mw</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability_of_branched_addition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">probability_of_linear_addition</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#build_branched_polymer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.build_branched_polymer" title="Link to this definition"></a></dt>
 <dd><p>Builds a branched polymer.</p>
-<section id="id9">
-<h2>Parameters:<a class="headerlink" href="#id9" title="Link to this heading"></a></h2>
-<dl>
-<dt>starting_polymer<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The initial polymer molecule to which reactions will be applied.</p>
-</dd>
-<dt>reaction_templates<span class="classifier">dict</span></dt><dd><p>A dictionary containing reaction templates for both linear and branched additions.
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul>
+<li><p><strong>starting_polymer</strong> (<em>rdkit.Chem.Mol</em>) – The initial polymer molecule to which reactions will be applied.</p></li>
+<li><p><strong>reaction_templates</strong> (<em>dict</em>) – A dictionary containing reaction templates for both linear and branched additions.
 Keys should include:</p>
 <blockquote>
 <div><ul class="simple">
@@ -892,30 +869,25 @@ Keys should include:</p>
 <li><p>“linear_react”: Reaction for linear addition.</p></li>
 </ul>
 </div></blockquote>
+</li>
+<li><p><strong>num_iterations</strong> (<em>int, optional</em>) – The number of iterations to perform. If specified, the process will stop after this many
+successful reactions, regardless of the target molecular weight.</p></li>
+<li><p><strong>target_mw</strong> (<em>float, optional</em>) – The target molecular weight for the polymer. If specified, the process will stop once
+the molecular weight of the polymer reaches or exceeds this value.</p></li>
+<li><p><strong>probability_of_branched_addition</strong> (<em>float, optional, default=0.5</em>) – The probability of performing a branched addition at each iteration.</p></li>
+<li><p><strong>probability_of_linear_addition</strong> (<em>float, optional, default=0.5</em>) – The probability of performing a linear addition at each iteration.</p></li>
+</ul>
 </dd>
-<dt>num_iterations<span class="classifier">int, optional</span></dt><dd><p>The number of iterations to perform. If specified, the process will stop after this many
-successful reactions, regardless of the target molecular weight.</p>
-</dd>
-<dt>target_mw<span class="classifier">float, optional</span></dt><dd><p>The target molecular weight for the polymer. If specified, the process will stop once
-the molecular weight of the polymer reaches or exceeds this value.</p>
-</dd>
-<dt>probability_of_branched_addition<span class="classifier">float, optional, default=0.5</span></dt><dd><p>The probability of performing a branched addition at each iteration.</p>
-</dd>
-<dt>probability_of_linear_addition<span class="classifier">float, optional, default=0.5</span></dt><dd><p>The probability of performing a linear addition at each iteration.</p>
-</dd>
-</dl>
-</section>
-<section id="id10">
-<h2>Returns:<a class="headerlink" href="#id10" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>polymer_network<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The resulting polymer molecule after the specified number of iterations or upon reaching
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>polymer_network</strong> – The resulting polymer molecule after the specified number of iterations or upon reaching
 the target molecular weight.
 Random stereochemsitry assigned to each stereocenter.</p>
 </dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>rdkit.Chem.Mol</p>
+</dd>
 </dl>
-</section>
-<section id="id11">
-<h2>Notes:<a class="headerlink" href="#id11" title="Link to this heading"></a></h2>
+<p class="rubric">Notes</p>
 <ul class="simple">
 <li><p>The function alternates between linear and branched additions based on the specified probabilities.</p></li>
 <li><dl class="simple">
@@ -929,18 +901,15 @@ Random stereochemsitry assigned to each stereocenter.</p>
 </dl>
 </li>
 </ul>
-</section>
-<section id="id12">
-<h2>Raises:<a class="headerlink" href="#id12" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If the reaction templates are invalid or incompatible with the starting polymer.</p>
-</dd>
-<dt>AssertionError</dt><dd><p>If the sum of probabilities does not equal 1.</p>
-</dd>
-<dt>ValueError</dt><dd><p>If neither <cite>num_iterations</cite> nor <cite>target_mw</cite> is specified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ValueError</strong> – If the reaction templates are invalid or incompatible with the starting polymer.</p></li>
+<li><p><strong>AssertionError</strong> – If the sum of probabilities does not equal 1.</p></li>
+<li><p><strong>ValueError</strong> – If neither <cite>num_iterations</cite> nor <cite>target_mw</cite> is specified.</p></li>
+</ul>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
 <dl class="py function">
@@ -948,43 +917,35 @@ Random stereochemsitry assigned to each stereocenter.</p>
 <span class="sig-prename descclassname"><span class="pre">swiftpol.crosslink.</span></span><span class="sig-name descname"><span class="pre">crosslink_polymer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">percentage_to_crosslink</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/crosslink.html#crosslink_polymer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.crosslink.crosslink_polymer" title="Link to this definition"></a></dt>
 <dd><p>Crosslinks a specified percentage of terminal chlorine atoms in a polymer
 and replaces the remaining halogens with hydrogens.</p>
-<section id="id13">
-<h2>Parameters:<a class="headerlink" href="#id13" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>mol<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The input molecule representing the polymer.</p>
-</dd>
-<dt>percentage_to_crosslink<span class="classifier">float, optional, default=50</span></dt><dd><p>The percentage (0-100) of terminal chlorine atoms to crosslink.
-The remaining halogens will be replaced with hydrogens.</p>
-</dd>
-</dl>
-</section>
-<section id="id14">
-<h2>Returns:<a class="headerlink" href="#id14" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>mol<span class="classifier">rdkit.Chem.Mol</span></dt><dd><p>The modified molecule with the specified percentage of crosslinks
-and the remaining halogens replaced by hydrogens.</p>
-</dd>
-</dl>
-</section>
-<section id="id15">
-<h2>Notes:<a class="headerlink" href="#id15" title="Link to this heading"></a></h2>
-<ul class="simple">
-<li><p>The function identifies terminal chlorine atoms bonded to carbon atoms.</p></li>
-<li><p>Crosslinking is performed by creating single bonds between carbon atoms
-of selected chlorine sites.</p></li>
-<li><p>Remaining halogens are replaced with hydrogens using the
-<cite>replace_halogens_with_hydrogens</cite> function.</p></li>
-<li><p>The <cite>percentage_to_crosslink</cite> parameter determines the proportion of
-chlorine atoms to crosslink.</p></li>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mol</strong> (<em>rdkit.Chem.Mol</em>) – The input molecule representing the polymer. Must contain terminal chlorine atoms at the point of crosslinking.
+The Chlorine dependency will be removed in future releases.</p></li>
+<li><p><strong>percentage_to_crosslink</strong> (<em>float, optional, default=50</em>) – The percentage (0-100) of terminal chlorine atoms to crosslink.
+The remaining halogens will be replaced with hydrogens.</p></li>
 </ul>
-</section>
-<section id="id16">
-<h2>Raises:<a class="headerlink" href="#id16" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt>ValueError</dt><dd><p>If <cite>percentage_to_crosslink</cite> is not between 0 and 100.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><ul class="simple">
+<li><p><strong>mol</strong> (<em>rdkit.Chem.Mol</em>) – The modified molecule with the specified percentage of crosslinks
+and the remaining halogens replaced by hydrogens.</p></li>
+<li><p><em>Notes</em></p></li>
+<li><p><em>——</em></p></li>
+<li><p><em>- The function identifies terminal chlorine atoms bonded to carbon atoms.</em></p></li>
+<li><p><em>- Crosslinking is performed by creating single bonds between carbon atoms</em> – of selected chlorine sites.</p></li>
+<li><p><em>- Remaining halogens are replaced with hydrogens using the</em> – <cite>replace_halogens_with_hydrogens</cite> function.</p></li>
+<li><ul>
+<li><p>The <cite>percentage_to_crosslink</cite> parameter determines the proportion of – chlorine atoms to crosslink.</p></li>
+</ul>
+</li>
+</ul>
+</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If <cite>percentage_to_crosslink</cite> is not between 0 and 100.</p>
 </dd>
 </dl>
-</section>
 </dd></dl>
 
 </section>
