@@ -101,7 +101,7 @@
 <span class="sd">        A new RDKit molecule with all halogens replaced by explicit hydrogens.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">halogens</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="s2">&quot;Cl&quot;</span><span class="p">,</span> <span class="s2">&quot;Br&quot;</span><span class="p">,</span> <span class="s2">&quot;I&quot;</span><span class="p">,</span> <span class="s2">&quot;At&quot;</span><span class="p">,</span> <span class="s2">&quot;Ts&quot;</span><span class="p">]</span>
+    <span class="n">halogens</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;F&quot;</span><span class="p">,</span> <span class="s2">&quot;Cl&quot;</span><span class="p">,</span> <span class="s2">&quot;Br&quot;</span><span class="p">,</span> <span class="s2">&quot;I&quot;</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">halogen</span> <span class="ow">in</span> <span class="n">halogens</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">matches</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetSubstructMatches</span><span class="p">(</span><span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="n">halogen</span><span class="p">))</span>
