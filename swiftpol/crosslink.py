@@ -24,7 +24,7 @@ def replace_halogens_with_hydrogens(mol):
         A new RDKit molecule with all halogens replaced by explicit hydrogens.
 
     """
-    halogens = ["F", "Cl", "Br", "I", "At", "Ts"]
+    halogens = ["F", "Cl", "Br", "I"]
     for halogen in halogens:
         try:
             matches = mol.GetSubstructMatches(Chem.MolFromSmarts(halogen))
