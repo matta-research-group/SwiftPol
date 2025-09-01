@@ -413,7 +413,7 @@ def calculate_box_components(
     This function determines the quantity of each molecule type required, considering the salt concentration
     and residual monomer concentration. It is adapted from the OpenFF Toolkit Packmol wrapper's solvate_topology function.
 
-    Parameters:
+    Parameters
     -----------
     chains : list
         A list of molecular chains to be included in the simulation box.
@@ -425,7 +425,7 @@ def calculate_box_components(
         The desired residual monomer concentration in the simulation box. Defaults to 0.00%.
 
 
-    Returns:
+    Returns
     --------
     tuple
         A tuple containing the following elements:
@@ -672,7 +672,7 @@ class polymer_system:
         """
         Initialize the polymer system and build the polymer chains.
 
-        **Parameters:**
+        Parameters
         ------------
 
         monomer_list (list): List of monomers to be used in the polymerization.
@@ -696,7 +696,7 @@ class polymer_system:
         acceptance = % deviation of blockiness and A percentage from target values. Default is 10%
 
 
-        **Attributes:**
+        Attributes
         ---------------
 
         length_target (float): The target length of the polymer chains.

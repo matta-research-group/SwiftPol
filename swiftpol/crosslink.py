@@ -63,11 +63,11 @@ def validate_linear_reaction(
     Validates the linear activation and polymerization reactions for compatibility
     with the starting polymer and reactants.
 
-    Note:
+    Note
     -----
     This function is not recommended for standalone use.
 
-    Parameters:
+    Parameters
     -----------
     starting_polymer : rdkit.Chem.Mol
         The initial polymer molecule to validate against the reactions.
@@ -81,7 +81,7 @@ def validate_linear_reaction(
     linear_react : rdkit.Chem.rdChemReactions.ChemicalReaction
         The reaction template for linear polymerization.
 
-    Raises:
+    Raises
     -------
     ValueError
         If the reactions are invalid or incompatible with the starting polymer.
@@ -130,11 +130,11 @@ def validate_branched_reaction(
     Validates the branched and linear activation and polymerization reactions
     for compatibility with the starting polymer and reactants.
 
-    Note:
+    Note
     -----
     This function is not recommended for standalone use.
 
-    Parameters:
+    Parameters
     -----------
     starting_polymer : rdkit.Chem.Mol
         The initial polymer molecule to validate against the reactions.
@@ -157,7 +157,7 @@ def validate_branched_reaction(
     linear_react : rdkit.Chem.rdChemReactions.ChemicalReaction
         The reaction template for linear polymerization.
 
-    Raises:
+    Raises
     -------
     ValueError
         If the reactions are invalid or incompatible with the starting polymer.
@@ -209,7 +209,7 @@ def iterative_chainID_update(polymer, last_polymer_added):
     are incremented sequentially, starting from the chain ID of the `last_polymer_added`. The function
     ensures that the chain IDs wrap around using the English alphabet (A-Z).
 
-    Parameters:
+    Parameters
     -----------
     polymer : rdkit.Chem.Mol
         The polymer molecule whose chain IDs will be updated.
@@ -218,12 +218,12 @@ def iterative_chainID_update(polymer, last_polymer_added):
         The last polymer molecule added to the network. The chain IDs of this molecule are used as
         the starting point for updating the chain IDs in the `polymer`.
 
-    Returns:
+    Returns
     --------
     polymer : rdkit.Chem.Mol
         The updated polymer molecule with modified chain IDs.
 
-    Notes:
+    Notes
     ------
     - Not recommended for standalone use.
     - The function uses the `AtomPDBResidueInfo` object to access and modify chain IDs during the network building process.
@@ -265,7 +265,7 @@ def build_branched_polymer(
     """
     Builds a branched polymer.
 
-    Parameters:
+    Parameters
     -----------
     starting_polymer : rdkit.Chem.Mol
         The initial polymer molecule to which reactions will be applied.
@@ -292,14 +292,14 @@ def build_branched_polymer(
     probability_of_linear_addition : float, optional, default=0.5
         The probability of performing a linear addition at each iteration.
 
-    Returns:
+    Returns
     --------
     polymer_network : rdkit.Chem.Mol
         The resulting polymer molecule after the specified number of iterations or upon reaching
         the target molecular weight.
         Random stereochemsitry assigned to each stereocenter.
 
-    Notes:
+    Notes
     ------
     - The function alternates between linear and branched additions based on the specified probabilities.
     - If both `num_iterations` and `target_mw` are specified, the process will stop as soon as either
@@ -307,8 +307,8 @@ def build_branched_polymer(
     - The reaction templates must be compatible with the starting polymer and follow RDKit's reaction
         SMARTS format.
 
-    Raises:
-    -------
+    Raises
+    ------
     ValueError
         If the reaction templates are invalid or incompatible with the starting polymer.
     AssertionError
@@ -557,16 +557,17 @@ def crosslink_polymer(mol, percentage_to_crosslink=50):
     Crosslinks a specified percentage of terminal chlorine atoms in a polymer
     and replaces the remaining halogens with hydrogens.
 
-    Parameters:
+    Parameters
     -----------
     mol : rdkit.Chem.Mol
-        The input molecule representing the polymer.
+        The input molecule representing the polymer. Must contain terminal chlorine atoms at the point of crosslinking.
+        The Chlorine dependency will be removed in future releases.
 
     percentage_to_crosslink : float, optional, default=50
         The percentage (0-100) of terminal chlorine atoms to crosslink.
         The remaining halogens will be replaced with hydrogens.
 
-    Returns:
+    Returns
     --------
     mol : rdkit.Chem.Mol
         The modified molecule with the specified percentage of crosslinks
@@ -582,7 +583,7 @@ def crosslink_polymer(mol, percentage_to_crosslink=50):
     - The `percentage_to_crosslink` parameter determines the proportion of
       chlorine atoms to crosslink.
 
-    Raises:
+    Raises
     -------
     ValueError
         If `percentage_to_crosslink` is not between 0 and 100.
