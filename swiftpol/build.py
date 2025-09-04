@@ -667,6 +667,7 @@ class polymer_system:
         perc_A_target=100,
         blockiness_target=[1.0, "A"],
         copolymer=False,
+        diblock=False,
         acceptance=10,
     ):
         """
@@ -693,8 +694,9 @@ class polymer_system:
 
         copolymer (bool, optional): Flag to indicate if the system is a copolymer. Default is False.
 
-        acceptance = % deviation of blockiness and A percentage from target values. Default is 10%
+        diblock (bool, optional): Flag to indicate if the system is a diblock copolymer. Default is False.
 
+        acceptance (float, optional): The percentage deviation of blockiness and A percentage from target values. Default is 10%.
 
         Attributes
         ---------------
@@ -738,8 +740,8 @@ class polymer_system:
         min_length (float): The minimum length of the polymer chains.
 
         max_length (float): The maximum length of the polymer chains.
-
-        """
+    
+            """
         self.length_target = length_target
         self.terminals = terminals
         perc_A_actual = []
@@ -782,14 +784,24 @@ class polymer_system:
                 length_actual = np.random.lognormal(mu, sigma)
                 if length_actual < 1:
                     length_actual = 1
-                sequence = reduce(
-                    lambda x, y: x + y,
-                    np.random.choice(
-                        ["A", "B"],
-                        size=(int(length_actual),),
-                        p=[perc_A_target / 100, 1 - (perc_A_target / 100)],
-                    ),
-                )
+                if diblock == False:
+                    sequence = reduce(
+                        lambda x, y: x + y,
+                        np.random.choice(
+                            ["A", "B"],
+                            size=(int(length_actual),),
+                            p=[perc_A_target / 100, 1 - (perc_A_target / 100)],
+                        ),
+                    )
+                else:
+                    sequence = reduce(
+                        lambda x, y: x + y,
+                        np.random.choice(
+                            ["AA", "BB"],
+                            size=(int(round(length_actual/2)),),
+                            p=[perc_A_target / 100, 1 - (perc_A_target / 100)],
+                        ),
+                    )
                 blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
                 if spec(sequence) == True:
                     id_new = string.ascii_uppercase[(n) % 26]
@@ -831,14 +843,24 @@ class polymer_system:
                     length_actual = np.random.lognormal(mu, sigma)
                     if length_actual < 1:
                         length_actual = 1
-                    sequence = reduce(
-                        lambda x, y: x + y,
-                        np.random.choice(
-                            ["A", "B"],
-                            size=(int(length_actual),),
-                            p=[perc_A_target / 100, 1 - (perc_A_target / 100)],
-                        ),
-                    )
+                    if diblock == False:
+                        sequence = reduce(
+                            lambda x, y: x + y,
+                            np.random.choice(
+                                ["A", "B"],
+                                size=(int(round(length_actual)),),
+                                p=[perc_A_target / 100, 1 - (perc_A_target / 100)],
+                            ),
+                        )
+                    else:
+                        sequence = reduce(
+                            lambda x, y: x + y,
+                            np.random.choice(
+                                ["AA", "BB"],
+                                size=(int(length_actual/2),),
+                                p=[perc_A_target / 100, 1 - (perc_A_target / 100)],
+                            ),
+                        )
                     blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
                     if spec(sequence) == True:
                         if stereoisomerism_input is not None:
@@ -1220,9 +1242,7 @@ class polymer_system:
 
         Notes
         -----
-        EXPERIMENTAL CAPABILITY. Proceed with caution
-
-        This function works independently of, and is unrelated to, the build.calculate_box_components function.
+        This function works independently of, and is unrelated to, the build.calculate_box_components function, which will be deprecated in future releases.
 
         Raises
         ------
