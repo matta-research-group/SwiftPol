@@ -699,7 +699,7 @@ class polymer_system:
         acceptance (float, optional): The percentage deviation of blockiness and A percentage from target values. Default is 10%.
 
         Attributes
-        ---------------
+        -----------
 
         length_target (float): The target length of the polymer chains.
 
@@ -741,7 +741,7 @@ class polymer_system:
 
         max_length (float): The maximum length of the polymer chains.
     
-            """
+        """
         self.length_target = length_target
         self.terminals = terminals
         perc_A_actual = []
