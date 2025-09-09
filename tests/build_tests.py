@@ -456,6 +456,7 @@ class TestPolymerSystemFromPDI(unittest.TestCase):
             copolymer=False,
             acceptance=10,
         )
+        print(sys.PDI)
         self.assertTrue(0.9 <= sys.PDI <= 1.1)
         # Test copolymer - removed whilst PDI calculation in dev
         x = build.polymer_system_from_PDI(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'],
@@ -468,7 +469,7 @@ class TestPolymerSystemFromPDI(unittest.TestCase):
                                 copolymer=True,
                                 acceptance=10)
         self.assertIsNotNone(x)
-        self.assertTrue(round(sys.PDI, 1) == 1.0)
+        self.assertTrue(round(x.PDI, 1) == 1.0)
 
 
 # Run
