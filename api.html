@@ -68,6 +68,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#swiftpol-build-polymer-system-from-pdi">swiftpol.build.polymer_system_from_PDI</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#swiftpol.build.polymer_system_from_PDI"><code class="docutils literal notranslate"><span class="pre">polymer_system_from_PDI</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system_from_PDI.string"><code class="docutils literal notranslate"><span class="pre">polymer_system_from_PDI.string</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system_from_PDI.__init__"><code class="docutils literal notranslate"><span class="pre">polymer_system_from_PDI.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system_from_PDI.generate_conformers"><code class="docutils literal notranslate"><span class="pre">polymer_system_from_PDI.generate_conformers()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#swiftpol.build.polymer_system_from_PDI.charge_system"><code class="docutils literal notranslate"><span class="pre">polymer_system_from_PDI.charge_system()</span></code></a></li>
@@ -476,84 +477,71 @@ Assigns % residual monomer value to ensemble under self.residual_monomer_actual<
 <h2>swiftpol.build.polymer_system_from_PDI<a class="headerlink" href="#swiftpol-build-polymer-system-from-pdi" title="Link to this heading"></a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="swiftpol.build.polymer_system_from_PDI">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">swiftpol.build.</span></span><span class="sig-name descname"><span class="pre">polymer_system_from_PDI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monomer_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_chains</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PDI_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stereoisomerism_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hydrogen'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perc_A_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blockiness_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">'A']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copolymer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acceptance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system_from_PDI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system_from_PDI" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">swiftpol.build.</span></span><span class="sig-name descname"><span class="pre">polymer_system_from_PDI</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monomer_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_chains</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PDI_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stereoisomerism_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hydrogen'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perc_A_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blockiness_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">'A']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copolymer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diblock</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acceptance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system_from_PDI"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system_from_PDI" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Build a polymer system based on a target polydispersity index (PDI).</p>
-<p>This class generates a polymer system with a specified number of chains,
-target chain length, and target PDI. It supports the generation of copolymers,
-stereoisomers, and blockiness control. The system is built using OpenFF and RDKit
-toolkits, with optional support for OpenEye toolkits if installed.</p>
-<p><strong>Note</strong>: This capability is under development and may change significantly in the next version of SwiftPol.
-Proceed with caution.</p>
-<dl class="field-list simple">
+<dl class="py attribute">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system_from_PDI.string">
+<span class="sig-name descname"><span class="pre">string</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;module</span> <span class="pre">'string'</span> <span class="pre">from</span> <span class="pre">'/usr/share/miniconda/envs/swiftpol/lib/python3.12/string.py'&gt;</span></em><a class="headerlink" href="#swiftpol.build.polymer_system_from_PDI.string" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="swiftpol.build.polymer_system_from_PDI.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monomer_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_chains</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PDI_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stereoisomerism_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hydrogen'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perc_A_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blockiness_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">'A']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copolymer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">diblock</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acceptance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system_from_PDI.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system_from_PDI.__init__" title="Link to this definition"></a></dt>
+<dd><p>Initialize the polymer system and build the polymer chains.</p>
+<p>This class initializes a polymer system and generates polymer chains based on the specified parameters. It supports homopolymers, copolymers, and diblock copolymers, with options for stereoisomerism, terminal groups, and blockiness control.</p>
+<dl class="field-list">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>monomer_list</strong> (<em>list of str</em>) – A list of monomer SMILES strings to be used in the polymer system.</p></li>
-<li><p><strong>reaction</strong> (<em>str</em>) – A SMARTS string defining the polymerization reaction.</p></li>
-<li><p><strong>length_target</strong> (<em>int</em>) – The target average chain length for the polymer system.</p></li>
-<li><p><strong>num_chains</strong> (<em>int</em>) – The number of polymer chains to generate.</p></li>
-<li><p><strong>PDI_target</strong> (<em>float</em>) – The target polydispersity index (PDI) for the polymer system.</p></li>
-<li><p><strong>stereoisomerism_input</strong> (<em>tuple, optional</em>) – A tuple containing the stereoisomer monomer, the fraction of stereoisomers
-to introduce, and the SMILES string of the stereoisomer. Default is None.</p></li>
-<li><p><strong>terminals</strong> (<em>str, optional</em>) – The type of terminal groups to use for the polymer chains. Default is ‘hydrogen’.</p></li>
-<li><p><strong>perc_A_target</strong> (<em>float, optional</em>) – The target percentage of monomer ‘A’ in the copolymer. Default is 100.</p></li>
-<li><p><strong>blockiness_target</strong> (<em>list, optional</em>) – A list containing the target blockiness value and the monomer to control
-blockiness for. Default is [1.0, ‘A’].</p></li>
-<li><p><strong>copolymer</strong> (<em>bool, optional</em>) – Whether to generate a copolymer. Default is False.</p></li>
-<li><p><strong>acceptance</strong> (<em>float, optional</em>) – The acceptance margin (in percentage) for the target blockiness and
-monomer percentage. Default is 10.</p></li>
+<dd class="field-odd"><ul>
+<li><p><strong>monomer_list</strong> (<em>list</em>) – List of monomers to be used in the polymerization.</p></li>
+<li><p><strong>reaction</strong> (<em>str</em>) – The type of reaction to be used for polymerization.</p></li>
+<li><p><strong>length_target</strong> (<em>float</em>) – The target length of the polymer chains.</p></li>
+<li><p><strong>num_chains</strong> (<em>int</em>) – The number of polymer chains to be generated.</p></li>
+<li><p><strong>PDI_target</strong> (<em>float</em>) – The target polydispersity index (PDI) of the polymer chains. Currently, a PDI value of up to 3.0 is supported. Smaller systems may not be able to achieve high PDI values.</p></li>
+<li><p><strong>stereoisomerism_input</strong> (<em>tuple, optional</em>) –</p>
+<dl class="simple">
+<dt>A tuple containing:</dt><dd><ul class="simple">
+<li><p>The monomer (str).</p></li>
+<li><p>The instance fraction (float, e.g., 0.5 for 50% stereoisomer).</p></li>
+<li><p>The SMILES string (str) of the stereoisomer to be introduced.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Default is None.</p>
+</li>
+<li><p><strong>terminals</strong> (<em>str, optional</em>) – The type of terminal groups to be used. Default is ‘hydrogen’, which adds a hydrogen atom.</p></li>
+<li><p><strong>perc_A_target</strong> (<em>float, optional</em>) – The target percentage of monomer A in the copolymer. Default is 100.</p></li>
+<li><p><strong>blockiness_target</strong> (<em>float, optional</em>) – The target blockiness of the copolymer, which indicates the degree of monomer A and B clustering. Default is 1.0, with reference to ‘A’ monomer linkages.</p></li>
+<li><p><strong>copolymer</strong> (<em>bool, optional</em>) – Flag to indicate if the system is a copolymer. Default is False.</p></li>
+<li><p><strong>diblock</strong> (<em>bool, optional</em>) – Flag to indicate if the system is a diblock copolymer. Default is False.</p></li>
+<li><p><strong>acceptance</strong> (<em>float, optional</em>) – The percentage deviation allowed for blockiness and A percentage from target values. Default is 10%.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Variables<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>chains</strong> (<em>list</em><em> of </em><em>openff.toolkit.topology.Molecule</em>) – A list of OpenFF Molecule objects representing the polymer chains.</p></li>
-<li><p><strong>chain_rdkit</strong> (<em>list</em><em> of </em><em>rdkit.Chem.Mol</em>) – A list of RDKit Molecule objects representing the polymer chains.</p></li>
-<li><p><strong>sequence</strong> (<em>str</em>) – The sequence of monomers in the polymer system.</p></li>
+<li><p><strong>length_target</strong> (<em>float</em>) – The target length of the polymer chains.</p></li>
+<li><p><strong>terminals</strong> (<em>str</em>) – The type of terminal groups used.</p></li>
+<li><p><strong>blockiness_target</strong> (<em>float</em>) – The target blockiness of the copolymer.</p></li>
+<li><p><strong>A_target</strong> (<em>float</em>) – The target percentage of monomer A in the copolymer.</p></li>
+<li><p><strong>chains</strong> (<em>list</em>) – List of polymer chains as OpenFF Molecule objects.</p></li>
+<li><p><strong>chain_rdkit</strong> (<em>list</em>) – List of polymer chains as RDKit molecule objects.</p></li>
+<li><p><strong>lengths</strong> (<em>list</em>) – List of lengths of the polymer chains.</p></li>
+<li><p><strong>perc_A_actual</strong> (<em>list</em>) – List of actual percentages of monomer A in the polymer chains.</p></li>
+<li><p><strong>B_block_length</strong> (<em>float</em>) – The average block length of monomer B in the copolymer.</p></li>
+<li><p><strong>A_block_length</strong> (<em>float</em>) – The average block length of monomer A in the copolymer.</p></li>
+<li><p><strong>blockiness_list</strong> (<em>list</em>) – List of blockiness values for the polymer chains.</p></li>
+<li><p><strong>mean_blockiness</strong> (<em>float</em>) – The mean blockiness of the polymer chains.</p></li>
 <li><p><strong>mol_weight_average</strong> (<em>float</em>) – The average molecular weight of the polymer chains.</p></li>
-<li><p><strong>PDI</strong> (<em>float</em>) – The polydispersity index of the polymer system.</p></li>
-<li><p><strong>Mn</strong> (<em>float</em>) – The number-average molecular weight of the polymer system.</p></li>
-<li><p><strong>Mw</strong> (<em>float</em>) – The weight-average molecular weight of the polymer system.</p></li>
-<li><p><strong>num_chains</strong> (<em>int</em>) – The number of polymer chains in the system.</p></li>
-<li><p><strong>length_average</strong> (<em>float</em>) – The average chain length of the polymer system.</p></li>
-<li><p><strong>lengths</strong> (<em>list</em><em> of </em><em>int</em>) – A list of chain lengths for the polymer chains.</p></li>
-<li><p><strong>min_length</strong> (<em>int</em>) – The minimum chain length in the polymer system.</p></li>
-<li><p><strong>max_length</strong> (<em>int</em>) – The maximum chain length in the polymer system.</p></li>
-<li><p><strong>A_actual</strong> (<em>float</em><em> or </em><em>None</em>) – The actual percentage of monomer ‘A’ in the copolymer. None if not a copolymer.</p></li>
-<li><p><strong>perc_A_actual</strong> (<em>list</em><em> of </em><em>float</em><em> or </em><em>None</em>) – A list of the actual percentages of monomer ‘A’ in each chain. None if not a copolymer.</p></li>
-<li><p><strong>B_block_length</strong> (<em>float</em><em> or </em><em>None</em>) – The average block length of monomer ‘B’. None if not a copolymer.</p></li>
-<li><p><strong>A_block_length</strong> (<em>float</em><em> or </em><em>None</em>) – The average block length of monomer ‘A’. None if not a copolymer.</p></li>
-<li><p><strong>blockiness_list</strong> (<em>list</em><em> of </em><em>float</em><em> or </em><em>None</em>) – A list of blockiness values for each chain. None if not a copolymer.</p></li>
-<li><p><strong>mean_blockiness</strong> (<em>float</em><em> or </em><em>None</em>) – The mean blockiness value for the polymer system. None if not a copolymer.</p></li>
+<li><p><strong>PDI</strong> (<em>float</em>) – The polydispersity index of the polymer chains.</p></li>
+<li><p><strong>Mn</strong> (<em>float</em>) – The number-average molecular weight of the polymer chains.</p></li>
+<li><p><strong>Mw</strong> (<em>float</em>) – The weight-average molecular weight of the polymer chains.</p></li>
+<li><p><strong>num_chains</strong> (<em>int</em>) – The number of polymer chains generated.</p></li>
+<li><p><strong>length_average</strong> (<em>float</em>) – The average length of the polymer chains.</p></li>
+<li><p><strong>min_length</strong> (<em>float</em>) – The minimum length of the polymer chains.</p></li>
+<li><p><strong>max_length</strong> (<em>float</em>) – The maximum length of the polymer chains.</p></li>
 </ul>
 </dd>
 </dl>
-<p class="rubric">Notes</p>
-<ul class="simple">
-<li><p>If OpenEye toolkits are not installed, RDKit will be used for conformer generation.</p></li>
-<li><p>The system is built using a log-normal distribution of chain lengths to achieve
-the target PDI.</p></li>
-<li><p>For small systems, PDI may not be close to the target value.</p></li>
-</ul>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.build</span><span class="w"> </span><span class="kn">import</span> <span class="n">polymer_system_from_PDI</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">monomer_list</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;OC(=O)COI&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">reaction</span> <span class="o">=</span> <span class="s1">&#39;[C:1][O:2][H:3].[I:4][O:5][C:6]&gt;&gt;[C:1][O:2][C:6].[H:3][O:5][I:4]&#39;</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">system</span> <span class="o">=</span> <span class="n">polymer_system_from_PDI</span><span class="p">(</span>
-<span class="gp">... </span>    <span class="n">monomer_list</span><span class="o">=</span><span class="n">monomer_list</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">reaction</span><span class="o">=</span><span class="n">reaction</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">length_target</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">num_chains</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">PDI_target</span><span class="o">=</span><span class="mf">1.7</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">copolymer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-<span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">system</span><span class="p">)</span>
-<span class="go">SwiftPol ensemble of size 50, average chain length = 10.6-mers, PDI = 1.7006109664210667</span>
-</pre></div>
-</div>
-<dl class="py method">
-<dt class="sig sig-object py" id="swiftpol.build.polymer_system_from_PDI.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">monomer_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reaction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">length_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_chains</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">PDI_target</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stereoisomerism_input</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">terminals</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'hydrogen'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perc_A_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blockiness_target</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[1.0,</span> <span class="pre">'A']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copolymer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">acceptance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system_from_PDI.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system_from_PDI.__init__" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="swiftpol.build.polymer_system_from_PDI.generate_conformers">

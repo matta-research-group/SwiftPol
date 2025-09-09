@@ -724,6 +724,7 @@
 
 
 
+
 <div class="viewcode-block" id="polymer_system">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">polymer_system</span><span class="p">:</span>
@@ -1553,108 +1554,6 @@
 <div class="viewcode-block" id="polymer_system_from_PDI">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system_from_PDI">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">polymer_system_from_PDI</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Build a polymer system based on a target polydispersity index (PDI).</span>
-
-<span class="sd">    This class generates a polymer system with a specified number of chains,</span>
-<span class="sd">    target chain length, and target PDI. It supports the generation of copolymers,</span>
-<span class="sd">    stereoisomers, and blockiness control. The system is built using OpenFF and RDKit</span>
-<span class="sd">    toolkits, with optional support for OpenEye toolkits if installed.</span>
-
-<span class="sd">    **Note**: This capability is under development and may change significantly in the next version of SwiftPol.</span>
-<span class="sd">    Proceed with caution.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    monomer_list : list of str</span>
-<span class="sd">        A list of monomer SMILES strings to be used in the polymer system.</span>
-<span class="sd">    reaction : str</span>
-<span class="sd">        A SMARTS string defining the polymerization reaction.</span>
-<span class="sd">    length_target : int</span>
-<span class="sd">        The target average chain length for the polymer system.</span>
-<span class="sd">    num_chains : int</span>
-<span class="sd">        The number of polymer chains to generate.</span>
-<span class="sd">    PDI_target : float</span>
-<span class="sd">        The target polydispersity index (PDI) for the polymer system.</span>
-<span class="sd">    stereoisomerism_input : tuple, optional</span>
-<span class="sd">        A tuple containing the stereoisomer monomer, the fraction of stereoisomers</span>
-<span class="sd">        to introduce, and the SMILES string of the stereoisomer. Default is None.</span>
-<span class="sd">    terminals : str, optional</span>
-<span class="sd">        The type of terminal groups to use for the polymer chains. Default is &#39;hydrogen&#39;.</span>
-<span class="sd">    perc_A_target : float, optional</span>
-<span class="sd">        The target percentage of monomer &#39;A&#39; in the copolymer. Default is 100.</span>
-<span class="sd">    blockiness_target : list, optional</span>
-<span class="sd">        A list containing the target blockiness value and the monomer to control</span>
-<span class="sd">        blockiness for. Default is [1.0, &#39;A&#39;].</span>
-<span class="sd">    copolymer : bool, optional</span>
-<span class="sd">        Whether to generate a copolymer. Default is False.</span>
-<span class="sd">    acceptance : float, optional</span>
-<span class="sd">        The acceptance margin (in percentage) for the target blockiness and</span>
-<span class="sd">        monomer percentage. Default is 10.</span>
-
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    chains : list of openff.toolkit.topology.Molecule</span>
-<span class="sd">        A list of OpenFF Molecule objects representing the polymer chains.</span>
-<span class="sd">    chain_rdkit : list of rdkit.Chem.Mol</span>
-<span class="sd">        A list of RDKit Molecule objects representing the polymer chains.</span>
-<span class="sd">    sequence : str</span>
-<span class="sd">        The sequence of monomers in the polymer system.</span>
-<span class="sd">    mol_weight_average : float</span>
-<span class="sd">        The average molecular weight of the polymer chains.</span>
-<span class="sd">    PDI : float</span>
-<span class="sd">        The polydispersity index of the polymer system.</span>
-<span class="sd">    Mn : float</span>
-<span class="sd">        The number-average molecular weight of the polymer system.</span>
-<span class="sd">    Mw : float</span>
-<span class="sd">        The weight-average molecular weight of the polymer system.</span>
-<span class="sd">    num_chains : int</span>
-<span class="sd">        The number of polymer chains in the system.</span>
-<span class="sd">    length_average : float</span>
-<span class="sd">        The average chain length of the polymer system.</span>
-<span class="sd">    lengths : list of int</span>
-<span class="sd">        A list of chain lengths for the polymer chains.</span>
-<span class="sd">    min_length : int</span>
-<span class="sd">        The minimum chain length in the polymer system.</span>
-<span class="sd">    max_length : int</span>
-<span class="sd">        The maximum chain length in the polymer system.</span>
-<span class="sd">    A_actual : float or None</span>
-<span class="sd">        The actual percentage of monomer &#39;A&#39; in the copolymer. None if not a copolymer.</span>
-<span class="sd">    perc_A_actual : list of float or None</span>
-<span class="sd">        A list of the actual percentages of monomer &#39;A&#39; in each chain. None if not a copolymer.</span>
-<span class="sd">    B_block_length : float or None</span>
-<span class="sd">        The average block length of monomer &#39;B&#39;. None if not a copolymer.</span>
-<span class="sd">    A_block_length : float or None</span>
-<span class="sd">        The average block length of monomer &#39;A&#39;. None if not a copolymer.</span>
-<span class="sd">    blockiness_list : list of float or None</span>
-<span class="sd">        A list of blockiness values for each chain. None if not a copolymer.</span>
-<span class="sd">    mean_blockiness : float or None</span>
-<span class="sd">        The mean blockiness value for the polymer system. None if not a copolymer.</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    - If OpenEye toolkits are not installed, RDKit will be used for conformer generation.</span>
-<span class="sd">    - The system is built using a log-normal distribution of chain lengths to achieve</span>
-<span class="sd">      the target PDI.</span>
-<span class="sd">    - For small systems, PDI may not be close to the target value.</span>
-
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; from swiftpol.build import polymer_system_from_PDI</span>
-<span class="sd">    &gt;&gt;&gt; monomer_list=[&#39;OC(=O)COI&#39;]</span>
-<span class="sd">    &gt;&gt;&gt; reaction = &#39;[C:1][O:2][H:3].[I:4][O:5][C:6]&gt;&gt;[C:1][O:2][C:6].[H:3][O:5][I:4]&#39;</span>
-<span class="sd">    &gt;&gt;&gt; system = polymer_system_from_PDI(</span>
-<span class="sd">    ...     monomer_list=monomer_list,</span>
-<span class="sd">    ...     reaction=reaction,</span>
-<span class="sd">    ...     length_target=50,</span>
-<span class="sd">    ...     num_chains=50,</span>
-<span class="sd">    ...     PDI_target=1.7,</span>
-<span class="sd">    ...     copolymer=False,</span>
-<span class="sd">    ... )</span>
-<span class="sd">    &gt;&gt;&gt; print(system)</span>
-<span class="sd">    SwiftPol ensemble of size 50, average chain length = 10.6-mers, PDI = 1.7006109664210667</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">try</span><span class="p">:</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">openeye</span><span class="w"> </span><span class="kn">import</span> <span class="n">oechem</span>
     <span class="k">except</span><span class="p">:</span>
@@ -1678,7 +1577,7 @@
     <span class="p">)</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">openff.units</span><span class="w"> </span><span class="kn">import</span> <span class="n">unit</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem</span><span class="w"> </span><span class="kn">import</span> <span class="n">AllChem</span>
-
+    <span class="kn">import</span><span class="w"> </span><span class="nn">string</span>
 <div class="viewcode-block" id="polymer_system_from_PDI.__init__">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system_from_PDI.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1693,29 +1592,124 @@
         <span class="n">perc_A_target</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
         <span class="n">blockiness_target</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">&quot;A&quot;</span><span class="p">],</span>
         <span class="n">copolymer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">acceptance</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">diblock</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">acceptance</span><span class="o">=</span><span class="mi">10</span>
     <span class="p">):</span>
-
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the polymer system and build the polymer chains.</span>
+<span class="sd">        </span>
+<span class="sd">        This class initializes a polymer system and generates polymer chains based on the specified parameters. It supports homopolymers, copolymers, and diblock copolymers, with options for stereoisomerism, terminal groups, and blockiness control.</span>
+<span class="sd">        </span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        monomer_list : list</span>
+<span class="sd">            List of monomers to be used in the polymerization.</span>
+<span class="sd">        </span>
+<span class="sd">        reaction : str</span>
+<span class="sd">            The type of reaction to be used for polymerization.</span>
+<span class="sd">        </span>
+<span class="sd">        length_target : float</span>
+<span class="sd">            The target length of the polymer chains.</span>
+<span class="sd">        </span>
+<span class="sd">        num_chains : int</span>
+<span class="sd">            The number of polymer chains to be generated.</span>
+<span class="sd">        </span>
+<span class="sd">        PDI_target : float</span>
+<span class="sd">            The target polydispersity index (PDI) of the polymer chains. Currently, a PDI value of up to 3.0 is supported. Smaller systems may not be able to achieve high PDI values.</span>
+<span class="sd">        </span>
+<span class="sd">        stereoisomerism_input : tuple, optional</span>
+<span class="sd">            A tuple containing:</span>
+<span class="sd">                - The monomer (str).</span>
+<span class="sd">                - The instance fraction (float, e.g., 0.5 for 50% stereoisomer).</span>
+<span class="sd">                - The SMILES string (str) of the stereoisomer to be introduced.</span>
+<span class="sd">            Default is None.</span>
+<span class="sd">        </span>
+<span class="sd">        terminals : str, optional</span>
+<span class="sd">            The type of terminal groups to be used. Default is &#39;hydrogen&#39;, which adds a hydrogen atom.</span>
+<span class="sd">        </span>
+<span class="sd">        perc_A_target : float, optional</span>
+<span class="sd">            The target percentage of monomer A in the copolymer. Default is 100.</span>
+<span class="sd">        </span>
+<span class="sd">        blockiness_target : float, optional</span>
+<span class="sd">            The target blockiness of the copolymer, which indicates the degree of monomer A and B clustering. Default is 1.0, with reference to &#39;A&#39; monomer linkages.</span>
+<span class="sd">        </span>
+<span class="sd">        copolymer : bool, optional</span>
+<span class="sd">            Flag to indicate if the system is a copolymer. Default is False.</span>
+<span class="sd">        </span>
+<span class="sd">        diblock : bool, optional</span>
+<span class="sd">            Flag to indicate if the system is a diblock copolymer. Default is False.</span>
+<span class="sd">        </span>
+<span class="sd">        acceptance : float, optional</span>
+<span class="sd">            The percentage deviation allowed for blockiness and A percentage from target values. Default is 10%.</span>
+<span class="sd">        </span>
+<span class="sd">        Attributes</span>
+<span class="sd">        ----------</span>
+<span class="sd">        length_target : float</span>
+<span class="sd">            The target length of the polymer chains.</span>
+<span class="sd">        </span>
+<span class="sd">        terminals : str</span>
+<span class="sd">            The type of terminal groups used.</span>
+<span class="sd">        </span>
+<span class="sd">        blockiness_target : float</span>
+<span class="sd">            The target blockiness of the copolymer.</span>
+<span class="sd">        </span>
+<span class="sd">        A_target : float</span>
+<span class="sd">            The target percentage of monomer A in the copolymer.</span>
+<span class="sd">        </span>
+<span class="sd">        chains : list</span>
+<span class="sd">            List of polymer chains as OpenFF Molecule objects.</span>
+<span class="sd">        </span>
+<span class="sd">        chain_rdkit : list</span>
+<span class="sd">            List of polymer chains as RDKit molecule objects.</span>
+<span class="sd">        </span>
+<span class="sd">        lengths : list</span>
+<span class="sd">            List of lengths of the polymer chains.</span>
+<span class="sd">        </span>
+<span class="sd">        perc_A_actual : list</span>
+<span class="sd">            List of actual percentages of monomer A in the polymer chains.</span>
+<span class="sd">        </span>
+<span class="sd">        B_block_length : float</span>
+<span class="sd">            The average block length of monomer B in the copolymer.</span>
+<span class="sd">        </span>
+<span class="sd">        A_block_length : float</span>
+<span class="sd">            The average block length of monomer A in the copolymer.</span>
+<span class="sd">        </span>
+<span class="sd">        blockiness_list : list</span>
+<span class="sd">            List of blockiness values for the polymer chains.</span>
+<span class="sd">        </span>
+<span class="sd">        mean_blockiness : float</span>
+<span class="sd">            The mean blockiness of the polymer chains.</span>
+<span class="sd">        </span>
+<span class="sd">        mol_weight_average : float</span>
+<span class="sd">            The average molecular weight of the polymer chains.</span>
+<span class="sd">        </span>
+<span class="sd">        PDI : float</span>
+<span class="sd">            The polydispersity index of the polymer chains.</span>
+<span class="sd">        </span>
+<span class="sd">        Mn : float</span>
+<span class="sd">            The number-average molecular weight of the polymer chains.</span>
+<span class="sd">        </span>
+<span class="sd">        Mw : float</span>
+<span class="sd">            The weight-average molecular weight of the polymer chains.</span>
+<span class="sd">        </span>
+<span class="sd">        num_chains : int</span>
+<span class="sd">            The number of polymer chains generated.</span>
+<span class="sd">        </span>
+<span class="sd">        length_average : float</span>
+<span class="sd">            The average length of the polymer chains.</span>
+<span class="sd">        </span>
+<span class="sd">        min_length : float</span>
+<span class="sd">            The minimum length of the polymer chains.</span>
+<span class="sd">        </span>
+<span class="sd">        max_length : float</span>
+<span class="sd">            The maximum length of the polymer chains.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">length_target</span> <span class="o">=</span> <span class="n">length_target</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">terminals</span> <span class="o">=</span> <span class="n">terminals</span>
         <span class="n">perc_A_actual</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">copolymer</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">blockiness_target</span> <span class="o">=</span> <span class="n">blockiness_target</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">A_target</span> <span class="o">=</span> <span class="n">perc_A_target</span>
-
-            <span class="k">def</span><span class="w"> </span><span class="nf">generate_chain_lengths_from_PDI</span><span class="p">(</span>
-                <span class="n">Mn_target</span><span class="p">,</span> <span class="n">PDI_target</span><span class="p">,</span> <span class="n">num_chains</span><span class="p">,</span> <span class="n">clip_extremes</span><span class="o">=</span><span class="kc">True</span>
-            <span class="p">):</span>
-                <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">PDI_target</span> <span class="o">*</span> <span class="mf">2.5</span><span class="p">))</span>
-                <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">Mn_target</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span>
-                <span class="n">lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">lognormal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">num_chains</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">clip_extremes</span><span class="p">:</span>
-                    <span class="n">min_length</span> <span class="o">=</span> <span class="mi">1</span>
-                    <span class="n">max_length</span> <span class="o">=</span> <span class="mi">5</span> <span class="o">*</span> <span class="n">Mn_target</span>
-                    <span class="n">lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">lengths</span><span class="p">,</span> <span class="n">min_length</span><span class="p">,</span> <span class="n">max_length</span><span class="p">)</span>
-                <span class="n">scale_factor</span> <span class="o">=</span> <span class="n">Mn_target</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
-                <span class="n">lengths</span> <span class="o">*=</span> <span class="n">scale_factor</span>
-                <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
 
             <span class="k">def</span><span class="w"> </span><span class="nf">spec</span><span class="p">(</span>
                 <span class="n">sequence</span><span class="p">,</span>
@@ -1744,31 +1738,32 @@
         <span class="k">if</span> <span class="n">stereoisomerism_input</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">stereo_monomer</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">new_smiles</span> <span class="o">=</span> <span class="n">stereoisomerism_input</span>
             <span class="n">monomer_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_smiles</span><span class="p">)</span>
-        <span class="c1"># Calculate range of chain lengths needed to build around a particular PDI</span>
-        <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">PDI_target</span><span class="p">))</span>
-        <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">length_target</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span>
-        <span class="n">chain_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">lognormal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">num_chains</span><span class="p">)</span>
-        <span class="n">chain_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">chain_lengths</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-        <span class="c1"># First round of building - copolymer</span>
         <span class="c1"># First round of building - copolymer</span>
         <span class="k">if</span> <span class="n">copolymer</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">length_list</span> <span class="o">=</span> <span class="n">generate_chain_lengths_from_PDI</span><span class="p">(</span>
-                <span class="n">length_target</span><span class="p">,</span> <span class="n">PDI_target</span><span class="p">,</span> <span class="n">num_chains</span><span class="p">,</span> <span class="n">clip_extremes</span><span class="o">=</span><span class="kc">True</span>
-            <span class="p">)</span>
-            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">length_list</span><span class="p">:</span>
-                <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_chains</span><span class="p">):</span>
+                <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">PDI_target</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">acceptance</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)))</span>
+                <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">length_target</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span>
+                <span class="n">length_actual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">lognormal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">length_actual</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">length_actual</span> <span class="o">=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">diblock</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
                     <span class="n">sequence</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span>
                         <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span>
                         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
                             <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">],</span>
-                            <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">l</span><span class="p">),),</span>
+                            <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">length_actual</span><span class="p">),),</span>
                             <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="n">perc_A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">perc_A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)],</span>
                         <span class="p">),</span>
                     <span class="p">)</span>
-                    <span class="n">blockiness</span> <span class="o">=</span> <span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">blockiness_target</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">spec</span><span class="p">(</span><span class="n">sequence</span><span class="p">):</span>
-                        <span class="k">break</span>  <span class="c1"># Exit the loop if the sequence is valid</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sequence</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span>
+                        <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span>
+                        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                            <span class="p">[</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">],</span>
+                            <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">length_actual</span><span class="o">/</span><span class="mi">2</span><span class="p">)),),</span>
+                            <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="n">perc_A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">perc_A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)],</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span>
                 <span class="n">blockiness</span> <span class="o">=</span> <span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">blockiness_target</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">spec</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
                     <span class="n">id_new</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span><span class="p">[(</span><span class="n">n</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">]</span>
@@ -1793,35 +1788,101 @@
                             <span class="n">chain_num</span><span class="o">=</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
                             <span class="n">chainID</span><span class="o">=</span><span class="n">id_new</span><span class="p">,</span>
                         <span class="p">)</span>
+                    <span class="n">lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">length_actual</span><span class="p">))</span>
+                    <span class="n">chains_rdkit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
+                    <span class="n">chain</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
+                    <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+                    <span class="n">perc_A_actual</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+                    <span class="n">blockiness_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blockiness</span><span class="p">)</span>
+                    <span class="n">BBL</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">blockiness_target</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">ABL</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">blockiness_target</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">2</span><span class="p">])</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">out_of_spec</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="c1"># Second round of building</span>
+                <span class="k">while</span> <span class="n">out_of_spec</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">PDI_target</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">acceptance</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)))</span>
+                    <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">length_target</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span>
+                    <span class="n">length_actual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">lognormal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">length_actual</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">length_actual</span> <span class="o">=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">diblock</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+                        <span class="n">sequence</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span>
+                            <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                                <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">],</span>
+                                <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">length_actual</span><span class="p">)),),</span>
+                                <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="n">perc_A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">perc_A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)],</span>
+                            <span class="p">),</span>
+                        <span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">sequence</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span>
+                            <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                                <span class="p">[</span><span class="s2">&quot;AA&quot;</span><span class="p">,</span> <span class="s2">&quot;BB&quot;</span><span class="p">],</span>
+                                <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">length_actual</span><span class="o">/</span><span class="mi">2</span><span class="p">),),</span>
+                                <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="n">perc_A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">perc_A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)],</span>
+                            <span class="p">),</span>
+                        <span class="p">)</span>
+                    <span class="n">blockiness</span> <span class="o">=</span> <span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">blockiness_target</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">spec</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">stereoisomerism_input</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                            <span class="n">id_new</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span><span class="p">[(</span><span class="n">n</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">]</span>
+                            <span class="n">sequence_stereo</span> <span class="o">=</span> <span class="n">introduce_stereoisomers</span><span class="p">(</span>
+                                <span class="n">stereo_monomer</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">sequence</span>
+                            <span class="p">)</span>
+                            <span class="n">pol</span> <span class="o">=</span> <span class="n">build_polymer</span><span class="p">(</span>
+                                <span class="n">sequence</span><span class="o">=</span><span class="n">sequence_stereo</span><span class="p">,</span>
+                                <span class="n">monomer_list</span><span class="o">=</span><span class="n">monomer_list</span><span class="p">,</span>
+                                <span class="n">reaction</span><span class="o">=</span><span class="n">reaction</span><span class="p">,</span>
+                                <span class="n">terminal</span><span class="o">=</span><span class="n">terminals</span><span class="p">,</span>
+                                <span class="n">chain_num</span><span class="o">=</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                <span class="n">chainID</span><span class="o">=</span><span class="n">id_new</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">id_new</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span><span class="p">[(</span><span class="n">n</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">]</span>
+                            <span class="n">pol</span> <span class="o">=</span> <span class="n">build_polymer</span><span class="p">(</span>
+                                <span class="n">sequence</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span>
+                                <span class="n">monomer_list</span><span class="o">=</span><span class="n">monomer_list</span><span class="p">,</span>
+                                <span class="n">reaction</span><span class="o">=</span><span class="n">reaction</span><span class="p">,</span>
+                                <span class="n">terminal</span><span class="o">=</span><span class="n">terminals</span><span class="p">,</span>
+                                <span class="n">chain_num</span><span class="o">=</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                <span class="n">chainID</span><span class="o">=</span><span class="n">id_new</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="n">lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">length_actual</span><span class="p">))</span>
+                        <span class="n">chains_rdkit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
+                        <span class="n">chain</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
+                        <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
+                        <span class="n">perc_A_actual</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="p">(</span><span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span>
+                        <span class="p">)</span>
+                        <span class="n">blockiness_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blockiness</span><span class="p">)</span>
+                        <span class="n">BBL</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">blockiness_target</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">])</span>
+                        <span class="n">ABL</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">blockiness_target</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">2</span><span class="p">])</span>
+                        <span class="n">out_of_spec</span> <span class="o">-=</span> <span class="mi">1</span>
 
-                    <span class="n">lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
-                <span class="n">chains_rdkit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
-                <span class="n">chain</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
-                <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
-                <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
-                <span class="n">perc_A_actual</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
-                <span class="n">blockiness_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blockiness</span><span class="p">)</span>
-                <span class="n">BBL</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">blockiness_target</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">1</span><span class="p">])</span>
-                <span class="n">ABL</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">blockiness_target</span><span class="p">[</span><span class="mi">1</span><span class="p">])[</span><span class="mi">2</span><span class="p">])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">B_block_length</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">BBL</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">A_block_length</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">ABL</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">blockiness_list</span> <span class="o">=</span> <span class="n">blockiness_list</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">mean_blockiness</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">blockiness_list</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">perc_A_actual</span> <span class="o">=</span> <span class="n">perc_A_actual</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">A_actual</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">perc_A_actual</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">B_block_length</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">BBL</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">A_block_length</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">ABL</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">blockiness_list</span> <span class="o">=</span> <span class="n">blockiness_list</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">mean_blockiness</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">blockiness_list</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">perc_A_actual</span> <span class="o">=</span> <span class="n">perc_A_actual</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">A_actual</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">perc_A_actual</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">chain_lengths</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_chains</span><span class="p">):</span>
+                <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">PDI_target</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">acceptance</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)))</span>
+                <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">length_target</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span>
+                <span class="n">length_actual</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">lognormal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">length_actual</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">length_actual</span> <span class="o">=</span> <span class="mi">1</span>
                 <span class="n">sequence</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span>
                     <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span>
                     <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
                         <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">],</span>
-                        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">l</span><span class="p">),),</span>
+                        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">length_actual</span><span class="p">),),</span>
                         <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="n">perc_A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">perc_A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)],</span>
                     <span class="p">),</span>
                 <span class="p">)</span>
-                <span class="n">id_new</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span><span class="p">[(</span><span class="n">n</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">stereoisomerism_input</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">id_new</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span><span class="p">[(</span><span class="n">n</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">]</span>
                     <span class="n">sequence_stereo</span> <span class="o">=</span> <span class="n">introduce_stereoisomers</span><span class="p">(</span>
                         <span class="n">stereo_monomer</span><span class="p">,</span> <span class="n">instance</span><span class="p">,</span> <span class="n">sequence</span>
                     <span class="p">)</span>
@@ -1834,6 +1895,7 @@
                         <span class="n">chainID</span><span class="o">=</span><span class="n">id_new</span><span class="p">,</span>
                     <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
+                    <span class="n">id_new</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span><span class="p">[(</span><span class="n">n</span><span class="p">)</span> <span class="o">%</span> <span class="mi">26</span><span class="p">]</span>
                     <span class="n">pol</span> <span class="o">=</span> <span class="n">build_polymer</span><span class="p">(</span>
                         <span class="n">sequence</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span>
                         <span class="n">monomer_list</span><span class="o">=</span><span class="n">monomer_list</span><span class="p">,</span>
@@ -1842,19 +1904,18 @@
                         <span class="n">chain_num</span><span class="o">=</span><span class="n">n</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
                         <span class="n">chainID</span><span class="o">=</span><span class="n">id_new</span><span class="p">,</span>
                     <span class="p">)</span>
-                <span class="n">lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">l</span><span class="p">))</span>
+                <span class="n">lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">length_actual</span><span class="p">))</span>
                 <span class="n">chains_rdkit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
                 <span class="n">chain</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
                 <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
                 <span class="n">perc_A_actual</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;A&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
-                <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">A_target</span> <span class="o">=</span> <span class="n">perc_A_target</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">B_block_length</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">A_block_length</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">blockiness_list</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">mean_blockiness</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">perc_A_actual</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">A_actual</span> <span class="o">=</span> <span class="kc">None</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span> <span class="o">=</span> <span class="n">sequence</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chains</span> <span class="o">=</span> <span class="n">chains</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">)):</span>
@@ -1872,13 +1933,14 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;System built!, size =&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_chains</span><span class="p">)</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+   <span class="c1"># def __repr__(self):</span>
 
-        <span class="n">description</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;SwiftPol ensemble of size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_chains</span><span class="si">}</span><span class="s2">, &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;average chain length = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">length_average</span><span class="si">}</span><span class="s2">-mers, PDI = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PDI</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">description</span>
+     <span class="c1">#   description = (</span>
+     <span class="c1">#       f&quot;SwiftPol ensemble of size {self.num_chains}, &quot;</span>
+     <span class="c1">#       f&quot;average chain length = {self.length_average}-mers, PDI = {self.PDI}&quot;</span>
+     <span class="c1">#   )</span>
+     <span class="c1">#   return description</span>
+
 
 <div class="viewcode-block" id="polymer_system_from_PDI.generate_conformers">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system_from_PDI.generate_conformers">[docs]</a>
@@ -1959,7 +2021,7 @@
             <span class="s2">&quot;PDI&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">PDI</span><span class="p">],</span>
             <span class="s2">&quot;Mn&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Mn</span><span class="p">],</span>
             <span class="s2">&quot;Mw&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Mw</span><span class="p">],</span>
-            <span class="s2">&quot;sequence&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">],</span>
+            <span class="s2">&quot;sequence&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">],</span> 
             <span class="s2">&quot;B_block_length&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">B_block_length</span><span class="p">],</span>
             <span class="s2">&quot;A_block_length&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">A_block_length</span><span class="p">],</span>
             <span class="s2">&quot;blockiness_list&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">blockiness_list</span><span class="p">],</span>
