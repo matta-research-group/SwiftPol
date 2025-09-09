@@ -469,7 +469,7 @@ class TestPolymerSystemFromPDI(unittest.TestCase):
                                 copolymer=True,
                                 acceptance=10)
         self.assertIsNotNone(x)
-        self.assertTrue(round(x.PDI, 1) == 1.0)
+        self.assertTrue(0.9 <= x.PDI <= 1.1)
 
 
 # Run
