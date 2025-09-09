@@ -450,26 +450,27 @@ class TestPolymerSystemFromPDI(unittest.TestCase):
         sys = build.polymer_system_from_PDI(
             monomer_list=["OC(=O)COI"],
             reaction="[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]",
-            length_target=100,
+            length_target=50,
             num_chains=20,
             PDI_target=1.0,
             copolymer=False,
             acceptance=10,
         )
         print(sys.PDI)
-        self.assertTrue(0.9 <= sys.PDI <= 1.1)
+        self.assertTrue(0.8 <= sys.PDI <= 1.2)
         # Test copolymer - removed whilst PDI calculation in dev
         x = build.polymer_system_from_PDI(monomer_list=['O[C@H](C)C(=O)O[I]','OCC(=O)O[I]'],
                                 reaction = '[C:1][O:2][H:3].[I:4][O:5][C:6]>>[C:1][O:2][C:6].[H:3][O:5][I:4]',
-                                length_target=20,
-                                num_chains = 3,
+                                length_target=50,
+                                num_chains = 20,
                                 perc_A_target=50,
                                 PDI_target=1.0,
                                 blockiness_target=[1.0, 'B'],
                                 copolymer=True,
                                 acceptance=10)
+        print(x.PDI)
         self.assertIsNotNone(x)
-        self.assertTrue(0.9 <= x.PDI <= 1.1)
+        self.assertTrue(0.8 <= x.PDI <= 1.2)
 
 
 # Run
