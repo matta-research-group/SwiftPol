@@ -2198,6 +2198,8 @@
 <span class="sd">            The desired residual monomer concentration in the simulation box. Default is 0.00.</span>
 <span class="sd">        residual_oligomer : float</span>
 <span class="sd">            The desired residual oligomer concentration in the simulation box. Default is 0.00.</span>
+<span class="sd">        return_rdkit : bool, optional</span>
+<span class="sd">            If True, return RDKit molecule objects instead of OpenFF Molecule objects. Default is False.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2210,11 +2212,7 @@
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
-<span class="sd">        EXPERIMENTAL CAPABILITY. Proceed with caution</span>
-
-<span class="sd">        This function works independently of, and is unrelated to, the build.calculate_box_components function.</span>
-
-<span class="sd">        Residual oligomers are polydisperse and are generated based on 10% of the target chain length used in ensemble initiation.</span>
+<span class="sd">        This function works independently of, and is unrelated to, the build.calculate_box_components function, which will be deprecated in future releases.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -2237,7 +2235,7 @@
             <span class="n">rolling_mass</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">rolling_mass</span><span class="o">.</span><span class="n">magnitude</span> <span class="o">&lt;</span> <span class="mi">1000</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s2">&quot;Residual monomer/oligomer calculation may not be accurate for small systems, as the residual mass can be close to or lower than the weight of a single monomer. Please check the output by querying the value of residual_monomer_actual&quot;</span>
+                <span class="s2">&quot;Residual monomer/oligomer calculation may not be appropriate for small systems, as the residual mass can be close to or lower than the weight of a single monomer. Please check the output by querying the value of residual_monomer_actual&quot;</span>
             <span class="p">)</span>
         <span class="n">number_of_copies</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="c1"># residual to add</span>
@@ -2266,6 +2264,7 @@
             <span class="n">B</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">B_rd</span><span class="p">)</span>
             <span class="n">B_mass</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">B</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span>
             <span class="n">B</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;B_residual&quot;</span>
+            <span class="n">mon_count</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">):</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">A_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">B_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">monomer_to_add</span><span class="p">:</span>
                     <span class="n">mon_count</span> <span class="o">=</span> <span class="n">r</span>
@@ -2285,6 +2284,7 @@
             <span class="n">A</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;A_residual&quot;</span>
             <span class="n">B</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
             <span class="n">B</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;B_residual&quot;</span>
+            <span class="n">mon_count</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">):</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">A_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">monomer_to_add</span><span class="p">:</span>
                     <span class="n">mon_count</span> <span class="o">=</span> <span class="n">r</span>
@@ -2296,11 +2296,15 @@
         <span class="n">oligomers</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="s2">&quot;A&quot;</span> <span class="ow">in</span> <span class="n">sequence</span> <span class="ow">and</span> <span class="s2">&quot;B&quot;</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+                <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1.05</span><span class="p">))</span>
+                <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length_target</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span>
+                <span class="n">chain_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">lognormal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">chain_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">chain_lengths</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
                 <span class="n">oligo_seq</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span>
                     <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span>
                     <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
                         <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="s2">&quot;B&quot;</span><span class="p">],</span>
-                        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length_target</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">)),</span>
+                        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">chain_lengths</span><span class="p">)),</span>
                         <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)],</span>
                     <span class="p">),</span>
                 <span class="p">)</span>
@@ -2309,13 +2313,11 @@
                     <span class="n">oligo_seq</span><span class="p">,</span>
                     <span class="n">monomer_list</span><span class="o">=</span><span class="n">monomer_list</span><span class="p">,</span>
                     <span class="n">reaction</span><span class="o">=</span><span class="n">AllChem</span><span class="o">.</span><span class="n">ReactionFromSmarts</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reaction</span><span class="p">),</span>
+                    <span class="n">chain_num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="n">oligomer_rd</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">oligomer_rd</span><span class="p">)</span>
-                <span class="n">info</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AtomPDBResidueInfo</span><span class="p">()</span>
-                <span class="n">info</span><span class="o">.</span><span class="n">SetResidueName</span><span class="p">(</span><span class="s2">&quot;O&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
-                <span class="n">info</span><span class="o">.</span><span class="n">SetResidueNumber</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">oligomer_rd</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
                 <span class="n">oligomer</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">oligomer_rd</span><span class="p">)</span>
+                <span class="n">oligomer</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;oligo&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
                 <span class="n">oligo_mass</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="n">oligomers_new</span> <span class="o">=</span> <span class="n">oligomers</span> <span class="o">+</span> <span class="p">[</span><span class="n">oligomer</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">oligomers_new</span><span class="p">:</span>
@@ -2342,27 +2344,21 @@
 
         <span class="k">elif</span> <span class="s2">&quot;A&quot;</span> <span class="ow">in</span> <span class="n">sequence</span> <span class="ow">and</span> <span class="s2">&quot;B&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">sequence</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
-                <span class="n">oligo_seq</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span>
-                    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
-                        <span class="p">[</span><span class="s2">&quot;A&quot;</span><span class="p">],</span>
-                        <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length_target</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">)),</span>
-                        <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)],</span>
-                    <span class="p">),</span>
-                <span class="p">)</span>
+                <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1.05</span><span class="p">))</span>
+                <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length_target</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span>
+                <span class="n">chain_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">lognormal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">chain_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">chain_lengths</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+                <span class="n">oligo_seq</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mi">50</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">)</span> <span class="o">*</span> <span class="s2">&quot;A&quot;</span>
                 <span class="n">monomer_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">mono</span> <span class="o">+</span> <span class="s2">&quot;[I]&quot;</span> <span class="k">for</span> <span class="n">mono</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">monomers</span><span class="p">]</span>
                 <span class="n">oligomer_rd</span> <span class="o">=</span> <span class="n">build</span><span class="o">.</span><span class="n">build_polymer</span><span class="p">(</span>
                     <span class="n">oligo_seq</span><span class="p">,</span>
                     <span class="n">monomer_list</span><span class="o">=</span><span class="n">monomer_list</span><span class="p">,</span>
                     <span class="n">reaction</span><span class="o">=</span><span class="n">AllChem</span><span class="o">.</span><span class="n">ReactionFromSmarts</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reaction</span><span class="p">),</span>
+                    <span class="n">chain_num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="n">oligomer_rd</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">oligomer_rd</span><span class="p">)</span>
-                <span class="n">info</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AtomPDBResidueInfo</span><span class="p">()</span>
-                <span class="n">info</span><span class="o">.</span><span class="n">SetResidueName</span><span class="p">(</span><span class="s2">&quot;O&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
-                <span class="n">info</span><span class="o">.</span><span class="n">SetResidueNumber</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">oligomer_rd</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
                 <span class="n">oligomer</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">oligomer_rd</span><span class="p">)</span>
-                <span class="n">oligomer</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;oligo&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">oligomer</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;oligo&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
                 <span class="n">oligo_mass</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="n">oligomers_new</span> <span class="o">=</span> <span class="n">oligomers</span> <span class="o">+</span> <span class="p">[</span><span class="n">oligomer</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">oligomers_new</span><span class="p">:</span>
@@ -2371,8 +2367,9 @@
                     <span class="n">oligomers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">oligomer</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">break</span>
+            <span class="n">B_to_add</span> <span class="o">=</span> <span class="mi">0</span>
 
-            <span class="n">monomer_mass</span> <span class="o">=</span> <span class="p">(</span><span class="n">A_to_add</span> <span class="o">*</span> <span class="n">A_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">B_to_add</span> <span class="o">*</span> <span class="n">B_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span>
+            <span class="n">monomer_mass</span> <span class="o">=</span> <span class="p">(</span><span class="n">A_to_add</span> <span class="o">*</span> <span class="n">A_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">B_to_add</span> <span class="o">*</span> <span class="mi">0</span><span class="p">)</span>
             <span class="n">oligomer_mass</span> <span class="o">=</span> <span class="mi">0</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">dalton</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">oligomers</span><span class="p">:</span>
                 <span class="n">oligomer_mass</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">i</span><span class="o">.</span><span class="n">atoms</span><span class="p">)</span>
@@ -2387,14 +2384,25 @@
 
             <span class="n">molecules</span> <span class="o">=</span> <span class="p">[</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">]</span> <span class="o">+</span> <span class="n">oligomers</span>
             <span class="n">number_of_copies</span> <span class="o">=</span> <span class="p">[</span><span class="n">A_to_add</span><span class="p">,</span> <span class="n">B_to_add</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">oligomers</span><span class="p">))]</span>
-
-        <span class="k">return</span> <span class="p">(</span>
-            <span class="n">molecules</span><span class="p">,</span>
-            <span class="n">number_of_copies</span><span class="p">,</span>
-            <span class="n">residual_monomer_actual</span><span class="p">,</span>
-            <span class="n">residual_oligomer_actual</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="k">if</span> <span class="n">return_rdkit</span><span class="p">:</span>
+            <span class="n">molecules</span> <span class="o">=</span> <span class="p">[</span><span class="n">mol</span><span class="o">.</span><span class="n">to_rdkit</span><span class="p">()</span> <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="n">molecules</span><span class="p">]</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="n">molecules</span><span class="p">,</span>
+                <span class="n">number_of_copies</span><span class="p">,</span>
+                <span class="n">residual_monomer_actual</span><span class="p">,</span>
+                <span class="n">residual_oligomer_actual</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">molecules</span><span class="p">:</span>
+                <span class="n">i</span><span class="o">.</span><span class="n">generate_unique_atom_names</span><span class="p">()</span>  <span class="c1"># required for polyply output</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="n">molecules</span><span class="p">,</span>
+                <span class="n">number_of_copies</span><span class="p">,</span>
+                <span class="n">residual_monomer_actual</span><span class="p">,</span>
+                <span class="n">residual_oligomer_actual</span><span class="p">,</span>
+            <span class="p">)</span></div>
 </div>
+
 
 </pre></div>
 
