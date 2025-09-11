@@ -2059,6 +2059,8 @@ class polymer_system_from_PDI:
             The desired residual monomer concentration in the simulation box. Default is 0.00.
         residual_oligomer : float
             The desired residual oligomer concentration in the simulation box. Default is 0.00.
+        return_rdkit : bool, optional
+            If True, return RDKit molecule objects instead of OpenFF Molecule objects. Default is False.
 
         Returns
         -------
@@ -2071,11 +2073,7 @@ class polymer_system_from_PDI:
 
         Notes
         -----
-        EXPERIMENTAL CAPABILITY. Proceed with caution
-
-        This function works independently of, and is unrelated to, the build.calculate_box_components function.
-
-        Residual oligomers are polydisperse and are generated based on 10% of the target chain length used in ensemble initiation.
+        This function works independently of, and is unrelated to, the build.calculate_box_components function, which will be deprecated in future releases.
 
         Raises
         ------
@@ -2098,7 +2096,7 @@ class polymer_system_from_PDI:
             rolling_mass += sum(atom.mass for atom in m.atoms)
         if rolling_mass.magnitude < 1000:
             warnings.warn(
-                "Residual monomer/oligomer calculation may not be accurate for small systems, as the residual mass can be close to or lower than the weight of a single monomer. Please check the output by querying the value of residual_monomer_actual"
+                "Residual monomer/oligomer calculation may not be appropriate for small systems, as the residual mass can be close to or lower than the weight of a single monomer. Please check the output by querying the value of residual_monomer_actual"
             )
         number_of_copies = []
         # residual to add
@@ -2127,6 +2125,7 @@ class polymer_system_from_PDI:
             B = Molecule.from_rdkit(B_rd)
             B_mass = sum([atom.mass for atom in B.atoms])
             B.name = "B_residual"
+            mon_count = 0
             for r in range(1, 100):
                 if (r * A_mass.magnitude) + (r * B_mass.magnitude) >= monomer_to_add:
                     mon_count = r
@@ -2146,6 +2145,7 @@ class polymer_system_from_PDI:
             A.name = "A_residual"
             B = Molecule.from_smiles("C")
             B.name = "B_residual"
+            mon_count = 0
             for r in range(1, 100):
                 if (r * A_mass.magnitude) >= monomer_to_add:
                     mon_count = r
@@ -2157,11 +2157,15 @@ class polymer_system_from_PDI:
         oligomers = []
         if "A" in sequence and "B" in sequence:
             for i in range(1000):
+                sigma = np.sqrt(np.log(1.05))
+                mu = np.log(self.length_target * 0.1) - 0.5 * sigma**2
+                chain_lengths = np.random.lognormal(mu, sigma, size=1)
+                chain_lengths = np.round(chain_lengths).astype(int)
                 oligo_seq = reduce(
                     lambda x, y: x + y,
                     np.random.choice(
                         ["A", "B"],
-                        size=(int(self.length_target * 0.1)),
+                        size=(int(chain_lengths)),
                         p=[self.A_target / 100, 1 - (self.A_target / 100)],
                     ),
                 )
@@ -2170,13 +2174,11 @@ class polymer_system_from_PDI:
                     oligo_seq,
                     monomer_list=monomer_list,
                     reaction=AllChem.ReactionFromSmarts(self.reaction),
+                    chain_num=len(self.chains) + 1 + i,
                 )
                 oligomer_rd = Chem.AddHs(oligomer_rd)
-                info = Chem.AtomPDBResidueInfo()
-                info.SetResidueName("O" + str(i + 1))
-                info.SetResidueNumber(1)
-                [atom.SetMonomerInfo(info) for atom in oligomer_rd.GetAtoms()]
                 oligomer = Molecule.from_rdkit(oligomer_rd)
+                oligomer.name = "oligo" + str(len(self.chains) + 1 + i)
                 oligo_mass = 0
                 oligomers_new = oligomers + [oligomer]
                 for i in oligomers_new:
@@ -2203,27 +2205,21 @@ class polymer_system_from_PDI:
 
         elif "A" in sequence and "B" not in sequence:
             for i in range(1000):
-                oligo_seq = reduce(
-                    lambda x, y: x + y,
-                    np.random.choice(
-                        ["A"],
-                        size=(int(self.length_target * 0.1)),
-                        p=[self.A_target / 100, 1 - (self.A_target / 100)],
-                    ),
-                )
+                sigma = np.sqrt(np.log(1.05))
+                mu = np.log(self.length_target * 0.1) - 0.5 * sigma**2
+                chain_lengths = np.random.lognormal(mu, sigma, size=1)
+                chain_lengths = np.round(chain_lengths).astype(int)
+                oligo_seq = int(50 * 0.1) * "A"
                 monomer_list = [mono + "[I]" for mono in self.monomers]
                 oligomer_rd = build.build_polymer(
                     oligo_seq,
                     monomer_list=monomer_list,
                     reaction=AllChem.ReactionFromSmarts(self.reaction),
+                    chain_num=len(self.chains) + 1 + i,
                 )
                 oligomer_rd = Chem.AddHs(oligomer_rd)
-                info = Chem.AtomPDBResidueInfo()
-                info.SetResidueName("O" + str(i + 1))
-                info.SetResidueNumber(1)
-                [atom.SetMonomerInfo(info) for atom in oligomer_rd.GetAtoms()]
                 oligomer = Molecule.from_rdkit(oligomer_rd)
-                oligomer.name = "oligo" + str(i + 1)
+                oligomer.name = "oligo" + str(len(self.chains) + 1 + i)
                 oligo_mass = 0
                 oligomers_new = oligomers + [oligomer]
                 for i in oligomers_new:
@@ -2232,8 +2228,9 @@ class polymer_system_from_PDI:
                     oligomers.append(oligomer)
                 else:
                     break
+            B_to_add = 0
 
-            monomer_mass = (A_to_add * A_mass.magnitude) + (B_to_add * B_mass.magnitude)
+            monomer_mass = (A_to_add * A_mass.magnitude) + (B_to_add * 0)
             oligomer_mass = 0 * unit.dalton
             for i in oligomers:
                 oligomer_mass += sum(atom.mass for atom in i.atoms)
@@ -2248,10 +2245,21 @@ class polymer_system_from_PDI:
 
             molecules = [A, B] + oligomers
             number_of_copies = [A_to_add, B_to_add] + [1 for c in range(len(oligomers))]
+        if return_rdkit:
+            molecules = [mol.to_rdkit() for mol in molecules]
+            return (
+                molecules,
+                number_of_copies,
+                residual_monomer_actual,
+                residual_oligomer_actual,
+            )
+        else:
+            for i in molecules:
+                i.generate_unique_atom_names()  # required for polyply output
+            return (
+                molecules,
+                number_of_copies,
+                residual_monomer_actual,
+                residual_oligomer_actual,
+            )
 
-        return (
-            molecules,
-            number_of_copies,
-            residual_monomer_actual,
-            residual_oligomer_actual,
-        )
