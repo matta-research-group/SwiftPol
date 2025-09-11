@@ -2049,7 +2049,7 @@ class polymer_system_from_PDI:
         print(f"Polyply input files generated! Saved at {return_tuple}")
         return return_tuple
 
-    def calculate_residuals(self, residual_monomer=0, residual_oligomer=0):
+    def calculate_residuals(self, residual_monomer=0, residual_oligomer=0, return_rdkit=False):
         """
         Generate residual monomer and oligomer molecules, and molecule counts.
 
