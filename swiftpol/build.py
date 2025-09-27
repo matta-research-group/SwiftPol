@@ -1740,9 +1740,9 @@ class polymer_system_from_PDI:
             for length_actual in out_of_spec:
                 loops_tracker = 0
                 while True:
-                    if loops_tracker>50:
+                    if loops_tracker>200:
                         if verbose:
-                            logging.info(f"build attempts exceeded 50, disregarding chain")  
+                            logging.info(f"build attempts exceeded 200, disregarding chain")  
                         break
                     if diblock:
                         sequence = reduce(
@@ -1788,9 +1788,10 @@ class polymer_system_from_PDI:
                                 chain_num=len(chains) + 1,
                                 chainID=id_new,
                             )
-                            loops_tracker+=1
                         if verbose:
                                 logging.info(f"Built chain {id_new}")  
+
+                        
                         # Store chain data
                         lengths.append(length_actual)
                         chains_rdkit.append(pol)
@@ -1801,7 +1802,9 @@ class polymer_system_from_PDI:
                         BBL.append(bbl)
                         ABL.append(abl)
                         break
-        
+                    else:
+                        loops_tracker+=1
+           
             # Finalize statistics
             self.B_block_length = mean(BBL)
             self.A_block_length = mean(ABL)
