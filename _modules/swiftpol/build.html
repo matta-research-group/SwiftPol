@@ -1861,9 +1861,9 @@
             <span class="k">for</span> <span class="n">length_actual</span> <span class="ow">in</span> <span class="n">out_of_spec</span><span class="p">:</span>
                 <span class="n">loops_tracker</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">loops_tracker</span><span class="o">&gt;</span><span class="mi">50</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">loops_tracker</span><span class="o">&gt;</span><span class="mi">200</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;build attempts exceeded 50, disregarding chain&quot;</span><span class="p">)</span>  
+                            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;build attempts exceeded 200, disregarding chain&quot;</span><span class="p">)</span>  
                         <span class="k">break</span>
                     <span class="k">if</span> <span class="n">diblock</span><span class="p">:</span>
                         <span class="n">sequence</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span>
@@ -1909,9 +1909,10 @@
                                 <span class="n">chain_num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">chains</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
                                 <span class="n">chainID</span><span class="o">=</span><span class="n">id_new</span><span class="p">,</span>
                             <span class="p">)</span>
-                            <span class="n">loops_tracker</span><span class="o">+=</span><span class="mi">1</span>
                         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
                                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Built chain </span><span class="si">{</span><span class="n">id_new</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  
+
+                        
                         <span class="c1"># Store chain data</span>
                         <span class="n">lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">length_actual</span><span class="p">)</span>
                         <span class="n">chains_rdkit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
@@ -1922,7 +1923,9 @@
                         <span class="n">BBL</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bbl</span><span class="p">)</span>
                         <span class="n">ABL</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">abl</span><span class="p">)</span>
                         <span class="k">break</span>
-        
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">loops_tracker</span><span class="o">+=</span><span class="mi">1</span>
+           
             <span class="c1"># Finalize statistics</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">B_block_length</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">BBL</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">A_block_length</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">ABL</span><span class="p">)</span>
