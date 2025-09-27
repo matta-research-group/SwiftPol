@@ -16,7 +16,7 @@ swiftpol.build
    :undoc-members:
    :show-inheritance:
    :no-imported-members:
-   :exclude-members: polymer_system, polymer_system_from_PDI
+   :exclude-members: polymer_system, polymer_system_from_PDI, _generate_chain_lengths
 
 swiftpol.build.polymer_system
 -----------------------------
