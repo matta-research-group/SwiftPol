@@ -1444,7 +1444,7 @@
             <span class="n">B_mass</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">B</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span>
             <span class="n">B</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;B_residual&quot;</span>
             <span class="n">mon_count</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1000</span><span class="p">):</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">A_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">B_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">monomer_to_add</span><span class="p">:</span>
                     <span class="n">mon_count</span> <span class="o">=</span> <span class="n">r</span>
                     <span class="k">break</span>
@@ -1464,7 +1464,7 @@
             <span class="n">B</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
             <span class="n">B</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;B_residual&quot;</span>
             <span class="n">mon_count</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10000</span><span class="p">):</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">A_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">monomer_to_add</span><span class="p">:</span>
                     <span class="n">mon_count</span> <span class="o">=</span> <span class="n">r</span>
                     <span class="k">break</span>
@@ -2257,10 +2257,11 @@
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Polyply input files generated! Saved at </span><span class="si">{</span><span class="n">return_tuple</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">return_tuple</span></div>
 
-
 <div class="viewcode-block" id="polymer_system_from_PDI.calculate_residuals">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system_from_PDI.calculate_residuals">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_residuals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">residual_monomer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">residual_oligomer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">return_rdkit</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">calculate_residuals</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">residual_monomer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">residual_oligomer</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">return_rdkit</span><span class="o">=</span><span class="kc">False</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate residual monomer and oligomer molecules, and molecule counts.</span>
 
@@ -2337,7 +2338,7 @@
             <span class="n">B_mass</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">B</span><span class="o">.</span><span class="n">atoms</span><span class="p">])</span>
             <span class="n">B</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;B_residual&quot;</span>
             <span class="n">mon_count</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10000</span><span class="p">):</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">A_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">B_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">monomer_to_add</span><span class="p">:</span>
                     <span class="n">mon_count</span> <span class="o">=</span> <span class="n">r</span>
                     <span class="k">break</span>
@@ -2357,7 +2358,7 @@
             <span class="n">B</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_smiles</span><span class="p">(</span><span class="s2">&quot;C&quot;</span><span class="p">)</span>
             <span class="n">B</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;B_residual&quot;</span>
             <span class="n">mon_count</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">100</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10000</span><span class="p">):</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">*</span> <span class="n">A_mass</span><span class="o">.</span><span class="n">magnitude</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">monomer_to_add</span><span class="p">:</span>
                     <span class="n">mon_count</span> <span class="o">=</span> <span class="n">r</span>
                     <span class="k">break</span>
@@ -2474,7 +2475,6 @@
                 <span class="n">residual_oligomer_actual</span><span class="p">,</span>
             <span class="p">)</span></div>
 </div>
-
 
 </pre></div>
 
