@@ -1329,7 +1329,7 @@ class polymer_system:
             B_mass = sum([atom.mass for atom in B.atoms])
             B.name = "B_residual"
             mon_count = 0
-            for r in range(1, 100):
+            for r in range(1, 1000):
                 if (r * A_mass.magnitude) + (r * B_mass.magnitude) >= monomer_to_add:
                     mon_count = r
                     break
@@ -1349,7 +1349,7 @@ class polymer_system:
             B = Molecule.from_smiles("C")
             B.name = "B_residual"
             mon_count = 0
-            for r in range(1, 100):
+            for r in range(1, 10000):
                 if (r * A_mass.magnitude) >= monomer_to_add:
                     mon_count = r
                     break
@@ -2120,8 +2120,9 @@ class polymer_system_from_PDI:
             return_tuple += (pdb_file,)
         print(f"Polyply input files generated! Saved at {return_tuple}")
         return return_tuple
-
-    def calculate_residuals(self, residual_monomer=0, residual_oligomer=0, return_rdkit=False):
+    def calculate_residuals(
+        self, residual_monomer=0, residual_oligomer=0, return_rdkit=False
+    ):
         """
         Generate residual monomer and oligomer molecules, and molecule counts.
 
@@ -2198,7 +2199,7 @@ class polymer_system_from_PDI:
             B_mass = sum([atom.mass for atom in B.atoms])
             B.name = "B_residual"
             mon_count = 0
-            for r in range(1, 100):
+            for r in range(1, 10000):
                 if (r * A_mass.magnitude) + (r * B_mass.magnitude) >= monomer_to_add:
                     mon_count = r
                     break
@@ -2218,7 +2219,7 @@ class polymer_system_from_PDI:
             B = Molecule.from_smiles("C")
             B.name = "B_residual"
             mon_count = 0
-            for r in range(1, 100):
+            for r in range(1, 10000):
                 if (r * A_mass.magnitude) >= monomer_to_add:
                     mon_count = r
                     break
@@ -2334,4 +2335,3 @@ class polymer_system_from_PDI:
                 residual_monomer_actual,
                 residual_oligomer_actual,
             )
-
