@@ -1,16 +1,11 @@
 ![title](Repo/logo.jpg)
 
 [![status](https://joss.theoj.org/papers/8ddec851cf6ac8c0ae55ed4024b75b79/status.svg)](https://joss.theoj.org/papers/8ddec851cf6ac8c0ae55ed4024b75b79)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15111991.svg)](https://doi.org/10.5281/zenodo.15111991)
-
+[![Zenodo](https://zenodo.org/badge/798303954.svg)](https://doi.org/10.5281/zenodo.15111991)
 [![PyTest](https://github.com/matta-research-group/SwiftPol/actions/workflows/SwiftPol_tests.yml/badge.svg)](https://github.com/matta-research-group/SwiftPol/actions/workflows/SwiftPol_tests.yml)
-
 [![Documentation](https://img.shields.io/badge/Documentation-Online-brightgreen)](https://matta-research-group.github.io/SwiftPol)
-
 [![License](https://img.shields.io/badge/license-BSD--3--Clause-blue.svg)](https://github.com/yourusername/yourrepository/blob/main/LICENSE)
-
 [![GitHub last commit](https://img.shields.io/github/last-commit/matta-research-group/SwiftPol)](https://github.com/matta-research-group/SwiftPol/commits/main)
-
 [![GitHub stars](https://img.shields.io/github/stars/matta-research-group/SwiftPol)](https://github.com/matta-research-group/SwiftPol/stargazers)
 
 
