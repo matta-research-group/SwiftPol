@@ -633,7 +633,8 @@ def introduce_stereoisomers(stereo_monomer, instance, seq):
 def _generate_chain_lengths(num_chains, length_target, PDI_target, clip_min=5, clip_max=1000, tolerance=0.1, verbose=False):
     import numpy as np
     import logging
-    logging.basicConfig(level=logging.INFO)
+    if verbose:
+        logging.basicConfig(level=logging.INFO)
 
     # Calculate the parameters for the lognormal distribution
     sigma = np.sqrt(np.log(PDI_target))
@@ -817,7 +818,7 @@ class polymer_system:
                 mu = np.log(length_target) - 0.5 * sigma**2
                 length_actual = np.random.lognormal(mu, sigma)
                 if length_actual < 1:
-                    length_actual = 5
+                    length_actual = 2
                 if diblock == False:
                     sequence = reduce(
                         lambda x, y: x + y,
@@ -875,9 +876,9 @@ class polymer_system:
                     sigma = np.sqrt(np.log(1.5 * (1 + acceptance / 100)))
                     mu = np.log(length_target) - 0.5 * sigma**2
                     length_actual = np.random.lognormal(mu, sigma)
-                    if length_actual < 1:
-                        length_actual = 2
                     if diblock == False:
+                        if length_actual < 1:
+                            length_actual = 2
                         sequence = reduce(
                             lambda x, y: x + y,
                             np.random.choice(
@@ -887,6 +888,8 @@ class polymer_system:
                             ),
                         )
                     else:
+                        if length_actual < 1:
+                            length_actual = 2
                         sequence = reduce(
                             lambda x, y: x + y,
                             np.random.choice(
@@ -1012,7 +1015,7 @@ class polymer_system:
         )
         return description
 
-    def generate_conformers(self):
+    def generate_conformers(self, rough=False):
         """
         Generate conformers for each polymer chain in the system.
 
@@ -1020,6 +1023,17 @@ class polymer_system:
         It first checks if the OpenEye toolkit is licensed and available. If it is, it uses the OpenEyeToolkitWrapper
         to generate conformers. Otherwise, it falls back to using the RDKitToolkitWrapper. Each chain is processed
         to generate a single conformer, and unique atom names are assigned to each chain.
+
+        Parameters
+        ----------
+        rough : bool, optional
+            If True, generates rough initial conformers using RDKit's EmbedMolecule function with the following settings:
+            - useExpTorsionAnglePrefs = False
+            - useBasicKnowledge = False
+            - useRandomCoords = True
+            - maxIterations = 500
+            - numThreads = 1
+            Default is False.
 
         Raises
         ------
@@ -1031,17 +1045,38 @@ class polymer_system:
             RDKitToolkitWrapper,
             OpenEyeToolkitWrapper,
         )
+        from rdkit.Chem import AllChem
+        from warnings import warn
 
-        # Generate conformers using OpenFF toolkit wrapper
-        for chain in self.chains:
-            num = self.chains.index(chain)
-            object = RDKitToolkitWrapper()
-            if oechem_imported:
-                if oechem.OEChemIsLicensed():
-                    object = OpenEyeToolkitWrapper()
-            object.generate_conformers(molecule=chain, n_conformers=1)
-            chain.generate_unique_atom_names()
-            self.chains[num] = chain
+        if rough:
+            params = AllChem.EmbedParameters()
+            params.useExpTorsionAnglePrefs = False
+            params.useBasicKnowledge = False
+            params.useRandomCoords = True
+            params.maxIterations = 500
+            params.numThreads = 1
+
+            for mol in self.chain_rdkit:
+                AllChem.EmbedMolecule(mol, params)
+            self.chains = [Molecule.from_rdkit(m) for m in self.chain_rdkit]
+            warn(
+            "Rough coordinates have been generated. Any charges previously applied to the system.chains attribute"
+            "will need to be reapplied.",
+            UserWarning,
+            )   
+
+
+        else:
+            # Generate conformers using OpenFF toolkit wrapper
+            for chain in self.chains:
+                num = self.chains.index(chain)
+                object = RDKitToolkitWrapper()
+                if oechem_imported:
+                    if oechem.OEChemIsLicensed():
+                        object = OpenEyeToolkitWrapper()
+                object.generate_conformers(molecule=chain, n_conformers=1)
+                chain.generate_unique_atom_names()
+                self.chains[num] = chain
 
     def charge_system(self, charge_scheme):
         """
@@ -1628,7 +1663,8 @@ class polymer_system_from_PDI:
         """
         from swiftpol.build import _generate_chain_lengths
         import logging
-        logging.basicConfig(level=logging.INFO)
+        if verbose:
+            logging.basicConfig(level=logging.INFO)
         self.length_target = length_target
         self.terminals = terminals
         perc_A_actual = []
@@ -1650,7 +1686,6 @@ class polymer_system_from_PDI:
                 )
 
             blockiness_list = []
-            out_of_spec = []
             BBL = []
             ABL = []
         chains = []
@@ -1665,7 +1700,6 @@ class polymer_system_from_PDI:
             monomer_list.append(new_smiles)
         # Generate chain lengths based on PDI_target
         if copolymer:
-
             # Generate a list of chain lengths
             chain_lengths = _generate_chain_lengths(num_chains, 
                                                     length_target, 
@@ -1675,69 +1709,6 @@ class polymer_system_from_PDI:
                                                     verbose=verbose)
             # Build chains based on generated lengths
             for n, length_actual in enumerate(chain_lengths):
-                if diblock:
-                    # Generate diblock sequence
-                    sequence = reduce(
-                        lambda x, y: x + y,
-                        np.random.choice(
-                            ["AA", "BB"],
-                            size=(int(round(length_actual / 2)),),
-                            p=[perc_A_target / 100, 1 - (perc_A_target / 100)],
-                        ),
-                    )
-                else:
-                    # Generate random copolymer sequence
-                    sequence = reduce(
-                        lambda x, y: x + y,
-                        np.random.choice(
-                            ["A", "B"],
-                            size=(length_actual,),
-                            p=[perc_A_target / 100, 1 - (perc_A_target / 100)],
-                        ),
-                    )
-        
-                # Calculate blockiness
-                blockiness, bbl, abl = blockiness_gen(sequence, blockiness_target[1])
-        
-                # Check if the sequence meets the specification
-                if spec(sequence):
-                    id_new = string.ascii_uppercase[n % 26]  # Wrap around after 26 chains
-                    if stereoisomerism_input is not None:
-                        sequence_stereo = introduce_stereoisomers(
-                            stereo_monomer, instance, sequence
-                        )
-                        pol = build_polymer(
-                            sequence=sequence_stereo,
-                            monomer_list=monomer_list,
-                            reaction=reaction,
-                            terminal=terminals,
-                            chain_num=n + 1,
-                            chainID=id_new)
-
-                    else:
-                        pol = build_polymer(
-                            sequence=sequence,
-                            monomer_list=monomer_list,
-                            reaction=reaction,
-                            terminal=terminals,
-                            chain_num=n + 1,
-                            chainID=id_new)
-                    # Store chain data
-                    lengths.append(length_actual)
-                    chains_rdkit.append(pol)
-                    chain = Molecule.from_rdkit(pol)
-                    chains.append(chain)
-                    perc_A_actual.append((sequence.count("A") / len(sequence)) * 100)
-                    blockiness_list.append(blockiness)
-                    BBL.append(bbl)
-                    ABL.append(abl)
-                    if verbose:
-                        logging.info(f"Built chain {id_new}")                       
-                else:
-                    out_of_spec.append(length_actual)
-
-            # Handle out-of-spec chain
-            for length_actual in out_of_spec:
                 loops_tracker = 0
                 while True:
                     if loops_tracker>200:
@@ -1762,8 +1733,6 @@ class polymer_system_from_PDI:
                                 p=[perc_A_target / 100, 1 - (perc_A_target / 100)],
                             ),
                         )
-        
-                    blockiness, bbl, abl = blockiness_gen(sequence, blockiness_target[1])
                     if spec(sequence):
                         id_new = string.ascii_uppercase[len(chains) % 26]
                         if stereoisomerism_input is not None:
@@ -1778,6 +1747,15 @@ class polymer_system_from_PDI:
                                 chain_num=len(chains) + 1,
                                 chainID=id_new,
                             )
+                            lengths.append(length_actual)
+                            chains_rdkit.append(pol)
+                            chain = Molecule.from_rdkit(pol)
+                            chains.append(chain)
+                            perc_A_actual.append((sequence.count("A") / len(sequence)) * 100)
+                            blockiness, bbl, abl = blockiness_gen(sequence, blockiness_target[1])
+                            blockiness_list.append(blockiness)
+                            BBL.append(bbl)
+                            ABL.append(abl)
                              
                         else:
                             pol = build_polymer(
@@ -1788,30 +1766,37 @@ class polymer_system_from_PDI:
                                 chain_num=len(chains) + 1,
                                 chainID=id_new,
                             )
+                            lengths.append(length_actual)
+                            chains_rdkit.append(pol)
+                            chain = Molecule.from_rdkit(pol)
+                            chains.append(chain)
+                            perc_A_actual.append((sequence.count("A") / len(sequence)) * 100)                        
+                            blockiness, bbl, abl = blockiness_gen(sequence, blockiness_target[1])
+                            blockiness_list.append(blockiness)
+                            BBL.append(bbl)
+                            ABL.append(abl)
                         if verbose:
                                 logging.info(f"Built chain {id_new}")  
 
                         
-                        # Store chain data
-                        lengths.append(length_actual)
-                        chains_rdkit.append(pol)
-                        chain = Molecule.from_rdkit(pol)
-                        chains.append(chain)
-                        perc_A_actual.append((sequence.count("A") / len(sequence)) * 100)
-                        blockiness_list.append(blockiness)
-                        BBL.append(bbl)
-                        ABL.append(abl)
                         break
                     else:
                         loops_tracker+=1
            
             # Finalize statistics
-            self.B_block_length = mean(BBL)
-            self.A_block_length = mean(ABL)
-            self.blockiness_list = blockiness_list
-            self.mean_blockiness = mean(blockiness_list)
-            self.perc_A_actual = perc_A_actual
-            self.A_actual = mean(perc_A_actual)
+            try:
+                self.B_block_length = mean(BBL)
+                self.A_block_length = mean(ABL)
+                self.blockiness_list = blockiness_list
+                self.mean_blockiness = mean(blockiness_list)
+                self.perc_A_actual = perc_A_actual
+                self.A_actual = mean(perc_A_actual)
+            except Exception as e:
+                raise ValueError(
+                    "Blockiness inputs may not be possible with the required chain lengths. "
+                    "Please check the blockiness_target or chain length inputs. "
+                    f"Error details: {str(e)}"
+                )
         else:
             # Generate chain lengths based on PDI_target
             chain_lengths = _generate_chain_lengths(num_chains, 
@@ -1892,7 +1877,7 @@ class polymer_system_from_PDI:
         return description
 
 
-    def generate_conformers(self):
+    def generate_conformers(self, rough=False):
         """
         Generate conformers for each polymer chain in the system.
 
@@ -1900,6 +1885,17 @@ class polymer_system_from_PDI:
         It first checks if the OpenEye toolkit is licensed and available. If it is, it uses the OpenEyeToolkitWrapper
         to generate conformers. Otherwise, it falls back to using the RDKitToolkitWrapper. Each chain is processed
         to generate a single conformer, and unique atom names are assigned to each chain.
+
+        Parameters
+        ----------
+        rough : bool, optional
+            If True, generates rough initial conformers using RDKit's EmbedMolecule function with the following settings:
+            - useExpTorsionAnglePrefs = False
+            - useBasicKnowledge = False
+            - useRandomCoords = True
+            - maxIterations = 500
+            - numThreads = 1
+            Default is False.
 
         Raises
         ------
@@ -1911,17 +1907,38 @@ class polymer_system_from_PDI:
             RDKitToolkitWrapper,
             OpenEyeToolkitWrapper,
         )
+        from rdkit.Chem import AllChem
+        from warnings import warn
 
-        # Generate conformers using OpenFF toolkit wrapper
-        for chain in self.chains:
-            num = self.chains.index(chain)
-            object = RDKitToolkitWrapper()
-            if oechem_imported:
-                if oechem.OEChemIsLicensed():
-                    object = OpenEyeToolkitWrapper()
-            object.generate_conformers(molecule=chain, n_conformers=1)
-            chain.generate_unique_atom_names()
-            self.chains[num] = chain
+        if rough:
+            params = AllChem.EmbedParameters()
+            params.useExpTorsionAnglePrefs = False
+            params.useBasicKnowledge = False
+            params.useRandomCoords = True
+            params.maxIterations = 500
+            params.numThreads = 1
+
+            for mol in self.chain_rdkit:
+                AllChem.EmbedMolecule(mol, params)
+            self.chains = [Molecule.from_rdkit(m) for m in self.chain_rdkit]
+            warn(
+            "Rough coordinates have been generated. Any charges previously applied to the system.chains attribute"
+            "will need to be reapplied.",
+            UserWarning,
+            )   
+
+
+        else:
+            # Generate conformers using OpenFF toolkit wrapper
+            for chain in self.chains:
+                num = self.chains.index(chain)
+                object = RDKitToolkitWrapper()
+                if oechem_imported:
+                    if oechem.OEChemIsLicensed():
+                        object = OpenEyeToolkitWrapper()
+                object.generate_conformers(molecule=chain, n_conformers=1)
+                chain.generate_unique_atom_names()
+                self.chains[num] = chain
 
     def charge_system(self, charge_scheme):
         """
