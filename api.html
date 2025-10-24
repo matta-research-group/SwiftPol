@@ -340,15 +340,24 @@ are made in pairs of ‘A’ monomers to ensure stereoisomerism.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="swiftpol.build.polymer_system.generate_conformers">
-<span class="sig-name descname"><span class="pre">generate_conformers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.generate_conformers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.generate_conformers" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">generate_conformers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rough</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.generate_conformers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.generate_conformers" title="Link to this definition"></a></dt>
 <dd><p>Generate conformers for each polymer chain in the system.</p>
 <p>This method uses the OpenFF toolkit OpenEye Wrapper to generate conformers for each polymer chain in the system.
 It first checks if the OpenEye toolkit is licensed and available. If it is, it uses the OpenEyeToolkitWrapper
 to generate conformers. Otherwise, it falls back to using the RDKitToolkitWrapper. Each chain is processed
 to generate a single conformer, and unique atom names are assigned to each chain.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ImportError</strong> – If neither RDKit nor OpenEye toolkits are available.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rough</strong> (<em>bool, optional</em>) – If True, generates rough initial conformers using RDKit’s EmbedMolecule function with the following settings:
+- useExpTorsionAnglePrefs = False
+- useBasicKnowledge = False
+- useRandomCoords = True
+- maxIterations = 500
+- numThreads = 1
+Default is False.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ImportError</strong> – If neither RDKit nor OpenEye toolkits are available.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -551,15 +560,24 @@ Assigns % residual monomer value to ensemble under self.residual_monomer_actual<
 
 <dl class="py method">
 <dt class="sig sig-object py" id="swiftpol.build.polymer_system_from_PDI.generate_conformers">
-<span class="sig-name descname"><span class="pre">generate_conformers</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system_from_PDI.generate_conformers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system_from_PDI.generate_conformers" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">generate_conformers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rough</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system_from_PDI.generate_conformers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system_from_PDI.generate_conformers" title="Link to this definition"></a></dt>
 <dd><p>Generate conformers for each polymer chain in the system.</p>
 <p>This method uses the OpenFF toolkit OpenEye Wrapper to generate conformers for each polymer chain in the system.
 It first checks if the OpenEye toolkit is licensed and available. If it is, it uses the OpenEyeToolkitWrapper
 to generate conformers. Otherwise, it falls back to using the RDKitToolkitWrapper. Each chain is processed
 to generate a single conformer, and unique atom names are assigned to each chain.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Raises<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>ImportError</strong> – If neither RDKit nor OpenEye toolkits are available.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>rough</strong> (<em>bool, optional</em>) – If True, generates rough initial conformers using RDKit’s EmbedMolecule function with the following settings:
+- useExpTorsionAnglePrefs = False
+- useBasicKnowledge = False
+- useRandomCoords = True
+- maxIterations = 500
+- numThreads = 1
+Default is False.</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ImportError</strong> – If neither RDKit nor OpenEye toolkits are available.</p>
 </dd>
 </dl>
 </dd></dl>
