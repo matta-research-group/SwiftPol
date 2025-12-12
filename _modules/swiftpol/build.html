@@ -78,7 +78,6 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">rdkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">Chem</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem</span><span class="w"> </span><span class="kn">import</span> <span class="n">AllChem</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">random</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
@@ -235,6 +234,7 @@
         <span class="n">info</span><span class="o">.</span><span class="n">SetChainId</span><span class="p">(</span><span class="n">chainID</span><span class="p">)</span>
         <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">hydrogen</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
         <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s2">&quot;Cl&quot;</span><span class="p">),</span> <span class="n">hydrogen</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
         <span class="n">Chem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">terminal</span> <span class="o">==</span> <span class="s2">&quot;carboxyl&quot;</span><span class="p">:</span>
         <span class="n">carboxyl</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmiles</span><span class="p">(</span><span class="s2">&quot;C(=O)[OH]&quot;</span><span class="p">)</span>
@@ -1115,7 +1115,7 @@
 
 <div class="viewcode-block" id="polymer_system.generate_conformers">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.generate_conformers">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">generate_conformers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rough</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_conformers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rough</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">random</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate conformers for each polymer chain in the system.</span>
 
@@ -1135,10 +1135,17 @@
 <span class="sd">            - numThreads = 1</span>
 <span class="sd">            Default is False.</span>
 
+<span class="sd">        random : bool, optional</span>
+<span class="sd">            If True, generates random conformers. Default is False.</span>
+<span class="sd">            Used specifically for when output files are to be used in Polyply to optimise polymer melt conformations.</span>
+
+
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
 <span class="sd">        ImportError</span>
 <span class="sd">            If neither RDKit nor OpenEye toolkits are available.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If both rough and random options are set to True.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit.utils.toolkits</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -1147,6 +1154,9 @@
         <span class="p">)</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem</span><span class="w"> </span><span class="kn">import</span> <span class="n">AllChem</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
+
+        <span class="k">if</span> <span class="n">rough</span> <span class="ow">and</span> <span class="n">random</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please select either rough or random conformer generation, not both.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">rough</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">EmbedParameters</span><span class="p">()</span>
@@ -1165,6 +1175,24 @@
             <span class="ne">UserWarning</span><span class="p">,</span>
             <span class="p">)</span>   
 
+        <span class="k">elif</span> <span class="n">random</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">random</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ran</span>
+            <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_rdkit</span><span class="p">:</span>
+                <span class="n">num_atoms</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span>
+                <span class="n">conf</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Conformer</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">):</span>
+                    <span class="c1"># Generate random x, y, z coordinates</span>
+                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+                    <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+                <span class="n">mol</span><span class="o">.</span><span class="n">RemoveAllConformers</span><span class="p">()</span>  <span class="c1"># Clear existing conformers from RDKit molecule</span>
+                <span class="n">mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">assignId</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># Update OFF chain attribute with new RDKit molecules</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chains</span> <span class="o">=</span> <span class="p">[</span><span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_rdkit</span><span class="p">]</span>
+            <span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Random coordinates have been generated. Any charges previously applied to the system.chains attribute &quot;</span>
+            <span class="s2">&quot;will need to be reapplied. Please ensure optimized conformer generation is performed prior to simulation (e.g. using Polyply).&quot;</span><span class="p">,</span>
+            <span class="ne">UserWarning</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Generate conformers using OpenFF toolkit wrapper</span>
@@ -1201,7 +1229,9 @@
         <span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.parameterize</span><span class="w"> </span><span class="kn">import</span> <span class="n">charge_openff_polymer</span>
 
         <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
-            <span class="n">chain</span><span class="o">.</span><span class="n">partial_charges</span> <span class="o">=</span> <span class="n">charge_openff_polymer</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">charge_scheme</span><span class="p">)</span></div>
+            <span class="n">chain</span><span class="o">.</span><span class="n">partial_charges</span> <span class="o">=</span> <span class="n">charge_openff_polymer</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">charge_scheme</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">charge_scheme</span> <span class="o">=</span> <span class="n">charge_scheme</span></div>
 
 
 <div class="viewcode-block" id="polymer_system.export_to_csv">
@@ -1340,10 +1370,19 @@
 <span class="sd">            If partial charges are not assigned to the system, processing large systems may raise errors from OpenFF-Interchange.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.build</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_box_components</span>
+        
         <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange</span><span class="w"> </span><span class="kn">import</span> <span class="n">Interchange</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">ForceField</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_conformers</span><span class="p">(</span><span class="n">random</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge_scheme</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">charge_system</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_scheme</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Partial charges may not be assigned to the system. Processing large systems may raise errors from OpenFF-Interchange&quot;</span><span class="p">,</span>
+                <span class="ne">UserWarning</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="n">box_vectors</span> <span class="o">=</span> <span class="n">calculate_box_components</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">monomers</span><span class="p">,</span>
@@ -2001,7 +2040,7 @@
 
 <div class="viewcode-block" id="polymer_system_from_PDI.generate_conformers">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system_from_PDI.generate_conformers">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">generate_conformers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rough</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate_conformers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rough</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">random</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate conformers for each polymer chain in the system.</span>
 
@@ -2021,10 +2060,17 @@
 <span class="sd">            - numThreads = 1</span>
 <span class="sd">            Default is False.</span>
 
+<span class="sd">        random : bool, optional</span>
+<span class="sd">            If True, generates random conformers. Default is False.</span>
+<span class="sd">            Used specifically for when output files are to be used in Polyply to optimise polymer melt conformations.</span>
+
+
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
 <span class="sd">        ImportError</span>
 <span class="sd">            If neither RDKit nor OpenEye toolkits are available.</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If both rough and random options are set to True.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit.utils.toolkits</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -2033,6 +2079,9 @@
         <span class="p">)</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem</span><span class="w"> </span><span class="kn">import</span> <span class="n">AllChem</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
+
+        <span class="k">if</span> <span class="n">rough</span> <span class="ow">and</span> <span class="n">random</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please select either rough or random conformer generation, not both.&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">rough</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">EmbedParameters</span><span class="p">()</span>
@@ -2051,6 +2100,24 @@
             <span class="ne">UserWarning</span><span class="p">,</span>
             <span class="p">)</span>   
 
+        <span class="k">elif</span> <span class="n">random</span><span class="p">:</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">random</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ran</span>
+            <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_rdkit</span><span class="p">:</span>
+                <span class="n">num_atoms</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span>
+                <span class="n">conf</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Conformer</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">):</span>
+                    <span class="c1"># Generate random x, y, z coordinates</span>
+                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+                    <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
+                <span class="n">mol</span><span class="o">.</span><span class="n">RemoveAllConformers</span><span class="p">()</span>  <span class="c1"># Clear existing conformers from RDKit molecule</span>
+                <span class="n">mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">assignId</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># Update OFF chain attribute with new RDKit molecules</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">chains</span> <span class="o">=</span> <span class="p">[</span><span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">m</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_rdkit</span><span class="p">]</span>
+            <span class="n">warn</span><span class="p">(</span>
+            <span class="s2">&quot;Random coordinates have been generated. Any charges previously applied to the system.chains attribute &quot;</span>
+            <span class="s2">&quot;will need to be reapplied. Please ensure optimized conformer generation is performed prior to simulation (e.g. using Polyply).&quot;</span><span class="p">,</span>
+            <span class="ne">UserWarning</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Generate conformers using OpenFF toolkit wrapper</span>
@@ -2087,7 +2154,9 @@
         <span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.parameterize</span><span class="w"> </span><span class="kn">import</span> <span class="n">charge_openff_polymer</span>
 
         <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
-            <span class="n">chain</span><span class="o">.</span><span class="n">partial_charges</span> <span class="o">=</span> <span class="n">charge_openff_polymer</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">charge_scheme</span><span class="p">)</span></div>
+            <span class="n">chain</span><span class="o">.</span><span class="n">partial_charges</span> <span class="o">=</span> <span class="n">charge_openff_polymer</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">charge_scheme</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">charge_system</span> <span class="o">=</span> <span class="n">charge_scheme</span></div>
 
 
 <div class="viewcode-block" id="polymer_system_from_PDI.export_to_csv">
@@ -2223,6 +2292,14 @@
         <span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">ForceField</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge_scheme</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">charge_system</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_scheme</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Partial charges may not be assigned to the system. Processing large systems may raise errors from OpenFF-Interchange&quot;</span><span class="p">,</span>
+                <span class="ne">UserWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+
         <span class="n">box_vectors</span> <span class="o">=</span> <span class="n">calculate_box_components</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">monomers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span>
         <span class="p">)[</span><span class="mi">3</span><span class="p">]</span>
@@ -2238,7 +2315,7 @@
             <span class="n">mol_pdb_files_dest</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">string_i</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">has_unique_atom_names</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
                 <span class="n">i</span><span class="o">.</span><span class="n">generate_unique_atom_names</span><span class="p">()</span>
-            <span class="n">i</span><span class="o">.</span><span class="n">generate_conformers</span><span class="p">(</span><span class="n">n_conformers</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">generate_conformers</span><span class="p">(</span><span class="n">n_conformers</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Conformers generated for residuals</span>
             <span class="n">i</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">string_i</span><span class="p">,</span> <span class="n">file_format</span><span class="o">=</span><span class="s2">&quot;pdb&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">residual_monomer_actual</span> <span class="o">=</span> <span class="n">residual_monomer_actual</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">residual_oligomer_actual</span> <span class="o">=</span> <span class="n">residual_oligomer_actual</span>
