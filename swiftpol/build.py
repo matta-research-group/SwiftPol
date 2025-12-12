@@ -1015,7 +1015,7 @@ class polymer_system:
         )
         return description
 
-    def generate_conformers(self, rough=False):
+    def generate_conformers(self, rough=False, random=False):
         """
         Generate conformers for each polymer chain in the system.
 
@@ -1035,10 +1035,17 @@ class polymer_system:
             - numThreads = 1
             Default is False.
 
+        random : bool, optional
+            If True, generates random conformers. Default is False.
+            Used specifically for when output files are to be used in Polyply to optimise polmyer melt conformations.
+            Default is False.
+
         Raises
         ------
         ImportError
             If neither RDKit nor OpenEye toolkits are available.
+        ValueError
+            If both rough and random options are set to True.
         """
 
         from openff.toolkit.utils.toolkits import (
@@ -1047,6 +1054,9 @@ class polymer_system:
         )
         from rdkit.Chem import AllChem
         from warnings import warn
+
+        if rough and random:
+            raise ValueError("Please select either rough or random conformer generation, not both.")
 
         if rough:
             params = AllChem.EmbedParameters()
@@ -1065,6 +1075,24 @@ class polymer_system:
             UserWarning,
             )   
 
+        elif random:
+            import random
+            for mol in self.chain_rdkit:
+                num_atoms = mol.GetNumAtoms()
+                conf = Chem.Conformer(num_atoms)
+                for i in range(num_atoms):
+                    # Generate random x, y, z coordinates
+                    x, y, z = random.uniform(-10, 10), random.uniform(-10, 10), random.uniform(-10, 10)
+                    conf.SetAtomPosition(i, (x, y, z))
+                mol.RemoveAllConformers()  # Clear existing conformers from RDKit molecule
+                mol.AddConformer(conf, assignId=True)
+            # Update OFF chain attribute with new RDKit molecules
+            self.chains = [Molecule.from_rdkit(m) for m in sys.chain_rdkit]
+            warn(
+            "Random coordinates have been generated. Any charges previously applied to the system.chains attribute"
+            "will need to be reapplied. Please ensure optimized conformer generation is performed prior to simulation (e.g. using Polyply).",
+            UserWarning,
+            )
 
         else:
             # Generate conformers using OpenFF toolkit wrapper
@@ -1228,10 +1256,12 @@ class polymer_system:
             If partial charges are not assigned to the system, processing large systems may raise errors from OpenFF-Interchange.
         """
         from swiftpol.build import calculate_box_components
+        
         from openff.interchange import Interchange
         from openff.toolkit import ForceField
         import warnings
 
+        self.generate_conformers(random = True)
         box_vectors = calculate_box_components(
             self.chains,
             self.monomers,
@@ -1877,7 +1907,7 @@ class polymer_system_from_PDI:
         return description
 
 
-    def generate_conformers(self, rough=False):
+    def generate_conformers(self, rough=False, random=False):
         """
         Generate conformers for each polymer chain in the system.
 
@@ -1897,10 +1927,17 @@ class polymer_system_from_PDI:
             - numThreads = 1
             Default is False.
 
+        random : bool, optional
+            If True, generates random conformers. Default is False.
+            Used specifically for when output files are to be used in Polyply to optimise polmyer melt conformations.
+            Default is False.
+
         Raises
         ------
         ImportError
             If neither RDKit nor OpenEye toolkits are available.
+        ValueError
+            If both rough and random options are set to True.
         """
 
         from openff.toolkit.utils.toolkits import (
@@ -1909,6 +1946,9 @@ class polymer_system_from_PDI:
         )
         from rdkit.Chem import AllChem
         from warnings import warn
+
+        if rough and random:
+            raise ValueError("Please select either rough or random conformer generation, not both.")
 
         if rough:
             params = AllChem.EmbedParameters()
@@ -1927,6 +1967,24 @@ class polymer_system_from_PDI:
             UserWarning,
             )   
 
+        elif random:
+            import random
+            for mol in self.chain_rdkit:
+                num_atoms = mol.GetNumAtoms()
+                conf = Chem.Conformer(num_atoms)
+                for i in range(num_atoms):
+                    # Generate random x, y, z coordinates
+                    x, y, z = random.uniform(-10, 10), random.uniform(-10, 10), random.uniform(-10, 10)
+                    conf.SetAtomPosition(i, (x, y, z))
+                mol.RemoveAllConformers()  # Clear existing conformers from RDKit molecule
+                mol.AddConformer(conf, assignId=True)
+            # Update OFF chain attribute with new RDKit molecules
+            self.chains = [Molecule.from_rdkit(m) for m in sys.chain_rdkit]
+            warn(
+            "Random coordinates have been generated. Any charges previously applied to the system.chains attribute"
+            "will need to be reapplied. Please ensure optimized conformer generation is performed prior to simulation (e.g. using Polyply).",
+            UserWarning,
+            )
 
         else:
             # Generate conformers using OpenFF toolkit wrapper
@@ -2087,6 +2145,9 @@ class polymer_system_from_PDI:
         from openff.toolkit import ForceField
         import warnings
 
+        # Generate random conformers
+        self.generate_conformers(random=True)
+
         box_vectors = calculate_box_components(
             self.chains, self.monomers, self.sequence, 0.0, 0.0
         )[3]
@@ -2102,7 +2163,7 @@ class polymer_system_from_PDI:
             mol_pdb_files_dest.append(string_i)
             if i.has_unique_atom_names == False:
                 i.generate_unique_atom_names()
-            i.generate_conformers(n_conformers=1)
+            i.generate_conformers(n_conformers=1) # Conformers generated for residuals
             i.to_file(string_i, file_format="pdb")
         self.residual_monomer_actual = residual_monomer_actual
         self.residual_oligomer_actual = residual_oligomer_actual
