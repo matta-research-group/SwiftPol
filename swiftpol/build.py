@@ -3,7 +3,6 @@ import rdkit
 from rdkit import Chem
 from rdkit.Chem import AllChem
 import os
-import random
 import numpy as np
 import matplotlib.pyplot as plt
 import numpy as np
@@ -1037,8 +1036,8 @@ class polymer_system:
 
         random : bool, optional
             If True, generates random conformers. Default is False.
-            Used specifically for when output files are to be used in Polyply to optimise polmyer melt conformations.
-            Default is False.
+            Used specifically for when output files are to be used in Polyply to optimise polymer melt conformations.
+
 
         Raises
         ------
@@ -1076,20 +1075,20 @@ class polymer_system:
             )   
 
         elif random:
-            import random
+            import random as ran
             for mol in self.chain_rdkit:
                 num_atoms = mol.GetNumAtoms()
                 conf = Chem.Conformer(num_atoms)
                 for i in range(num_atoms):
                     # Generate random x, y, z coordinates
-                    x, y, z = random.uniform(-10, 10), random.uniform(-10, 10), random.uniform(-10, 10)
+                    x, y, z = ran.uniform(-10, 10), ran.uniform(-10, 10), ran.uniform(-10, 10)
                     conf.SetAtomPosition(i, (x, y, z))
                 mol.RemoveAllConformers()  # Clear existing conformers from RDKit molecule
                 mol.AddConformer(conf, assignId=True)
             # Update OFF chain attribute with new RDKit molecules
-            self.chains = [Molecule.from_rdkit(m) for m in sys.chain_rdkit]
+            self.chains = [Molecule.from_rdkit(m) for m in self.chain_rdkit]
             warn(
-            "Random coordinates have been generated. Any charges previously applied to the system.chains attribute"
+            "Random coordinates have been generated. Any charges previously applied to the system.chains attribute "
             "will need to be reapplied. Please ensure optimized conformer generation is performed prior to simulation (e.g. using Polyply).",
             UserWarning,
             )
@@ -1127,6 +1126,8 @@ class polymer_system:
 
         for chain in self.chains:
             chain.partial_charges = charge_openff_polymer(chain, charge_scheme)
+
+        self.charge_scheme = charge_scheme
 
     def export_to_csv(self, filename):
         """
@@ -1262,6 +1263,13 @@ class polymer_system:
         import warnings
 
         self.generate_conformers(random = True)
+        if self.charge_scheme:
+            self.charge_system(self.charge_scheme)
+        else:
+            warnings.warn(
+                "Partial charges may not be assigned to the system. Processing large systems may raise errors from OpenFF-Interchange",
+                UserWarning,
+            )
         box_vectors = calculate_box_components(
             self.chains,
             self.monomers,
@@ -1929,8 +1937,8 @@ class polymer_system_from_PDI:
 
         random : bool, optional
             If True, generates random conformers. Default is False.
-            Used specifically for when output files are to be used in Polyply to optimise polmyer melt conformations.
-            Default is False.
+            Used specifically for when output files are to be used in Polyply to optimise polymer melt conformations.
+
 
         Raises
         ------
@@ -1968,20 +1976,20 @@ class polymer_system_from_PDI:
             )   
 
         elif random:
-            import random
+            import random as ran
             for mol in self.chain_rdkit:
                 num_atoms = mol.GetNumAtoms()
                 conf = Chem.Conformer(num_atoms)
                 for i in range(num_atoms):
                     # Generate random x, y, z coordinates
-                    x, y, z = random.uniform(-10, 10), random.uniform(-10, 10), random.uniform(-10, 10)
+                    x, y, z = ran.uniform(-10, 10), ran.uniform(-10, 10), ran.uniform(-10, 10)
                     conf.SetAtomPosition(i, (x, y, z))
                 mol.RemoveAllConformers()  # Clear existing conformers from RDKit molecule
                 mol.AddConformer(conf, assignId=True)
             # Update OFF chain attribute with new RDKit molecules
-            self.chains = [Molecule.from_rdkit(m) for m in sys.chain_rdkit]
+            self.chains = [Molecule.from_rdkit(m) for m in self.chain_rdkit]
             warn(
-            "Random coordinates have been generated. Any charges previously applied to the system.chains attribute"
+            "Random coordinates have been generated. Any charges previously applied to the system.chains attribute "
             "will need to be reapplied. Please ensure optimized conformer generation is performed prior to simulation (e.g. using Polyply).",
             UserWarning,
             )
@@ -2019,6 +2027,8 @@ class polymer_system_from_PDI:
 
         for chain in self.chains:
             chain.partial_charges = charge_openff_polymer(chain, charge_scheme)
+
+        self.charge_system = charge_scheme
 
     def export_to_csv(self, filename):
         """
@@ -2145,8 +2155,13 @@ class polymer_system_from_PDI:
         from openff.toolkit import ForceField
         import warnings
 
-        # Generate random conformers
-        self.generate_conformers(random=True)
+        if self.charge_scheme:
+            self.charge_system(self.charge_scheme)
+        else:
+            warnings.warn(
+                "Partial charges may not be assigned to the system. Processing large systems may raise errors from OpenFF-Interchange",
+                UserWarning,
+            )
 
         box_vectors = calculate_box_components(
             self.chains, self.monomers, self.sequence, 0.0, 0.0
