@@ -47,7 +47,7 @@ dependencies:
       - espaloma-charge
       - pdb4amber
       - pytraj
-      - rdkit
+      - rdkit >= 2025.03.2
       #- torch == 2.0.0
       - torchdata
 
