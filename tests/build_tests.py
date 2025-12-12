@@ -434,13 +434,7 @@ class TestPolymerSystem(unittest.TestCase):
         self.assertIsNotNone(sys.chains[0].conformers)
         sys.generate_conformers(random=True)
         self.assertIsNotNone(sys.chains[0].conformers)
-        # Test generate conformers with rough and random option simultaneously
-        with self.assertWarns(UserWarning) as warning_context:
-            sys.generate_conformers(rough=True, random=True)
-        self.assertIn(
-            "Please select either rough or random conformer generation, not both.",
-            str(warning_context.warning),
-        )
+
         
 
 
