@@ -395,7 +395,7 @@ class TestPolymerSystem(unittest.TestCase):
 
         # Test polyply output
         y.charge_system("NAGL")
-        y.generate_conformers()
+        y.generate_conformers(random = True)
         files = y.generate_polyply_files()
 
         for i in files:
@@ -429,6 +429,13 @@ class TestPolymerSystem(unittest.TestCase):
         self.assertIsNotNone(molecules)
         self.assertIsNotNone(number_of_copies)
         self.assertTrue(len(molecules) == len(number_of_copies))
+        # Test generate conformers with rough and random option separately
+        sys.generate_conformers(rough=True)
+        self.assertIsNotNone(sys.chains[0].conformers)
+        sys.generate_conformers(random=True)
+        self.assertIsNotNone(sys.chains[0].conformers)
+
+        
 
 
 class TestPolymerSystemFromPDI(unittest.TestCase):
