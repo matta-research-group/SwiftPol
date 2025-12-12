@@ -157,6 +157,7 @@ def build_polymer(
         info.SetChainId(chainID)
         [atom.SetMonomerInfo(info) for atom in hydrogen.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("Cl"), hydrogen)[0]
+        Chem.SanitizeMol(polymer)
         Chem.AddHs(polymer)
     elif terminal == "carboxyl":
         carboxyl = Chem.MolFromSmiles("C(=O)[OH]")
