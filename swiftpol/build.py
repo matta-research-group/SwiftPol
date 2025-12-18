@@ -1069,7 +1069,8 @@ class polymer_system:
             for mol in self.chain_rdkit:
                 AllChem.EmbedMolecule(mol, params)
             self.chains = [Molecule.from_rdkit(m) for m in self.chain_rdkit]
-            self.chains = [m.generate_unique_atom_names() for m in self.chains]
+            for chain in self.chains:
+                chain.generate_unique_atom_names()
             warn(
             "Rough coordinates have been generated. Any charges previously applied to the system.chains attribute"
             "will need to be reapplied.",
@@ -1089,7 +1090,8 @@ class polymer_system:
                 mol.AddConformer(conf, assignId=True)
             # Update OFF chain attribute with new RDKit molecules
             self.chains = [Molecule.from_rdkit(m) for m in self.chain_rdkit]
-            self.chains = [m.generate_unique_atom_names() for m in self.chains]
+            for chain in self.chains:
+                chain.generate_unique_atom_names()
             warn(
             "Random coordinates have been generated. Any charges previously applied to the system.chains attribute "
             "will need to be reapplied. Please ensure optimized conformer generation is performed prior to simulation (e.g. using Polyply).",
@@ -1972,7 +1974,8 @@ class polymer_system_from_PDI:
             for mol in self.chain_rdkit:
                 AllChem.EmbedMolecule(mol, params)
             self.chains = [Molecule.from_rdkit(m) for m in self.chain_rdkit]
-            self.chains = [m.generate_unique_atom_names() for m in self.chains]
+            for chain in self.chains:
+                chain.generate_unique_atom_names()
             warn(
             "Rough coordinates have been generated. Any charges previously applied to the system.chains attribute"
             "will need to be reapplied.",
@@ -1992,7 +1995,8 @@ class polymer_system_from_PDI:
                 mol.AddConformer(conf, assignId=True)
             # Update OFF chain attribute with new RDKit molecules
             self.chains = [Molecule.from_rdkit(m) for m in self.chain_rdkit]
-            self.chains = [m.generate_unique_atom_names() for m in self.chains]
+            for chain in self.chains:
+                chain.generate_unique_atom_names()
             warn(
             "Random coordinates have been generated. Any charges previously applied to the system.chains attribute "
             "will need to be reapplied. Please ensure optimized conformer generation is performed prior to simulation (e.g. using Polyply).",
