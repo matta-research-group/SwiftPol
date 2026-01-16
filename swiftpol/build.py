@@ -1133,7 +1133,6 @@ class polymer_system:
     def export_to_csv(self, filename, include_all_data=True):
         """
         Export the attributes of the polymer_system instance into a pandas DataFrame and save it as a CSV file.
-    
         Parameters
         ----------
         filename : str
