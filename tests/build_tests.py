@@ -448,7 +448,7 @@ class TestPolymerSystemFromPDI(unittest.TestCase):
             num_chains=50,
             PDI_target=1.7,
             copolymer=False,
-            acceptance=10,
+            acceptance=5,
         )
         self.assertTrue(len(sys.chains) == 50)
         self.assertTrue(40 <= sys.length_average <= 60)
