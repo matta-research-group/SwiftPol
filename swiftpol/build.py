@@ -1552,8 +1552,8 @@ class polymer_system:
         else:
             for i in molecules:
                 i.generate_unique_atom_names()  # required for polyply output
-                self.residual_monomer_actual = residual_monomer_actual
-                self.residual_oligomer_actual = residual_oligomer_actual
+            self.residual_monomer_actual = residual_monomer_actual
+            self.residual_oligomer_actual = residual_oligomer_actual
             return (
                 molecules,
                 number_of_copies,
