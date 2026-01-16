@@ -2068,7 +2068,6 @@ class polymer_system_from_PDI:
             If True, include all attributes of the system. If False, only include a subset of attributes.
             subset includes: monomers, length_target, num_chains, PDI, Mn, Mw.
         """
-        import pandas as pd
         all_data = {
             "monomers": [self.monomers],
             "length_target": [self.length_target],
