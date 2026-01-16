@@ -1134,16 +1134,20 @@ class polymer_system:
 
         self.charge_scheme = charge_scheme
 
-    def export_to_csv(self, filename):
+    def export_to_csv(self, filename, include_all_data=True):
         """
-        Export all the instances in polymer_system.__init__() into a pandas DataFrame and save it as a CSV file.
-
+        Export the attributes of the polymer_system instance into a pandas DataFrame and save it as a CSV file.
+    
         Parameters
         ----------
         filename : str
             The name of the CSV file to save the data.
+        include_all_data : bool, optional
+            If True, include all attributes of the system. If False, only include a subset of attributes.
+            subset includes: monomers, length_target, num_chains, PDI, Mn, Mw.
         """
-        data = {
+        import pandas as pd
+        all_data = {
             "monomers": [self.monomers],
             "length_target": [self.length_target],
             "terminals": [self.terminals],
@@ -1152,16 +1156,33 @@ class polymer_system:
             "PDI": [self.PDI],
             "Mn": [self.Mn],
             "Mw": [self.Mw],
-            "sequence": [self.sequence],
             "B_block_length": [self.B_block_length],
             "A_block_length": [self.A_block_length],
-            "blockiness_list": [self.blockiness_list],
             "mean_blockiness": [self.mean_blockiness],
-            "perc_A_actual": [self.perc_A_actual],
-            "A_actual": [self.A_actual],
+            "A_actual": [self.A_actual]
         }
+        
+        if hasattr(self, "charge_scheme") and self.charge_scheme is not None:
+            all_data["charge_scheme"] = [self.charge_scheme]
+        
+        if hasattr(self, "residual_monomer_actual") and self.residual_monomer_actual is not None:
+            all_data["residual_monomer_actual"] = [self.residual_monomer_actual]
+        
+        if hasattr(self, "residual_oligomer_actual") and self.residual_oligomer_actual is not None:
+            all_data["residual_oligomer_actual"] = [self.residual_oligomer_actual]
 
-        df = pd.DataFrame(data)
+        subset_data = {
+            "monomers": [self.monomers],
+            "length_target": [self.length_target],
+            "num_chains": [self.num_chains],
+            "PDI": [self.PDI],
+            "Mn": [self.Mn],
+            "Mw": [self.Mw],
+        }
+    
+        data_to_export = all_data if include_all_data else subset_data
+
+        df = pd.DataFrame(data_to_export)
         df.to_csv(filename, index=False)
 
     def pack_solvated_system(
@@ -1537,6 +1558,8 @@ class polymer_system:
         else:
             for i in molecules:
                 i.generate_unique_atom_names()  # required for polyply output
+                self.residual_monomer_actual = residual_monomer_actual
+                self.residual_oligomer_actual = residual_oligomer_actual
             return (
                 molecules,
                 number_of_copies,
@@ -2039,16 +2062,20 @@ class polymer_system_from_PDI:
 
         self.charge_system = charge_scheme
 
-    def export_to_csv(self, filename):
+    def export_to_csv(self, filename, include_all_data=True):
         """
-        Export all the instances in polymer_system.__init__() into a pandas DataFrame and save it as a CSV file.
-
+        Export the attributes of the polymer_system instance into a pandas DataFrame and save it as a CSV file.
+    
         Parameters
         ----------
         filename : str
             The name of the CSV file to save the data.
+        include_all_data : bool, optional
+            If True, include all attributes of the system. If False, only include a subset of attributes.
+            subset includes: monomers, length_target, num_chains, PDI, Mn, Mw.
         """
-        data = {
+        import pandas as pd
+        all_data = {
             "monomers": [self.monomers],
             "length_target": [self.length_target],
             "terminals": [self.terminals],
@@ -2057,16 +2084,33 @@ class polymer_system_from_PDI:
             "PDI": [self.PDI],
             "Mn": [self.Mn],
             "Mw": [self.Mw],
-            "sequence": [self.sequence], 
             "B_block_length": [self.B_block_length],
             "A_block_length": [self.A_block_length],
-            "blockiness_list": [self.blockiness_list],
             "mean_blockiness": [self.mean_blockiness],
-            "perc_A_actual": [self.perc_A_actual],
-            "A_actual": [self.A_actual],
+            "A_actual": [self.A_actual]
         }
+        
+        if hasattr(self, "charge_scheme") and self.charge_scheme is not None:
+            all_data["charge_scheme"] = [self.charge_scheme]
+        
+        if hasattr(self, "residual_monomer_actual") and self.residual_monomer_actual is not None:
+            all_data["residual_monomer_actual"] = [self.residual_monomer_actual]
+        
+        if hasattr(self, "residual_oligomer_actual") and self.residual_oligomer_actual is not None:
+            all_data["residual_oligomer_actual"] = [self.residual_oligomer_actual]
 
-        df = pd.DataFrame(data)
+        subset_data = {
+            "monomers": [self.monomers],
+            "length_target": [self.length_target],
+            "num_chains": [self.num_chains],
+            "PDI": [self.PDI],
+            "Mn": [self.Mn],
+            "Mw": [self.Mw],
+        }
+    
+        data_to_export = all_data if include_all_data else subset_data
+
+        df = pd.DataFrame(data_to_export)
         df.to_csv(filename, index=False)
 
     def pack_solvated_system(self, salt_concentration=0.0, residual_monomer=0.00):
@@ -2431,9 +2475,12 @@ class polymer_system_from_PDI:
         else:
             for i in molecules:
                 i.generate_unique_atom_names()  # required for polyply output
+            self.residual_monomer_actual = residual_monomer_actual
+            self.residual_oligomer_actual = residual_oligomer_actual
             return (
                 molecules,
                 number_of_copies,
                 residual_monomer_actual,
                 residual_oligomer_actual,
             )
+        
