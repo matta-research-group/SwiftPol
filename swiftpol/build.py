@@ -87,7 +87,7 @@ def build_polymer(
         Chem.MolFromSmarts("I")
     )
     mw = Chem.RWMol(Chem.MolFromSmiles(monomers[sequence[0]]))
-    mw.ReplaceAtom(hits[0][0], Chem.Atom(17))
+    mw.ReplaceAtom(hits[0][0], Chem.Atom(85))
     Chem.SanitizeMol(mw)
     mw.CommitBatchEdit()
     polymer = Chem.AddHs(mw)
@@ -156,7 +156,7 @@ def build_polymer(
         info.SetResidueNumber(1)
         info.SetChainId(chainID)
         [atom.SetMonomerInfo(info) for atom in hydrogen.GetAtoms()]
-        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("Cl"), hydrogen)[0]
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[At]"), hydrogen)[0]
         Chem.SanitizeMol(polymer)
         Chem.AddHs(polymer)
     elif terminal == "carboxyl":
@@ -166,7 +166,7 @@ def build_polymer(
         info.SetResidueNumber(1)
         info.SetChainId(chainID)
         [atom.SetMonomerInfo(info) for atom in carboxyl.GetAtoms()]
-        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("Cl"), carboxyl)[0]
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[At]"), carboxyl)[0]
     elif terminal == "ester":
         carbon = Chem.MolFromSmiles("[CH3]")
         carbon = Chem.AddHs(carbon)
@@ -175,11 +175,7 @@ def build_polymer(
         info.SetResidueNumber(1)
         info.SetChainId(chainID)
         [atom.SetMonomerInfo(info) for atom in carbon.GetAtoms()]
-        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("Cl"), carbon)[0]
-        # Chem.AddHs(polymer)
-        polymer = Chem.ReplaceSubstructs(
-            polymer, Chem.MolFromSmarts("Cl"), Chem.MolFromSmiles("C")
-        )[0]
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[At]"), carbon)[0]
     else:
         try:
             term = Chem.MolFromSmiles(terminal)
@@ -207,7 +203,7 @@ def build_polymer(
         info.SetResidueNumber(1)
         info.SetChainId(chainID)
         [atom.SetMonomerInfo(info) for atom in term_gap.GetAtoms()]
-        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("Cl"), term_gap)[0]
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[At]"), term_gap)[0]
         Chem.SanitizeMol(polymer)
     hydrogen = Chem.MolFromSmiles("[H]")
     info = Chem.AtomPDBResidueInfo()
