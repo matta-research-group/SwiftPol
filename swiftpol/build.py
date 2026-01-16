@@ -2099,7 +2099,6 @@ class polymer_system_from_PDI:
             "Mn": [self.Mn],
             "Mw": [self.Mw],
         }
-    
         data_to_export = all_data if include_all_data else subset_data
 
         df = pd.DataFrame(data_to_export)
