@@ -108,26 +108,35 @@ We acknowledge the use of a free academic license provided by OpenEye, Candence 
 .
 ├── CODE_OF_CONDUCT.md
 ├── Dev_tools
+│   ├── docker.yml
 │   └── swiftpol.yml
+├── Dockerfile
+├── docs
 ├── Example_Notebooks
 │   ├── Chitin.ipynb
-│   ├── Crosslinked_PEDGA.ipynb
+│   ├── Crosslinking_demo.ipynb
 │   ├── PLGA_demo.ipynb
+│   ├── Rubber_Vulcanization.ipynb
 │   └── rxn_smarts.ipynb
 ├── LICENSE
 ├── pyproject.toml
 ├── README.md
 ├── Repo
-│   └── logo.jpg
+│   ├── crosslinking_flow.png
+│   ├── logo.jpg
+│   └── SwiftPol.png
 ├── setup.py
 ├── swiftpol
 │   ├── build.py
+│   ├── crosslink.py
 │   ├── demo.py
 │   ├── __init__.py
+│   ├── meta.yaml
 │   ├── parameterize.py
-│   └── _version.py
+│   └── __version__.py
 └── tests
     ├── build_tests.py
+    ├── crosslink_tests.py
     ├── demo_tests.py
     └── parameterize_tests.py
 ```
