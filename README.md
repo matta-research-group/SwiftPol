@@ -52,7 +52,7 @@ Examples of using SwiftPol code to build different polymers can be found at [Exa
 [YAML environment file listing all required packages to use SwiftPol](https://github.com/matta-research-group/SwiftPol/blob/main/Dev_tools/swiftpol.yml)
 
 To use SwiftPol please download the following packages:
-- RDkit
+- RDKit
 - openff-interchange
 - openff-toolkit
 - openff-nagl
