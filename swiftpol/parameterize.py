@@ -14,7 +14,7 @@ def charge_polymer(polymer, charge_scheme):
     polymer : rdkit.Chem.rdchem.Mol
         A polymer chain for which the charges are to be calculated.
     charge_scheme : str
-        A string that specifies the charge scheme to be used. It can be either 'AM1_BCC', 'espaloma', or 'NAGL'.
+        A string that specifies the charge scheme to be used. It can be either 'AM1_BCC', 'espaloma', or 'AshGC'.
 
     Returns
     -------
@@ -24,7 +24,7 @@ def charge_polymer(polymer, charge_scheme):
     Raises
     ------
     AttributeError
-        If the charge_scheme input is not 'AM1_BCC', 'NAGL', or 'espaloma'.
+        If the charge_scheme input is not 'AM1_BCC', 'AshGC', or 'espaloma'.
     """
     # Function implementation here
     from openff import toolkit
@@ -35,20 +35,20 @@ def charge_polymer(polymer, charge_scheme):
         openff_chain.generate_conformers()
         openff_chain.assign_partial_charges("am1bcc")
         return openff_chain.partial_charges.magnitude
-    elif charge_scheme == "NAGL" and toolkit.__version__ < "0.16.0":
+    elif charge_scheme == "AshGC" and toolkit.__version__ < "0.16.0":
         raise ModuleNotFoundError(
-            "Installed version of openff-toolkit is below what is required to use NAGL. Please update to v.0.16.0"
+            "Installed version of openff-toolkit is below what is required to use AshGC. Please update to v.0.16.0"
         )
-    elif charge_scheme == "NAGL" and toolkit.__version__ >= "0.16.0":
+    elif charge_scheme == "AshGC" and toolkit.__version__ >= "0.16.0":
         try:
-            from openff.toolkit.utils.nagl_wrapper import NAGLToolkitWrapper
+            from openff.toolkit.utils.nagl_wrapper import AshGCToolkitWrapper
         except:
             raise ImportError(
-                "The package openff-nagl is not installed. You will not be able to use NAGL."
+                "The package openff-nagl is not installed. You will not be able to use AshGC."
             )
         chain_h = Chem.AddHs(polymer)
         openff_chain = Molecule.from_rdkit(chain_h)
-        ntkw = NAGLToolkitWrapper()
+        ntkw = AshGCToolkitWrapper()
         ntkw.assign_partial_charges(openff_chain, "openff-gnn-am1bcc-0.1.0-rc.2.pt")
         return openff_chain.partial_charges.magnitude
     elif charge_scheme == "espaloma":
@@ -66,7 +66,7 @@ def charge_polymer(polymer, charge_scheme):
 
     else:
         raise AttributeError(
-            "This function takes either 'AM1_BCC', 'NAGL', or 'espaloma' as charge_scheme input"
+            "This function takes either 'AM1_BCC', 'AshGC', or 'espaloma' as charge_scheme input"
         )
 
 
@@ -75,14 +75,14 @@ def charge_openff_polymer(openff_chain, charge_scheme, overwrite=True):
     Assign partial charges to a polymer chain based on the specified charge scheme.
 
     This function assigns partial charges to a polymer chain using one of the following charge schemes:
-    'AM1_BCC', 'NAGL', or 'espaloma'. It can optionally overwrite existing charges.
+    'AM1_BCC', 'AshGC', or 'espaloma'. It can optionally overwrite existing charges.
 
     Parameters
     ----------
     openff_chain : openff.toolkit.topology.Molecule
         The original polymer chain to which partial charges will be assigned.
     charge_scheme : str
-        The charge scheme to use for assigning partial charges. Options are 'AM1_BCC', 'NAGL', or 'espaloma'.
+        The charge scheme to use for assigning partial charges. Options are 'AM1_BCC', 'AshGC', or 'espaloma'.
     overwrite : bool, optional
         Whether to overwrite existing partial charges. Default is True.
 
@@ -94,11 +94,11 @@ def charge_openff_polymer(openff_chain, charge_scheme, overwrite=True):
     Raises
     ------
     ModuleNotFoundError
-        If the installed version of openff-toolkit is below what is required to use NAGL.
+        If the installed version of openff-toolkit is below what is required to use AshGC.
     ImportError
         If the required package for the specified charge scheme is not installed.
     AttributeError
-        If the charge_scheme input is not 'AM1_BCC', 'NAGL', or 'espaloma'.
+        If the charge_scheme input is not 'AM1_BCC', 'AshGC', or 'espaloma'.
     """
     # Function implementation here
     from openff import toolkit
@@ -114,18 +114,18 @@ def charge_openff_polymer(openff_chain, charge_scheme, overwrite=True):
         else:
             chain_copy.assign_partial_charges("am1bcc")
             return chain_copy.partial_charges
-    elif charge_scheme == "NAGL" and toolkit.__version__ < "0.16.0":
+    elif charge_scheme == "AshGC" and toolkit.__version__ < "0.16.0":
         raise ModuleNotFoundError(
-            "Installed version of openff-toolkit is below what is required to use NAGL. Please update to v.0.16.0"
+            "Installed version of openff-toolkit is below what is required to use AshGC. Please update to v.0.16.0"
         )
-    elif charge_scheme == "NAGL" and toolkit.__version__ >= "0.16.0":
+    elif charge_scheme == "AshGC" and toolkit.__version__ >= "0.16.0":
         try:
-            from openff.toolkit.utils.nagl_wrapper import NAGLToolkitWrapper
+            from openff.toolkit.utils.nagl_wrapper import AshGCToolkitWrapper
         except:
             raise ImportError(
-                "The package openff-nagl is not installed. You will not be able to use NAGL."
+                "The package openff-nagl is not installed. You will not be able to use AshGC."
             )
-        ntkw = NAGLToolkitWrapper()
+        ntkw = AshGCToolkitWrapper()
         if overwrite:
             ntkw.assign_partial_charges(openff_chain, "openff-gnn-am1bcc-0.1.0-rc.2.pt")
             return openff_chain.partial_charges
@@ -151,5 +151,5 @@ def charge_openff_polymer(openff_chain, charge_scheme, overwrite=True):
 
     else:
         raise AttributeError(
-            "This function takes either 'AM1_BCC', 'NAGL', or 'espaloma' as charge_scheme input"
+            "This function takes either 'AM1_BCC', 'AshGC', or 'espaloma' as charge_scheme input"
         )
