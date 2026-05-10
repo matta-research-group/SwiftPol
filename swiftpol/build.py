@@ -167,6 +167,8 @@ def build_polymer(
         info.SetChainId(chainID)
         [atom.SetMonomerInfo(info) for atom in carboxyl.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[At]"), carboxyl)[0]
+        Chem.SanitizeMol(polymer)
+        Chem.AddHs(polymer)
     elif terminal == "ester":
         carbon = Chem.MolFromSmiles("[CH3]")
         carbon = Chem.AddHs(carbon)
@@ -1455,12 +1457,12 @@ class polymer_system:
                 sigma = np.sqrt(np.log(1.05))
                 mu = np.log(self.length_target * 0.1) - 0.5 * sigma**2
                 chain_lengths = np.random.lognormal(mu, sigma, size=1)
-                chain_lengths = np.round(chain_lengths).astype(int)
+                chain_lengths = np.round(chain_lengths).astype(int)[0]  # Extract scalar value
                 oligo_seq = reduce(
                     lambda x, y: x + y,
                     np.random.choice(
                         ["A", "B"],
-                        size=(int(chain_lengths)),
+                        size=chain_lengths,  # Use the scalar value here
                         p=[self.A_target / 100, 1 - (self.A_target / 100)],
                     ),
                 )
@@ -1470,6 +1472,7 @@ class polymer_system:
                     monomer_list=monomer_list,
                     reaction=AllChem.ReactionFromSmarts(self.reaction),
                     chain_num=len(self.chains) + 1 + i,
+                    terminal=self.terminals,
                 )
                 oligomer_rd = Chem.AddHs(oligomer_rd)
                 oligomer = Molecule.from_rdkit(oligomer_rd)
@@ -1499,7 +1502,7 @@ class polymer_system:
             number_of_copies = [A_to_add, B_to_add] + [1 for c in range(len(oligomers))]
 
         elif "A" in sequence and "B" not in sequence:
-            for i in range(1000):
+            for i in range(10000):
                 sigma = np.sqrt(np.log(1.05))
                 mu = np.log(self.length_target * 0.1) - 0.5 * sigma**2
                 chain_lengths = np.random.lognormal(mu, sigma, size=1)
@@ -1511,6 +1514,7 @@ class polymer_system:
                     monomer_list=monomer_list,
                     reaction=AllChem.ReactionFromSmarts(self.reaction),
                     chain_num=len(self.chains) + 1 + i,
+                    terminal=self.terminals,
                 )
                 oligomer_rd = Chem.AddHs(oligomer_rd)
                 oligomer = Molecule.from_rdkit(oligomer_rd)
@@ -2370,12 +2374,12 @@ class polymer_system_from_PDI:
                 sigma = np.sqrt(np.log(1.05))
                 mu = np.log(self.length_target * 0.1) - 0.5 * sigma**2
                 chain_lengths = np.random.lognormal(mu, sigma, size=1)
-                chain_lengths = np.round(chain_lengths).astype(int)
+                chain_lengths = np.round(chain_lengths).astype(int)[0]  # Extract scalar value
                 oligo_seq = reduce(
                     lambda x, y: x + y,
                     np.random.choice(
                         ["A", "B"],
-                        size=(int(chain_lengths)),
+                        size=chain_lengths,  # Use the scalar value here
                         p=[self.A_target / 100, 1 - (self.A_target / 100)],
                     ),
                 )
@@ -2385,8 +2389,8 @@ class polymer_system_from_PDI:
                     monomer_list=monomer_list,
                     reaction=AllChem.ReactionFromSmarts(self.reaction),
                     chain_num=len(self.chains) + 1 + i,
+                    terminal=self.terminals,                
                 )
-                oligomer_rd = Chem.AddHs(oligomer_rd)
                 oligomer = Molecule.from_rdkit(oligomer_rd)
                 oligomer.name = "oligo" + str(len(self.chains) + 1 + i)
                 oligo_mass = 0
@@ -2414,7 +2418,7 @@ class polymer_system_from_PDI:
             number_of_copies = [A_to_add, B_to_add] + [1 for c in range(len(oligomers))]
 
         elif "A" in sequence and "B" not in sequence:
-            for i in range(1000):
+            for i in range(10000):
                 sigma = np.sqrt(np.log(1.05))
                 mu = np.log(self.length_target * 0.1) - 0.5 * sigma**2
                 chain_lengths = np.random.lognormal(mu, sigma, size=1)
@@ -2426,8 +2430,8 @@ class polymer_system_from_PDI:
                     monomer_list=monomer_list,
                     reaction=AllChem.ReactionFromSmarts(self.reaction),
                     chain_num=len(self.chains) + 1 + i,
+                    terminal=self.terminals,                    
                 )
-                oligomer_rd = Chem.AddHs(oligomer_rd)
                 oligomer = Molecule.from_rdkit(oligomer_rd)
                 oligomer.name = "oligo" + str(len(self.chains) + 1 + i)
                 oligo_mass = 0
