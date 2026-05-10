@@ -11,8 +11,12 @@ def perceive_sequences(sys):
         residue_names = []
         for atom in polymer.GetAtoms():
             info = atom.GetPDBResidueInfo()
-            residue_names.append(info.GetResidueName())
-            residue_ids.append(info.GetResidueNumber())
+            try:
+                residue_names.append(info.GetResidueName())
+                residue_ids.append(info.GetResidueNumber())
+            except:
+                warnings.warn(f"Atom {atom.GetIdx()} in chain {chain_id} does not have valid residue information. Skipping this atom.")
+                continue
         residue_ids_dict = {residue_ids[i]: residue_names[i] for i in range(len(residue_ids))} 
         for i in residue_ids_dict:
             if residue_ids_dict[i].find('A') > 0:

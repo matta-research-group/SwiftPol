@@ -167,6 +167,8 @@ def build_polymer(
         info.SetChainId(chainID)
         [atom.SetMonomerInfo(info) for atom in carboxyl.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[At]"), carboxyl)[0]
+        Chem.SanitizeMol(polymer)
+        Chem.AddHs(polymer)
     elif terminal == "ester":
         carbon = Chem.MolFromSmiles("[CH3]")
         carbon = Chem.AddHs(carbon)
@@ -1470,6 +1472,7 @@ class polymer_system:
                     monomer_list=monomer_list,
                     reaction=AllChem.ReactionFromSmarts(self.reaction),
                     chain_num=len(self.chains) + 1 + i,
+                    terminal=self.terminals,
                 )
                 oligomer_rd = Chem.AddHs(oligomer_rd)
                 oligomer = Molecule.from_rdkit(oligomer_rd)
@@ -1511,6 +1514,7 @@ class polymer_system:
                     monomer_list=monomer_list,
                     reaction=AllChem.ReactionFromSmarts(self.reaction),
                     chain_num=len(self.chains) + 1 + i,
+                    terminal=self.terminals,
                 )
                 oligomer_rd = Chem.AddHs(oligomer_rd)
                 oligomer = Molecule.from_rdkit(oligomer_rd)
@@ -2385,8 +2389,9 @@ class polymer_system_from_PDI:
                     monomer_list=monomer_list,
                     reaction=AllChem.ReactionFromSmarts(self.reaction),
                     chain_num=len(self.chains) + 1 + i,
+                    terminal=self.terminals,                
                 )
-                oligomer_rd = Chem.AddHs(oligomer_rd)
+                #oligomer_rd = Chem.AddHs(oligomer_rd)
                 oligomer = Molecule.from_rdkit(oligomer_rd)
                 oligomer.name = "oligo" + str(len(self.chains) + 1 + i)
                 oligo_mass = 0
@@ -2426,8 +2431,9 @@ class polymer_system_from_PDI:
                     monomer_list=monomer_list,
                     reaction=AllChem.ReactionFromSmarts(self.reaction),
                     chain_num=len(self.chains) + 1 + i,
+                    terminal=self.terminals,                    
                 )
-                oligomer_rd = Chem.AddHs(oligomer_rd)
+                #oligomer_rd = Chem.AddHs(oligomer_rd)
                 oligomer = Molecule.from_rdkit(oligomer_rd)
                 oligomer.name = "oligo" + str(len(self.chains) + 1 + i)
                 oligo_mass = 0
