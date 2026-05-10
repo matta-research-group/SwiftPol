@@ -89,3 +89,11 @@ jobs:
         pip install -e .
         pip install pytest pytest-cov        
         pytest tests/crosslink_tests.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+
+    - name: utils tests
+      run: |
+        source ~/.bashrc
+        conda activate swiftpol
+        pip install -e .
+        pip install pytest pytest-cov        
+        pytest tests/utils_tests.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
