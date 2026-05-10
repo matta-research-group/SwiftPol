@@ -2391,7 +2391,6 @@ class polymer_system_from_PDI:
                     chain_num=len(self.chains) + 1 + i,
                     terminal=self.terminals,                
                 )
-                #oligomer_rd = Chem.AddHs(oligomer_rd)
                 oligomer = Molecule.from_rdkit(oligomer_rd)
                 oligomer.name = "oligo" + str(len(self.chains) + 1 + i)
                 oligo_mass = 0
@@ -2433,7 +2432,6 @@ class polymer_system_from_PDI:
                     chain_num=len(self.chains) + 1 + i,
                     terminal=self.terminals,                    
                 )
-                #oligomer_rd = Chem.AddHs(oligomer_rd)
                 oligomer = Molecule.from_rdkit(oligomer_rd)
                 oligomer.name = "oligo" + str(len(self.chains) + 1 + i)
                 oligo_mass = 0
