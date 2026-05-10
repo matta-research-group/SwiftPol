@@ -120,12 +120,12 @@ def charge_openff_polymer(openff_chain, charge_scheme, overwrite=True):
         )
     elif charge_scheme == "AshGC" and toolkit.__version__ >= "0.16.0":
         try:
-            from openff.toolkit.utils.nagl_wrapper import AshGCToolkitWrapper
+            from openff.toolkit.utils.nagl_wrapper import NAGLToolkitWrapper
         except:
             raise ImportError(
                 "The package openff-nagl is not installed. You will not be able to use AshGC."
             )
-        ntkw = AshGCToolkitWrapper()
+        ntkw = NAGLToolkitWrapper()
         if overwrite:
             ntkw.assign_partial_charges(openff_chain, "openff-gnn-am1bcc-0.1.0-rc.2.pt")
             return openff_chain.partial_charges

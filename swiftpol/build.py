@@ -506,7 +506,7 @@ def calculate_box_components(
         .round()
     )
     water_to_add = int(
-        round((solvent_mass) / water_mass).m_as(unit.dimensionless).round()
+        round((solvent_mass) / water_mass).m_as(unit.dimensionless)
     )
 
     # Neutralise the system by adding and removing salt
