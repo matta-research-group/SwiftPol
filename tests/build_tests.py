@@ -330,7 +330,7 @@ class TestPolymerSystem(unittest.TestCase):
         # Test all charge methods
         x.charge_system("espaloma")
         self.assertTrue(len(x.chains[0].partial_charges) == len(x.chains[0].atoms))
-        x.charge_system("NAGL")
+        x.charge_system("AshGC")
         self.assertTrue(len(x.chains[0].partial_charges) == len(x.chains[0].atoms))
 
         # Check all chains have a name
@@ -394,7 +394,7 @@ class TestPolymerSystem(unittest.TestCase):
         self.assertIsNotNone(solvated_y)
 
         # Test polyply output
-        y.charge_system("NAGL")
+        y.charge_system("AshGC")
         y.generate_conformers(random = True)
         files = y.generate_polyply_files()
 

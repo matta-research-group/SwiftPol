@@ -24,8 +24,8 @@ class TestParameterize(unittest.TestCase):
             self.assertIsNotNone(charges)
         except ImportError:
             pass  # Skip the test if espaloma is not installed
-        # Test NAGL charge scheme
-        charges = charge_polymer(polymer, "NAGL")
+        # Test AsjGC charge scheme
+        charges = charge_polymer(polymer, "AshGC")
         self.assertIsNotNone(charges)
         # Test invalid charge scheme
         with self.assertRaises(AttributeError):
@@ -42,8 +42,8 @@ class TestParameterize(unittest.TestCase):
             self.assertIsNotNone(charges)
         except ImportError:
             pass  # Skip the test if espaloma is not installed
-        # Test NAGL charge scheme
-        charges = charge_openff_polymer(openff_polymer, "NAGL")
+        # Test AshGC charge scheme
+        charges = charge_openff_polymer(openff_polymer, "AshGC")
         self.assertIsNotNone(charges)
         # Test invalid charge scheme
         with self.assertRaises(AttributeError):
@@ -51,7 +51,7 @@ class TestParameterize(unittest.TestCase):
 
         # Test with overwrite = False
         openff_polymer2 = Molecule.from_rdkit(polymer)
-        charges = charge_openff_polymer(openff_polymer, "NAGL", overwrite=False)
+        charges = charge_openff_polymer(openff_polymer, "AshGC", overwrite=False)
         self.assertIsNotNone(charges)
         self.assertIsNone(openff_polymer2.partial_charges)
 
@@ -76,8 +76,8 @@ class TestParameterize(unittest.TestCase):
             self.assertIsNotNone(charges)
         except ImportError:
             pass  # Skip the test if espaloma is not installed
-        # Test NAGL charge scheme
-        charges = charge_polymer(polymer, "NAGL")
+        # Test AshGC charge scheme
+        charges = charge_polymer(polymer, "AshGC")
         self.assertIsNotNone(charges)
 
 if __name__ == "__main__":
