@@ -5,8 +5,7 @@
 def perceive_sequences(sys):
     import warnings
     sequence_dict = {}
-    for polymer in sys.chain_rdkit:
-        chain_id = sys.chain_rdkit.index(polymer)
+    for chain_id, polymer in enumerate(sys.chain_rdkit):
         residue_ids = []
         residue_names = []
         for atom in polymer.GetAtoms():
