@@ -415,7 +415,7 @@ class TestPolymerSystem(unittest.TestCase):
             acceptance=10,
             stereoisomerism_input=["A", 0.5, "O[C@@H](C)C(=O)O[I]"],
         )
-        sys.charge_system("NAGL")
+        sys.charge_system("AshGC")
         (
             molecules,
             number_of_copies,
