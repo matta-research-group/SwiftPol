@@ -506,7 +506,7 @@ def calculate_box_components(
         .round()
     )
     water_to_add = int(
-        round((solvent_mass) / water_mass).m_as(unit.dimensionless).round()
+        round((solvent_mass) / water_mass).m_as(unit.dimensionless)
     )
 
     # Neutralise the system by adding and removing salt
@@ -1112,13 +1112,13 @@ class polymer_system:
         """
         Assign partial charges to each polymer chain in the system.
 
-        This method uses one of AM1-BCC, Espaloma, or OpenFF NAGL to assign partial charges to each polymer chain in the system.
+        This method uses one of AM1-BCC, Espaloma, or OpenFF AshGC to assign partial charges to each polymer chain in the system.
         It iterates over each chain in the `self.chains` list and assigns partial charges to the chain.
 
         Parameters
         ----------
         charge_scheme : str
-            The charge assignment scheme to use. Options are 'AM1_BCC', 'espaloma', or 'NAGL'.
+            The charge assignment scheme to use. Options are 'AM1_BCC', 'espaloma', or 'AshGC'.
 
         Raises
         ------
@@ -1327,13 +1327,13 @@ class polymer_system:
             )
             interchange = Interchange.from_smirnoff(
                 topology=topology,
-                force_field=ForceField("openff-2.2.0.offxml"),
+                force_field=ForceField("openff-2.3.0-rc2.offxml"),
                 box=box_vectors,
             )
         else:
             interchange = Interchange.from_smirnoff(
                 topology=topology,
-                force_field=ForceField("openff-2.2.0.offxml"),
+                force_field=ForceField("openff-2.3.0-rc2.offxml"),
                 charge_from_molecules=list(set([i for i in self.chains])),
                 box=box_vectors,
             )
@@ -2039,13 +2039,13 @@ class polymer_system_from_PDI:
         """
         Assign partial charges to each polymer chain in the system.
 
-        This method uses one of AM1-BCC, Espaloma, or OpenFF NAGL to assign partial charges to each polymer chain in the system.
+        This method uses one of AM1-BCC, Espaloma, or OpenFF AshGC to assign partial charges to each polymer chain in the system.
         It iterates over each chain in the `self.chains` list and assigns partial charges to the chain.
 
         Parameters
         ----------
         charge_scheme : str
-            The charge assignment scheme to use. Options are 'AM1_BCC', 'espaloma', or 'NAGL'.
+            The charge assignment scheme to use. Options are 'AM1_BCC', 'espaloma', or 'AshGC'.
 
         Raises
         ------
@@ -2245,13 +2245,13 @@ class polymer_system_from_PDI:
             )
             interchange = Interchange.from_smirnoff(
                 topology=topology,
-                force_field=ForceField("openff-2.2.0.offxml"),
+                force_field=ForceField("openff-2.3.0-rc2.offxml"),
                 box=box_vectors,
             )
         else:
             interchange = Interchange.from_smirnoff(
                 topology=topology,
-                force_field=ForceField("openff-2.2.0.offxml"),
+                force_field=ForceField("openff-2.3.0-rc2.offxml"),
                 charge_from_molecules=[i for i in self.chains],
                 box=box_vectors,
             )

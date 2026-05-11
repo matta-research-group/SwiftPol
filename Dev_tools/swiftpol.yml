@@ -18,11 +18,11 @@ dependencies:
   - openeye-toolkits
   - openff-forcefields
   - openff-interchange
-  - openff-nagl>=0.3.8 
+  - openff-nagl>=0.5.5
   - openff-models
-  - openff-toolkit>=0.17.0
+  - openff-toolkit>=0.18.0
   - openff-toolkit-examples
-  - openff-units==0.2.2
+  - openff-units>=0.3.2
   - openff-utilities
   - openmm
   - packmol

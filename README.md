@@ -57,7 +57,7 @@ To use SwiftPol please download the following packages:
 - openff-toolkit
 - openff-nagl
 - openeye-toolkits
-- openff-units==0.2.2
+- openff-units
 - dgl==2.0.0
 
 optional dependencies:
@@ -66,7 +66,7 @@ optional dependencies:
 
 for quick dependency and swiftpol install using [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/index.html), run the following commands in bash
 ```bash
-conda create -n swiftpol python=3.10 rdkit openff-interchange openff-toolkit openff-nagl dgl=2.0.0 openeye-toolkits nglview openff-units=0.2.2 -c conda-forge -c dglteam -c openeye
+conda create -n swiftpol python=3.10 rdkit openff-interchange openff-toolkit openff-nagl dgl=2.0.0 openeye-toolkits nglview openff-units -c conda-forge -c dglteam -c openeye
 conda activate swiftpol
 git clone https://github.com/matta-research-group/SwiftPol
 cd SwiftPol
@@ -130,6 +130,7 @@ We acknowledge the use of a free academic license provided by OpenEye, Candence 
 │   ├── build.py
 │   ├── crosslink.py
 │   ├── demo.py
+│   ├── utils.py
 │   ├── __init__.py
 │   ├── meta.yaml
 │   ├── parameterize.py
@@ -138,6 +139,7 @@ We acknowledge the use of a free academic license provided by OpenEye, Candence 
     ├── build_tests.py
     ├── crosslink_tests.py
     ├── demo_tests.py
+    ├── utils_tests.py
     └── parameterize_tests.py
 ```
 
