@@ -595,7 +595,7 @@
         <span class="o">.</span><span class="n">round</span><span class="p">()</span>
     <span class="p">)</span>
     <span class="n">water_to_add</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
-        <span class="nb">round</span><span class="p">((</span><span class="n">solvent_mass</span><span class="p">)</span> <span class="o">/</span> <span class="n">water_mass</span><span class="p">)</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">()</span>
+        <span class="nb">round</span><span class="p">((</span><span class="n">solvent_mass</span><span class="p">)</span> <span class="o">/</span> <span class="n">water_mass</span><span class="p">)</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">)</span>
     <span class="p">)</span>
 
     <span class="c1"># Neutralise the system by adding and removing salt</span>
@@ -1215,13 +1215,13 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Assign partial charges to each polymer chain in the system.</span>
 
-<span class="sd">        This method uses one of AM1-BCC, Espaloma, or OpenFF NAGL to assign partial charges to each polymer chain in the system.</span>
+<span class="sd">        This method uses one of AM1-BCC, Espaloma, or OpenFF AshGC to assign partial charges to each polymer chain in the system.</span>
 <span class="sd">        It iterates over each chain in the `self.chains` list and assigns partial charges to the chain.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        charge_scheme : str</span>
-<span class="sd">            The charge assignment scheme to use. Options are &#39;AM1_BCC&#39;, &#39;espaloma&#39;, or &#39;NAGL&#39;.</span>
+<span class="sd">            The charge assignment scheme to use. Options are &#39;AM1_BCC&#39;, &#39;espaloma&#39;, or &#39;AshGC&#39;.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -1439,13 +1439,13 @@
             <span class="p">)</span>
             <span class="n">interchange</span> <span class="o">=</span> <span class="n">Interchange</span><span class="o">.</span><span class="n">from_smirnoff</span><span class="p">(</span>
                 <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
-                <span class="n">force_field</span><span class="o">=</span><span class="n">ForceField</span><span class="p">(</span><span class="s2">&quot;openff-2.2.0.offxml&quot;</span><span class="p">),</span>
+                <span class="n">force_field</span><span class="o">=</span><span class="n">ForceField</span><span class="p">(</span><span class="s2">&quot;openff-2.3.0-rc2.offxml&quot;</span><span class="p">),</span>
                 <span class="n">box</span><span class="o">=</span><span class="n">box_vectors</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">interchange</span> <span class="o">=</span> <span class="n">Interchange</span><span class="o">.</span><span class="n">from_smirnoff</span><span class="p">(</span>
                 <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
-                <span class="n">force_field</span><span class="o">=</span><span class="n">ForceField</span><span class="p">(</span><span class="s2">&quot;openff-2.2.0.offxml&quot;</span><span class="p">),</span>
+                <span class="n">force_field</span><span class="o">=</span><span class="n">ForceField</span><span class="p">(</span><span class="s2">&quot;openff-2.3.0-rc2.offxml&quot;</span><span class="p">),</span>
                 <span class="n">charge_from_molecules</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">])),</span>
                 <span class="n">box</span><span class="o">=</span><span class="n">box_vectors</span><span class="p">,</span>
             <span class="p">)</span>
@@ -2166,13 +2166,13 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Assign partial charges to each polymer chain in the system.</span>
 
-<span class="sd">        This method uses one of AM1-BCC, Espaloma, or OpenFF NAGL to assign partial charges to each polymer chain in the system.</span>
+<span class="sd">        This method uses one of AM1-BCC, Espaloma, or OpenFF AshGC to assign partial charges to each polymer chain in the system.</span>
 <span class="sd">        It iterates over each chain in the `self.chains` list and assigns partial charges to the chain.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        charge_scheme : str</span>
-<span class="sd">            The charge assignment scheme to use. Options are &#39;AM1_BCC&#39;, &#39;espaloma&#39;, or &#39;NAGL&#39;.</span>
+<span class="sd">            The charge assignment scheme to use. Options are &#39;AM1_BCC&#39;, &#39;espaloma&#39;, or &#39;AshGC&#39;.</span>
 
 <span class="sd">        Raises</span>
 <span class="sd">        ------</span>
@@ -2381,13 +2381,13 @@
             <span class="p">)</span>
             <span class="n">interchange</span> <span class="o">=</span> <span class="n">Interchange</span><span class="o">.</span><span class="n">from_smirnoff</span><span class="p">(</span>
                 <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
-                <span class="n">force_field</span><span class="o">=</span><span class="n">ForceField</span><span class="p">(</span><span class="s2">&quot;openff-2.2.0.offxml&quot;</span><span class="p">),</span>
+                <span class="n">force_field</span><span class="o">=</span><span class="n">ForceField</span><span class="p">(</span><span class="s2">&quot;openff-2.3.0-rc2.offxml&quot;</span><span class="p">),</span>
                 <span class="n">box</span><span class="o">=</span><span class="n">box_vectors</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">interchange</span> <span class="o">=</span> <span class="n">Interchange</span><span class="o">.</span><span class="n">from_smirnoff</span><span class="p">(</span>
                 <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
-                <span class="n">force_field</span><span class="o">=</span><span class="n">ForceField</span><span class="p">(</span><span class="s2">&quot;openff-2.2.0.offxml&quot;</span><span class="p">),</span>
+                <span class="n">force_field</span><span class="o">=</span><span class="n">ForceField</span><span class="p">(</span><span class="s2">&quot;openff-2.3.0-rc2.offxml&quot;</span><span class="p">),</span>
                 <span class="n">charge_from_molecules</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">],</span>
                 <span class="n">box</span><span class="o">=</span><span class="n">box_vectors</span><span class="p">,</span>
             <span class="p">)</span>

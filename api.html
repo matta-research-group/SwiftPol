@@ -373,11 +373,11 @@ Used specifically for when output files are to be used in Polyply to optimise po
 <dt class="sig sig-object py" id="swiftpol.build.polymer_system.charge_system">
 <span class="sig-name descname"><span class="pre">charge_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">charge_scheme</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system.charge_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system.charge_system" title="Link to this definition"></a></dt>
 <dd><p>Assign partial charges to each polymer chain in the system.</p>
-<p>This method uses one of AM1-BCC, Espaloma, or OpenFF NAGL to assign partial charges to each polymer chain in the system.
+<p>This method uses one of AM1-BCC, Espaloma, or OpenFF AshGC to assign partial charges to each polymer chain in the system.
 It iterates over each chain in the <cite>self.chains</cite> list and assigns partial charges to the chain.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>charge_scheme</strong> (<em>str</em>) – The charge assignment scheme to use. Options are ‘AM1_BCC’, ‘espaloma’, or ‘NAGL’.</p>
+<dd class="field-odd"><p><strong>charge_scheme</strong> (<em>str</em>) – The charge assignment scheme to use. Options are ‘AM1_BCC’, ‘espaloma’, or ‘AshGC’.</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ImportError</strong> – If the selected toolkit is not available.</p>
@@ -602,11 +602,11 @@ Used specifically for when output files are to be used in Polyply to optimise po
 <dt class="sig sig-object py" id="swiftpol.build.polymer_system_from_PDI.charge_system">
 <span class="sig-name descname"><span class="pre">charge_system</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">charge_scheme</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/build.html#polymer_system_from_PDI.charge_system"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.build.polymer_system_from_PDI.charge_system" title="Link to this definition"></a></dt>
 <dd><p>Assign partial charges to each polymer chain in the system.</p>
-<p>This method uses one of AM1-BCC, Espaloma, or OpenFF NAGL to assign partial charges to each polymer chain in the system.
+<p>This method uses one of AM1-BCC, Espaloma, or OpenFF AshGC to assign partial charges to each polymer chain in the system.
 It iterates over each chain in the <cite>self.chains</cite> list and assigns partial charges to the chain.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>charge_scheme</strong> (<em>str</em>) – The charge assignment scheme to use. Options are ‘AM1_BCC’, ‘espaloma’, or ‘NAGL’.</p>
+<dd class="field-odd"><p><strong>charge_scheme</strong> (<em>str</em>) – The charge assignment scheme to use. Options are ‘AM1_BCC’, ‘espaloma’, or ‘AshGC’.</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><p><strong>ImportError</strong> – If the selected toolkit is not available.</p>
@@ -733,7 +733,7 @@ Assigns % residual monomer value to ensemble under self.residual_monomer_actual<
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>polymer</strong> (<em>rdkit.Chem.rdchem.Mol</em>) – A polymer chain for which the charges are to be calculated.</p></li>
-<li><p><strong>charge_scheme</strong> (<em>str</em>) – A string that specifies the charge scheme to be used. It can be either ‘AM1_BCC’, ‘espaloma’, or ‘NAGL’.</p></li>
+<li><p><strong>charge_scheme</strong> (<em>str</em>) – A string that specifies the charge scheme to be used. It can be either ‘AM1_BCC’, ‘espaloma’, or ‘AshGC’.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -743,7 +743,7 @@ Assigns % residual monomer value to ensemble under self.residual_monomer_actual<
 <dd class="field-odd"><p>numpy.ndarray</p>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>AttributeError</strong> – If the charge_scheme input is not ‘AM1_BCC’, ‘NAGL’, or ‘espaloma’.</p>
+<dd class="field-even"><p><strong>AttributeError</strong> – If the charge_scheme input is not ‘AM1_BCC’, ‘AshGC’, or ‘espaloma’.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -753,12 +753,12 @@ Assigns % residual monomer value to ensemble under self.residual_monomer_actual<
 <span class="sig-prename descclassname"><span class="pre">swiftpol.parameterize.</span></span><span class="sig-name descname"><span class="pre">charge_openff_polymer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">openff_chain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge_scheme</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">overwrite</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/swiftpol/parameterize.html#charge_openff_polymer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#swiftpol.parameterize.charge_openff_polymer" title="Link to this definition"></a></dt>
 <dd><p>Assign partial charges to a polymer chain based on the specified charge scheme.</p>
 <p>This function assigns partial charges to a polymer chain using one of the following charge schemes:
-‘AM1_BCC’, ‘NAGL’, or ‘espaloma’. It can optionally overwrite existing charges.</p>
+‘AM1_BCC’, ‘AshGC’, or ‘espaloma’. It can optionally overwrite existing charges.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>openff_chain</strong> (<em>openff.toolkit.topology.Molecule</em>) – The original polymer chain to which partial charges will be assigned.</p></li>
-<li><p><strong>charge_scheme</strong> (<em>str</em>) – The charge scheme to use for assigning partial charges. Options are ‘AM1_BCC’, ‘NAGL’, or ‘espaloma’.</p></li>
+<li><p><strong>charge_scheme</strong> (<em>str</em>) – The charge scheme to use for assigning partial charges. Options are ‘AM1_BCC’, ‘AshGC’, or ‘espaloma’.</p></li>
 <li><p><strong>overwrite</strong> (<em>bool, optional</em>) – Whether to overwrite existing partial charges. Default is True.</p></li>
 </ul>
 </dd>
@@ -770,9 +770,9 @@ Assigns % residual monomer value to ensemble under self.residual_monomer_actual<
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>ModuleNotFoundError</strong> – If the installed version of openff-toolkit is below what is required to use NAGL.</p></li>
+<li><p><strong>ModuleNotFoundError</strong> – If the installed version of openff-toolkit is below what is required to use AshGC.</p></li>
 <li><p><strong>ImportError</strong> – If the required package for the specified charge scheme is not installed.</p></li>
-<li><p><strong>AttributeError</strong> – If the charge_scheme input is not ‘AM1_BCC’, ‘NAGL’, or ‘espaloma’.</p></li>
+<li><p><strong>AttributeError</strong> – If the charge_scheme input is not ‘AM1_BCC’, ‘AshGC’, or ‘espaloma’.</p></li>
 </ul>
 </dd>
 </dl>
