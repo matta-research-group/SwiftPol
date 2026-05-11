@@ -48,7 +48,7 @@ def charge_polymer(polymer, charge_scheme):
             )
         chain_h = Chem.AddHs(polymer)
         openff_chain = Molecule.from_rdkit(chain_h)
-        ntkw = AshGCToolkitWrapper()
+        ntkw = NAGLToolkitWrapper()
         ntkw.assign_partial_charges(openff_chain, "openff-gnn-am1bcc-0.1.0-rc.2.pt")
         return openff_chain.partial_charges.magnitude
     elif charge_scheme == "espaloma":
