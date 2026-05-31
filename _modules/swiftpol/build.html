@@ -1392,6 +1392,7 @@
         <span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.build</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_box_components</span>
         
         <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange</span><span class="w"> </span><span class="kn">import</span> <span class="n">Interchange</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange.components._packmol</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNIT_CUBE</span>    
         <span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">ForceField</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
@@ -1403,13 +1404,7 @@
                 <span class="s2">&quot;Partial charges may not be assigned to the system. Processing large systems may raise errors from OpenFF-Interchange&quot;</span><span class="p">,</span>
                 <span class="ne">UserWarning</span><span class="p">,</span>
             <span class="p">)</span>
-        <span class="n">box_vectors</span> <span class="o">=</span> <span class="n">calculate_box_components</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">monomers</span><span class="p">,</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span>
-            <span class="n">salt_concentration</span><span class="o">=</span><span class="mf">0.0</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">mole</span> <span class="o">/</span> <span class="n">unit</span><span class="o">.</span><span class="n">liter</span><span class="p">,</span>
-            <span class="n">residual_monomer</span><span class="o">=</span><span class="mf">0.00</span><span class="p">,</span>
-        <span class="p">)[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">box_vectors</span> <span class="o">=</span> <span class="p">(</span><span class="mi">5</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">nanometer</span><span class="p">)</span> <span class="o">*</span> <span class="n">UNIT_CUBE</span>
         <span class="p">(</span>
             <span class="n">molecules</span><span class="p">,</span>
             <span class="n">number_of_copies</span><span class="p">,</span>
@@ -1454,7 +1449,7 @@
         <span class="k">for</span> <span class="n">pdb_file</span> <span class="ow">in</span> <span class="n">mol_pdb_files_dest</span><span class="p">:</span>
             <span class="n">return_tuple</span> <span class="o">+=</span> <span class="p">(</span><span class="n">pdb_file</span><span class="p">,)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Polyply input files generated! Saved at </span><span class="si">{</span><span class="n">return_tuple</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">return_tuple</span></div>
+        <span class="k">return</span> <span class="n">topology</span></div>
 
 
 <div class="viewcode-block" id="polymer_system.calculate_residuals">
@@ -2184,7 +2179,7 @@
         <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
             <span class="n">chain</span><span class="o">.</span><span class="n">partial_charges</span> <span class="o">=</span> <span class="n">charge_openff_polymer</span><span class="p">(</span><span class="n">chain</span><span class="p">,</span> <span class="n">charge_scheme</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">charge_system</span> <span class="o">=</span> <span class="n">charge_scheme</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">charge_scheme</span> <span class="o">=</span> <span class="n">charge_scheme</span></div>
 
 
 <div class="viewcode-block" id="polymer_system_from_PDI.export_to_csv">
@@ -2338,7 +2333,7 @@
         <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange</span><span class="w"> </span><span class="kn">import</span> <span class="n">Interchange</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">ForceField</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-
+        <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange.components._packmol</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNIT_CUBE</span>  
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge_scheme</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">charge_system</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_scheme</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -2347,15 +2342,8 @@
                 <span class="ne">UserWarning</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="n">box_vectors</span> <span class="o">=</span> <span class="n">calculate_box_components</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">monomers</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sequence</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span>
-        <span class="p">)[</span><span class="mi">3</span><span class="p">]</span>
-        <span class="p">(</span>
-            <span class="n">molecules</span><span class="p">,</span>
-            <span class="n">number_of_copies</span><span class="p">,</span>
-            <span class="n">residual_monomer_actual</span><span class="p">,</span>
-            <span class="n">residual_oligomer_actual</span><span class="p">,</span>
-        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_residuals</span><span class="p">(</span><span class="n">residual_monomer</span><span class="p">,</span> <span class="n">residual_oligomer</span><span class="p">)</span>
+        <span class="n">box_vectors</span> <span class="o">=</span> <span class="p">(</span><span class="mi">50</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">angstrom</span><span class="p">)</span> <span class="o">*</span> <span class="n">UNIT_CUBE</span>
+        <span class="n">molecules</span><span class="p">,</span> <span class="n">number_of_copies</span><span class="p">,</span> <span class="n">residual_monomer_actual</span><span class="p">,</span> <span class="n">residual_oligomer_actual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_residuals</span><span class="p">(</span><span class="n">residual_monomer</span><span class="p">,</span> <span class="n">residual_oligomer</span><span class="p">)</span>
         <span class="n">mol_pdb_files_dest</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">molecules</span><span class="p">:</span>
             <span class="n">string_i</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">molecules</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot;.pdb&quot;</span>
@@ -2388,7 +2376,7 @@
             <span class="n">interchange</span> <span class="o">=</span> <span class="n">Interchange</span><span class="o">.</span><span class="n">from_smirnoff</span><span class="p">(</span>
                 <span class="n">topology</span><span class="o">=</span><span class="n">topology</span><span class="p">,</span>
                 <span class="n">force_field</span><span class="o">=</span><span class="n">ForceField</span><span class="p">(</span><span class="s2">&quot;openff-2.3.0-rc2.offxml&quot;</span><span class="p">),</span>
-                <span class="n">charge_from_molecules</span><span class="o">=</span><span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">],</span>
+                <span class="n">charge_from_molecules</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">])),</span>
                 <span class="n">box</span><span class="o">=</span><span class="n">box_vectors</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="n">interchange</span><span class="o">.</span><span class="n">to_gromacs</span><span class="p">(</span><span class="s2">&quot;swiftpol_output&quot;</span><span class="p">)</span>
@@ -2396,7 +2384,7 @@
         <span class="k">for</span> <span class="n">pdb_file</span> <span class="ow">in</span> <span class="n">mol_pdb_files_dest</span><span class="p">:</span>
             <span class="n">return_tuple</span> <span class="o">+=</span> <span class="p">(</span><span class="n">pdb_file</span><span class="p">,)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Polyply input files generated! Saved at </span><span class="si">{</span><span class="n">return_tuple</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">return_tuple</span></div>
+        <span class="k">return</span> <span class="n">topology</span></div>
 
 <div class="viewcode-block" id="polymer_system_from_PDI.calculate_residuals">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system_from_PDI.calculate_residuals">[docs]</a>
