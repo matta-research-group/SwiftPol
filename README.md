@@ -48,7 +48,7 @@ Examples of using SwiftPol code to build different polymers can be found at [Exa
 -  [Constructing Reaction SMARTS](Example_Notebooks/rxn_smarts.ipynb)
 -  [Building Crosslinked PEGDA Networks](Example_Notebooks/Crosslinking_demo.ipynb)
 -  [Building PDMS](Example_Notebooks/PDMS_build.ipynb)
--  [Polyply Integration](Example_Notebooks/Polyply_integration)
+-  [Polyply Integration](Example_Notebooks/Polyply_integration.ipynb)
 
 ### Dependencies
 [YAML environment file listing all required packages to use SwiftPol](https://github.com/matta-research-group/SwiftPol/blob/main/Dev_tools/swiftpol.yml)
