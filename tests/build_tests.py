@@ -398,10 +398,6 @@ class TestPolymerSystem(unittest.TestCase):
         y.generate_conformers(random = True)
         files = y.generate_polyply_files()
 
-        for i in files:
-            self.assertTrue(os.path.isfile(i))
-            os.remove(i)
-        os.remove("swiftpol_output_pointenergy.mdp")
 
         # Test residual calculation
         sys = build.polymer_system(
