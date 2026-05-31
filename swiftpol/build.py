@@ -1280,6 +1280,7 @@ class polymer_system:
         from swiftpol.build import calculate_box_components
         
         from openff.interchange import Interchange
+        from openff.interchange.components._packmol import UNIT_CUBE    
         from openff.toolkit import ForceField
         import warnings
 
@@ -1291,13 +1292,7 @@ class polymer_system:
                 "Partial charges may not be assigned to the system. Processing large systems may raise errors from OpenFF-Interchange",
                 UserWarning,
             )
-        box_vectors = calculate_box_components(
-            self.chains,
-            self.monomers,
-            self.sequence,
-            salt_concentration=0.0 * unit.mole / unit.liter,
-            residual_monomer=0.00,
-        )[3]
+        box_vectors = (5 * unit.nanometer) * UNIT_CUBE
         (
             molecules,
             number_of_copies,
@@ -1342,7 +1337,7 @@ class polymer_system:
         for pdb_file in mol_pdb_files_dest:
             return_tuple += (pdb_file,)
         print(f"Polyply input files generated! Saved at {return_tuple}")
-        return return_tuple
+        return topology
 
     def calculate_residuals(
         self, residual_monomer=0, residual_oligomer=0, return_rdkit=False
@@ -2057,7 +2052,7 @@ class polymer_system_from_PDI:
         for chain in self.chains:
             chain.partial_charges = charge_openff_polymer(chain, charge_scheme)
 
-        self.charge_system = charge_scheme
+        self.charge_scheme = charge_scheme
 
     def export_to_csv(self, filename, include_all_data=True):
         """
@@ -2202,7 +2197,7 @@ class polymer_system_from_PDI:
         from openff.interchange import Interchange
         from openff.toolkit import ForceField
         import warnings
-
+        from openff.interchange.components._packmol import UNIT_CUBE  
         if self.charge_scheme:
             self.charge_system(self.charge_scheme)
         else:
@@ -2211,15 +2206,8 @@ class polymer_system_from_PDI:
                 UserWarning,
             )
 
-        box_vectors = calculate_box_components(
-            self.chains, self.monomers, self.sequence, 0.0, 0.0
-        )[3]
-        (
-            molecules,
-            number_of_copies,
-            residual_monomer_actual,
-            residual_oligomer_actual,
-        ) = self.calculate_residuals(residual_monomer, residual_oligomer)
+        box_vectors = (50 * unit.angstrom) * UNIT_CUBE
+        molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual = self.calculate_residuals(residual_monomer, residual_oligomer)
         mol_pdb_files_dest = []
         for i in molecules:
             string_i = str(molecules.index(i)) + ".pdb"
@@ -2252,7 +2240,7 @@ class polymer_system_from_PDI:
             interchange = Interchange.from_smirnoff(
                 topology=topology,
                 force_field=ForceField("openff-2.3.0-rc2.offxml"),
-                charge_from_molecules=[i for i in self.chains],
+                charge_from_molecules=list(set([i for i in self.chains])),
                 box=box_vectors,
             )
         interchange.to_gromacs("swiftpol_output")
@@ -2260,7 +2248,7 @@ class polymer_system_from_PDI:
         for pdb_file in mol_pdb_files_dest:
             return_tuple += (pdb_file,)
         print(f"Polyply input files generated! Saved at {return_tuple}")
-        return return_tuple
+        return topology
     def calculate_residuals(
         self, residual_monomer=0, residual_oligomer=0, return_rdkit=False
     ):

@@ -48,6 +48,7 @@ Examples of using SwiftPol code to build different polymers can be found at [Exa
 -  [Constructing Reaction SMARTS](Example_Notebooks/rxn_smarts.ipynb)
 -  [Building Crosslinked PEGDA Networks](Example_Notebooks/Crosslinking_demo.ipynb)
 -  [Building PDMS](Example_Notebooks/PDMS_build.ipynb)
+-  [Polyply Integration](Example_Notebooks/Polyply_integration)
 
 ### Dependencies
 [YAML environment file listing all required packages to use SwiftPol](https://github.com/matta-research-group/SwiftPol/blob/main/Dev_tools/swiftpol.yml)
@@ -119,6 +120,7 @@ We acknowledge the use of a free academic license provided by OpenEye, Candence 
 │   ├── PLGA_demo.ipynb
 │   ├── Rubber_Vulcanization.ipynb
 │   ├── PDMS_build.ipynb
+│   ├── Polyply_integration.ipynb
 │   └── rxn_smarts.ipynb
 ├── LICENSE
 ├── pyproject.toml
