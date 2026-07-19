@@ -163,6 +163,17 @@ class TestBuildPolymer(unittest.TestCase):
         )
         self.assertIsNotNone(polymer)
 
+        # Test with different initiator
+        polymer = build.build_polymer(
+            sequence='AAAAA',
+            monomer_list=['I-[Si](-C)(-C)-O-I'],
+            reaction='[O:1][I:3].[Si:2][I:4]>>[O:1][Si:2].[I:3][I:4]',
+            terminal='C',
+            initiator='[Si](-C)(-C)(-C)'
+        )
+        self.assertIsNotNone(polymer)
+        self.assertTrue(len(sys.chain_rdkit[0].GetSubstructMatches(Chem.MolFromSmarts('[Si](-C)(-C)(-C)')))==2)
+
 
 class TestBuildLinearCopolymer(unittest.TestCase):
     def test_build_linear_copolymer(self):

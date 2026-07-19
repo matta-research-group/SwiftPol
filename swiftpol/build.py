@@ -51,7 +51,7 @@ import string
 
 # Build polymer - generic
 def build_polymer(
-    sequence, monomer_list, reaction, terminal="hydrogen", initiator = '[H]', chain_num=1, chainID="A"
+    sequence, monomer_list, reaction, terminal="hydrogen", initiator='[H]', chain_num=1, chainID="A"
 ):
 
     """
@@ -66,8 +66,10 @@ def build_polymer(
     reaction : rdkit.Chem.rdChemReactions.ChemicalReaction
         An RDKit reaction object used to link monomers.
     terminal : str, optional
-        The terminal group to be added to the polymer. Options are 'hydrogen', 'carboxyl', 'ester', or a canonical smiles string to insert as the terminal.
+        The terminal group to be added to the polymer. Options are 'hydrogen', 'carboxyl', 'ester', or a canonical SMILES string to insert as the terminal.
         Default is 'hydrogen'.
+    initiator : str, optional
+        The initiator group/alternate terminal to be added to the polymer as a canonical SMILES string. Default is '[H]'.
     chain_number : int, optional
         The number of polymer chains to construct. Default is 1. Input used for ensemble build.
 
@@ -212,11 +214,9 @@ def build_polymer(
             init = Chem.MolFromSmiles(initiator)
             init = Chem.AddHs(init)
             editable_init = Chem.EditableMol(init)
-            target_atom_idx = 0
-            for atom in init.GetAtoms():
-                if atom.GetSymbol() == initiator[0]:
-                    target_atom_idx = atom.GetIdx()
-                    break
+            target_atom_idx = next(
+                 (a.GetIdx() for a in init.GetAtoms() if a.GetAtomicNum() > 1), 0
+             )
 
             for neighbor in init.GetAtomWithIdx(target_atom_idx).GetNeighbors():
                 if neighbor.GetSymbol() == "H":  # remove an H to make room for polymer
@@ -230,13 +230,8 @@ def build_polymer(
             info.SetResidueNumber(1)
             info.SetChainId(chainID)
             [atom.SetMonomerInfo(info) for atom in init_gap.GetAtoms()]
-            try:
-                polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[I]"), init_gap)[0]
-                Chem.SanitizeMol(polymer)
-            except:
-                raise ValueError(
-                    "replacement of initiator failed. Please check the initiator SMILES and polymer structure."
-                )
+            polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[I]"), init_gap)[0]
+            Chem.SanitizeMol(polymer)
         except:
             raise ValueError(
                 "Initiator must be a valid SMILES string"
@@ -746,6 +741,8 @@ class polymer_system:
         stereoisomerism_input (tuple, optional): A tuple containing the monomer, instance fraction (e.g. 0.5 for 50% stereoisomer), and SMILES string of the stereoisomer to be introduced. Default is None.
 
         terminals (str, optional): The type of terminal groups to be used. Default is 'hydrogen', adds a hydrogen atom.
+
+        initiator (str, optional): The initiator group/alternate terminal to be added to the polymer as a canonical SMILES string. Default is '[H]'.
 
         perc_A_target (float, optional): The target percentage of monomer A in the copolymer. Default is 100.
 
@@ -1666,6 +1663,9 @@ class polymer_system_from_PDI:
         
         terminals : str, optional
             The type of terminal groups to be used. Default is 'hydrogen', which adds a hydrogen atom.
+
+        initiator : (str, optional)
+            The initiator group/alternate terminal to be added to the polymer as a canonical SMILES string. Default is '[H]'.
         
         perc_A_target : float, optional
             The target percentage of monomer A in the copolymer. Default is 100.
