@@ -167,7 +167,7 @@ class TestBuildPolymer(unittest.TestCase):
         polymer = build.build_polymer(
             sequence='AAAAA',
             monomer_list=['I-[Si](-C)(-C)-O-I'],
-            reaction='[O:1][I:3].[Si:2][I:4]>>[O:1][Si:2].[I:3][I:4]',
+            reaction=AllChem.ReactionFromSmarts('[O:1][I:3].[Si:2][I:4]>>[O:1][Si:2].[I:3][I:4]'),
             terminal='C',
             initiator='[Si](-C)(-C)(-C)'
         )
