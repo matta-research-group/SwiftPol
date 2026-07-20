@@ -51,7 +51,7 @@ import string
 
 # Build polymer - generic
 def build_polymer(
-    sequence, monomer_list, reaction, terminal="hydrogen", chain_num=1, chainID="A"
+    sequence, monomer_list, reaction, terminal="hydrogen", initiator='[H]', chain_num=1, chainID="A"
 ):
 
     """
@@ -66,8 +66,10 @@ def build_polymer(
     reaction : rdkit.Chem.rdChemReactions.ChemicalReaction
         An RDKit reaction object used to link monomers.
     terminal : str, optional
-        The terminal group to be added to the polymer. Options are 'hydrogen', 'carboxyl', 'ester', or a canonical smiles string to insert as the terminal.
+        The terminal group to be added to the polymer. Options are 'hydrogen', 'carboxyl', 'ester', or a canonical SMILES string to insert as the terminal.
         Default is 'hydrogen'.
+    initiator : str, optional
+        The initiator group/alternate terminal to be added to the polymer as a canonical SMILES string. Default is '[H]'.
     chain_number : int, optional
         The number of polymer chains to construct. Default is 1. Input used for ensemble build.
 
@@ -207,15 +209,33 @@ def build_polymer(
         [atom.SetMonomerInfo(info) for atom in term_gap.GetAtoms()]
         polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[At]"), term_gap)[0]
         Chem.SanitizeMol(polymer)
-    hydrogen = Chem.MolFromSmiles("[H]")
-    info = Chem.AtomPDBResidueInfo()
-    info.SetResidueName(str(chain_num) + sequence[-1] + str(len(sequence)))
-    info.SetResidueNumber(len(sequence))
-    info.SetChainId(chainID)
-    [atom.SetMonomerInfo(info) for atom in hydrogen.GetAtoms()]
-    polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("I"), hydrogen)[
-        0
-    ]  # remove any excess iodine
+    if initiator:
+        try:
+            init = Chem.MolFromSmiles(initiator)
+            init = Chem.AddHs(init)
+            editable_init = Chem.EditableMol(init)
+            target_atom_idx = next(
+                 (a.GetIdx() for a in init.GetAtoms() if a.GetAtomicNum() > 1), 0
+             )
+
+            for neighbor in init.GetAtomWithIdx(target_atom_idx).GetNeighbors():
+                if neighbor.GetSymbol() == "H":  # remove an H to make room for polymer
+                    hydrogen_idx = neighbor.GetIdx()
+                    editable_init.RemoveAtom(hydrogen_idx)
+                    break
+            init_gap = editable_init.GetMol()
+
+            info = Chem.AtomPDBResidueInfo()
+            info.SetResidueName(str(chain_num) + sequence[0] + str(1))
+            info.SetResidueNumber(1)
+            info.SetChainId(chainID)
+            [atom.SetMonomerInfo(info) for atom in init_gap.GetAtoms()]
+            polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[I]"), init_gap)[0]
+            Chem.SanitizeMol(polymer)
+        except Exception as e:
+            raise ValueError(
+                "Initiator must be a valid SMILES string"
+            ) from e
     Chem.SanitizeMol(polymer)
     return polymer
 
@@ -697,6 +717,7 @@ class polymer_system:
         num_chains,
         stereoisomerism_input=None,
         terminals="hydrogen",
+        initiator='[H]',
         perc_A_target=100,
         blockiness_target=[1.0, "A"],
         copolymer=False,
@@ -720,6 +741,8 @@ class polymer_system:
         stereoisomerism_input (tuple, optional): A tuple containing the monomer, instance fraction (e.g. 0.5 for 50% stereoisomer), and SMILES string of the stereoisomer to be introduced. Default is None.
 
         terminals (str, optional): The type of terminal groups to be used. Default is 'hydrogen', adds a hydrogen atom.
+
+        initiator (str, optional): The initiator group/alternate terminal to be added to the polymer as a canonical SMILES string. Default is '[H]'.
 
         perc_A_target (float, optional): The target percentage of monomer A in the copolymer. Default is 100.
 
@@ -847,6 +870,7 @@ class polymer_system:
                             monomer_list=monomer_list,
                             reaction=reaction,
                             terminal=terminals,
+                            initiator=initiator,
                             chain_num=n + 1,
                             chainID=id_new,
                         )
@@ -856,6 +880,7 @@ class polymer_system:
                             monomer_list=monomer_list,
                             reaction=reaction,
                             terminal=terminals,
+                            initiator=initiator,
                             chain_num=n + 1,
                             chainID=id_new,
                         )
@@ -908,6 +933,7 @@ class polymer_system:
                                 monomer_list=monomer_list,
                                 reaction=reaction,
                                 terminal=terminals,
+                                initiator=initiator,
                                 chain_num=n + 1,
                                 chainID=id_new,
                             )
@@ -918,6 +944,7 @@ class polymer_system:
                                 monomer_list=monomer_list,
                                 reaction=reaction,
                                 terminal=terminals,
+                                initiator=initiator,
                                 chain_num=n + 1,
                                 chainID=id_new,
                             )
@@ -964,6 +991,7 @@ class polymer_system:
                         monomer_list=monomer_list,
                         reaction=reaction,
                         terminal=terminals,
+                        initiator=initiator,
                         chain_num=n + 1,
                         chainID=id_new,
                     )
@@ -974,6 +1002,7 @@ class polymer_system:
                         monomer_list=monomer_list,
                         reaction=reaction,
                         terminal=terminals,
+                        initiator=initiator,
                         chain_num=n + 1,
                         chainID=id_new,
                     )
@@ -1595,6 +1624,7 @@ class polymer_system_from_PDI:
         PDI_target,
         stereoisomerism_input=None,
         terminals="hydrogen",
+        initiator='[H]',
         perc_A_target=100,
         blockiness_target=[1.0, "A"],
         copolymer=False,
@@ -1633,6 +1663,9 @@ class polymer_system_from_PDI:
         
         terminals : str, optional
             The type of terminal groups to be used. Default is 'hydrogen', which adds a hydrogen atom.
+
+        initiator : (str, optional)
+            The initiator group/alternate terminal to be added to the polymer as a canonical SMILES string. Default is '[H]'.
         
         perc_A_target : float, optional
             The target percentage of monomer A in the copolymer. Default is 100.
@@ -1802,6 +1835,7 @@ class polymer_system_from_PDI:
                                 monomer_list=monomer_list,
                                 reaction=reaction,
                                 terminal=terminals,
+                                initiator=initiator,
                                 chain_num=len(chains) + 1,
                                 chainID=id_new,
                             )
@@ -1821,6 +1855,7 @@ class polymer_system_from_PDI:
                                 monomer_list=monomer_list,
                                 reaction=reaction,
                                 terminal=terminals,
+                                initiator=initiator,
                                 chain_num=len(chains) + 1,
                                 chainID=id_new,
                             )
@@ -1880,6 +1915,7 @@ class polymer_system_from_PDI:
                         monomer_list=monomer_list,
                         reaction=reaction,
                         terminal=terminals,
+                        initiator=initiator,
                         chain_num=n + 1,
                         chainID=id_new,
                     )
@@ -1889,6 +1925,7 @@ class polymer_system_from_PDI:
                         monomer_list=monomer_list,
                         reaction=reaction,
                         terminal=terminals,
+                        initiator=initiator,
                         chain_num=n + 1,
                         chainID=id_new,
                     )
