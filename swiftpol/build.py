@@ -232,10 +232,10 @@ def build_polymer(
             [atom.SetMonomerInfo(info) for atom in init_gap.GetAtoms()]
             polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[I]"), init_gap)[0]
             Chem.SanitizeMol(polymer)
-        except:
+        except Exception as e:
             raise ValueError(
                 "Initiator must be a valid SMILES string"
-            )
+            ) from e
     Chem.SanitizeMol(polymer)
     return polymer
 
