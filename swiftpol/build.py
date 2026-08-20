@@ -798,6 +798,7 @@ class polymer_system:
         max_length (float): The maximum length of the polymer chains.
     
         """
+        from swiftpol.utils import _generate_chain_id
         self.length_target = length_target
         self.terminals = terminals
         perc_A_actual = []
@@ -860,7 +861,7 @@ class polymer_system:
                     )
                 blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
                 if spec(sequence) == True:
-                    id_new = string.ascii_uppercase[(n) % 26]
+                    id_new = _generate_chain_id(n)
                     if stereoisomerism_input is not None:
                         sequence_stereo = introduce_stereoisomers(
                             stereo_monomer, instance, sequence
@@ -924,7 +925,7 @@ class polymer_system:
                     blockiness = blockiness_gen(sequence, blockiness_target[1])[0]
                     if spec(sequence) == True:
                         if stereoisomerism_input is not None:
-                            id_new = string.ascii_uppercase[(n) % 26]
+                            id_new = _generate_chain_id(n)
                             sequence_stereo = introduce_stereoisomers(
                                 stereo_monomer, instance, sequence
                             )
@@ -938,7 +939,7 @@ class polymer_system:
                                 chainID=id_new,
                             )
                         else:
-                            id_new = string.ascii_uppercase[(n) % 26]
+                            id_new = _generate_chain_id(n)
                             pol = build_polymer(
                                 sequence=sequence,
                                 monomer_list=monomer_list,
@@ -982,7 +983,7 @@ class polymer_system:
                     ),
                 )
                 if stereoisomerism_input is not None:
-                    id_new = string.ascii_uppercase[(n) % 26]
+                    id_new = _generate_chain_id(n)
                     sequence_stereo = introduce_stereoisomers(
                         stereo_monomer, instance, sequence
                     )
@@ -996,7 +997,7 @@ class polymer_system:
                         chainID=id_new,
                     )
                 else:
-                    id_new = string.ascii_uppercase[(n) % 26]
+                    id_new = _generate_chain_id(n)
                     pol = build_polymer(
                         sequence=sequence,
                         monomer_list=monomer_list,
@@ -1613,7 +1614,6 @@ class polymer_system_from_PDI:
     )
     from openff.units import unit
     from rdkit.Chem import AllChem
-    import string
     
     def __init__(
         self,
@@ -1753,6 +1753,7 @@ class polymer_system_from_PDI:
         - For debugging and progress tracking, set `verbose=True`.
         """
         from swiftpol.build import _generate_chain_lengths
+        from swiftpol.utils import _generate_chain_id
         import logging
         if verbose:
             logging.basicConfig(level=logging.INFO)
@@ -1825,7 +1826,7 @@ class polymer_system_from_PDI:
                             ),
                         )
                     if spec(sequence):
-                        id_new = string.ascii_uppercase[len(chains) % 26]
+                        id_new = _generate_chain_id(n)
                         if stereoisomerism_input is not None:
                             sequence_stereo = introduce_stereoisomers(
                                 stereo_monomer, instance, sequence
@@ -1905,7 +1906,7 @@ class polymer_system_from_PDI:
                 sequence = 'A' * length_actual
         
                 # Handle stereoisomerism if specified
-                id_new = string.ascii_uppercase[n % 26]  # Wrap around after 26 chains
+                id_new = _generate_chain_id(n)
                 if stereoisomerism_input is not None:
                     sequence_stereo = introduce_stereoisomers(
                         stereo_monomer, instance, sequence
@@ -2504,3 +2505,5 @@ class polymer_system_from_PDI:
                 residual_oligomer_actual,
             )
         
+
+

@@ -43,5 +43,14 @@ class TestUtils(unittest.TestCase):
             file_name = f'sequence_{i}.json'
             self.assertTrue(os.path.exists(file_name), f"File {file_name} does not exist.")
 
+
+    # Example: Generate chain IDs for 100 chains
+    def test_id_generator(self):
+        chains = [utils._generate_chain_id(i) for i in range(100)]
+        self.assertTrue(chains[0] == 'A')
+        self.assertTrue(chains[25] == 'Z')
+        self.assertTrue(chains[26] == 'AA')
+        self.assertTrue(chains[-1] == 'CV')
+
 if __name__ == "__main__":
     unittest.main()

@@ -124,3 +124,29 @@ def export_seq_to_json(dict_seq, resname_map, chirality_map={"A": "S", "S": "R",
         # Write to JSON file
         with open(f"sequence_{s}.json", "w") as f:
             json.dump(graph, f, indent=2)
+
+
+
+def _generate_chain_id(index):
+    """
+    Generate a unique chain ID based on the given index.
+
+    The chain ID is generated using uppercase letters (A-Z). For indices 0-25, 
+    it returns single letters (A-Z). For indices 26 and above, it generates 
+    combinations of letters (e.g., AA, AB, ..., AZ, BA, etc.).
+
+    Parameters
+    ----------
+    index : int
+        The index for which to generate the chain ID.
+
+    Returns
+    -------
+    str
+        The generated chain ID as a string.
+    """
+    import string
+    letters = string.ascii_uppercase  # A-Z
+    first_letter = letters[(index // 26) - 1] if index >= 26 else ""
+    second_letter = letters[index % 26]
+    return first_letter + second_letter
