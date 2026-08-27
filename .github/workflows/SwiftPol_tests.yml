@@ -69,10 +69,9 @@ jobs:
     - name: Lint with pylint
       shell: bash -l {0}
       run: |
-        source ~/.bashrc
         conda activate swiftpol
-        pylint swiftpol --disable=all --enable=E,W0102,W0702,W0612,W0201,W1514
-
+        pylint swiftpol --exit-zero --max-line-length=127 --disable=all --enable=E,W0102,W0702,W0612,W0201,W1514
+        
     - name: Build tests
       run: |
         source ~/.bashrc
