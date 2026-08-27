@@ -71,7 +71,7 @@ jobs:
       run: |
         source ~/.bashrc
         conda activate swiftpol
-        pylint swiftpol --exit-zero --max-line-length=127
+        pylint swiftpol --disable=all --enable=E,W0102,W0702,W0612,W0201,W1514
 
     - name: Build tests
       run: |
