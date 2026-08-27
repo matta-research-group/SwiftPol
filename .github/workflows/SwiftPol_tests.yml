@@ -55,7 +55,7 @@ jobs:
         conda env create -f Dev_tools/swiftpol.yml
         conda activate swiftpol
         python -m pip install --upgrade pip
-        python -m pip install pytest flake8 
+        python -m pip install pytest flake8 pylint
 
     - name: Lint with flake8
       run: |
@@ -66,6 +66,16 @@ jobs:
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
+    - name: Lint with pylint
+      shell: bash -l {0}
+      run: |
+        conda activate swiftpol
+        pylint swiftpol --exit-zero --max-line-length=127 \
+          --disable=all \
+          --enable=E,W0102,W0702,W0612,W0201,W1514 \
+          --generated-members="rdkit.Chem.*,rdkit.Chem.AllChem.*" \
+          --ignored-modules=openff.units
+          
     - name: Build tests
       run: |
         source ~/.bashrc

@@ -1,9 +1,11 @@
 ### Utilities for Swiftpol/Polyply MARTINI builder
 ### Under development
 
+
 # Perceive sequences
 def perceive_sequences(sys):
     import warnings
+
     sequence_dict = {}
     for chain_id, polymer in enumerate(sys.chain_rdkit):
         residue_ids = []
@@ -14,37 +16,50 @@ def perceive_sequences(sys):
                 residue_names.append(info.GetResidueName())
                 residue_ids.append(info.GetResidueNumber())
             except:
-                warnings.warn(f"Atom {atom.GetIdx()} in chain {chain_id} does not have valid residue information. Skipping this atom.")
+                warnings.warn(
+                    f"Atom {atom.GetIdx()} in chain {chain_id} does not have valid residue information. Skipping this atom."
+                )
                 continue
-        residue_ids_dict = {residue_ids[i]: residue_names[i] for i in range(len(residue_ids))} 
+        residue_ids_dict = {
+            residue_ids[i]: residue_names[i] for i in range(len(residue_ids))
+        }
         for i in residue_ids_dict:
-            if residue_ids_dict[i].find('A') > 0:
-                residue_ids_dict[i] = 'A'
-            elif residue_ids_dict[i].find('B') > 0:
-                residue_ids_dict[i] = 'B'
-            elif residue_ids_dict[i].find('C') > 0:
-                residue_ids_dict[i] = 'C'       
-            elif residue_ids_dict[i].find('D') > 0:
-                residue_ids_dict[i] = 'D' 
-            elif residue_ids_dict[i].find('S') > 0:
-                residue_ids_dict[i] = 'S'                               
-        sorted_residue_ids_dict = dict(sorted(residue_ids_dict.items(), key=lambda item: int(item[0])))
-        sequence = ''.join(sorted_residue_ids_dict.values())
+            if residue_ids_dict[i].find("A") > 0:
+                residue_ids_dict[i] = "A"
+            elif residue_ids_dict[i].find("B") > 0:
+                residue_ids_dict[i] = "B"
+            elif residue_ids_dict[i].find("C") > 0:
+                residue_ids_dict[i] = "C"
+            elif residue_ids_dict[i].find("D") > 0:
+                residue_ids_dict[i] = "D"
+            elif residue_ids_dict[i].find("S") > 0:
+                residue_ids_dict[i] = "S"
+        sorted_residue_ids_dict = dict(
+            sorted(residue_ids_dict.items(), key=lambda item: int(item[0]))
+        )
+        sequence = "".join(sorted_residue_ids_dict.values())
         # Terminal info for ester and carboxyl groups
         if sys.terminals:
-            if sys.terminals == 'ester':
-                sequence += 'Z'
-            elif sys.terminals == 'carboxyl':
-                sequence += 'X'
+            if sys.terminals == "ester":
+                sequence += "Z"
+            elif sys.terminals == "carboxyl":
+                sequence += "X"
             else:
-                warnings.warn(f"Unsupported terminal type '{sys.terminals}'. No terminal information will be appended to the sequence.")
-        
+                warnings.warn(
+                    f"Unsupported terminal type '{sys.terminals}'. No terminal information will be appended to the sequence."
+                )
+
         sequence_dict[chain_id] = sequence
 
     return sequence_dict
 
 
-def export_seq_to_json(dict_seq, resname_map, chirality_map={"A": "S", "S": "R", "B": "S"}, terminals_map={"Z": "E", "X": "C"}):
+def export_seq_to_json(
+    dict_seq,
+    resname_map,
+    chirality_map={"A": "S", "S": "R", "B": "S"},
+    terminals_map={"Z": "E", "X": "C"},
+):
     """
     Export sequences to JSON format with support for terminals.
 
@@ -80,37 +95,45 @@ def export_seq_to_json(dict_seq, resname_map, chirality_map={"A": "S", "S": "R",
 
         # Build nodes
         for i, letter in enumerate(sequence):
-            nodes.append({
-                "resname": resname_map[letter],
-                "seqid": 0,
-                "chiral": chirality_map.get(letter, None),  # Default to None if chirality is not defined
-                "id": i
-            })
+            nodes.append(
+                {
+                    "resname": resname_map[letter],
+                    "seqid": 0,
+                    "chiral": chirality_map.get(
+                        letter, None
+                    ),  # Default to None if chirality is not defined
+                    "id": i,
+                }
+            )
 
         # Add start terminal as the first node, if present
         if start_terminal:
-            nodes.insert(0, {
-                "resname": resname_map[start_terminal],
-                "seqid": -1,  # Use -1 for terminal residues
-                "chiral": None,  # Terminals typically don't have chirality
-                "id": 0
-            })
+            nodes.insert(
+                0,
+                {
+                    "resname": resname_map[start_terminal],
+                    "seqid": -1,  # Use -1 for terminal residues
+                    "chiral": None,  # Terminals typically don't have chirality
+                    "id": 0,
+                },
+            )
 
         # Add end terminal as the last node, if present
         if end_terminal:
-            nodes.append({
-                "resname": resname_map[end_terminal],
-                "seqid": len(sequence),  # Use the sequence length as the ID for the end terminal
-                "chiral": None,
-                "id": len(nodes)  # ID is the current length of the nodes list
-            })
+            nodes.append(
+                {
+                    "resname": resname_map[end_terminal],
+                    "seqid": len(
+                        sequence
+                    ),  # Use the sequence length as the ID for the end terminal
+                    "chiral": None,
+                    "id": len(nodes),  # ID is the current length of the nodes list
+                }
+            )
 
         # Build linear edges
         for i in range(len(nodes) - 1):
-            edges.append({
-                "source": i,
-                "target": i + 1
-            })
+            edges.append({"source": i, "target": i + 1})
 
         # Full graph structure
         graph = {
@@ -118,7 +141,7 @@ def export_seq_to_json(dict_seq, resname_map, chirality_map={"A": "S", "S": "R",
             "multigraph": False,
             "graph": {},
             "nodes": nodes,
-            "edges": edges
+            "edges": edges,
         }
 
         # Write to JSON file
@@ -126,13 +149,12 @@ def export_seq_to_json(dict_seq, resname_map, chirality_map={"A": "S", "S": "R",
             json.dump(graph, f, indent=2)
 
 
-
 def _generate_chain_id(index):
     """
     Generate a unique chain ID based on the given index.
 
-    The chain ID is generated using uppercase letters (A-Z). For indices 0-25, 
-    it returns single letters (A-Z). For indices 26 and above, it generates 
+    The chain ID is generated using uppercase letters (A-Z). For indices 0-25,
+    it returns single letters (A-Z). For indices 26 and above, it generates
     combinations of letters (e.g., AA, AB, ..., AZ, BA, etc.).
 
     Parameters
@@ -146,6 +168,7 @@ def _generate_chain_id(index):
         The generated chain ID as a string.
     """
     import string
+
     letters = string.ascii_uppercase  # A-Z
     first_letter = letters[(index // 26) - 1] if index >= 26 else ""
     second_letter = letters[index % 26]

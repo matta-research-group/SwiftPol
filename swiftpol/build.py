@@ -51,9 +51,14 @@ import string
 
 # Build polymer - generic
 def build_polymer(
-    sequence, monomer_list, reaction, terminal="hydrogen", initiator='[H]', chain_num=1, chainID="A"
+    sequence,
+    monomer_list,
+    reaction,
+    terminal="hydrogen",
+    initiator="[H]",
+    chain_num=1,
+    chainID="A",
 ):
-
     """
     Constructs a polymer from a given sequence of monomers.
 
@@ -158,7 +163,9 @@ def build_polymer(
         info.SetResidueNumber(1)
         info.SetChainId(chainID)
         [atom.SetMonomerInfo(info) for atom in hydrogen.GetAtoms()]
-        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[At]"), hydrogen)[0]
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[At]"), hydrogen)[
+            0
+        ]
         Chem.SanitizeMol(polymer)
         Chem.AddHs(polymer)
     elif terminal == "carboxyl":
@@ -168,7 +175,9 @@ def build_polymer(
         info.SetResidueNumber(1)
         info.SetChainId(chainID)
         [atom.SetMonomerInfo(info) for atom in carboxyl.GetAtoms()]
-        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[At]"), carboxyl)[0]
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[At]"), carboxyl)[
+            0
+        ]
         Chem.SanitizeMol(polymer)
         Chem.AddHs(polymer)
     elif terminal == "ester":
@@ -207,7 +216,9 @@ def build_polymer(
         info.SetResidueNumber(1)
         info.SetChainId(chainID)
         [atom.SetMonomerInfo(info) for atom in term_gap.GetAtoms()]
-        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[At]"), term_gap)[0]
+        polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[At]"), term_gap)[
+            0
+        ]
         Chem.SanitizeMol(polymer)
     if initiator:
         try:
@@ -215,8 +226,8 @@ def build_polymer(
             init = Chem.AddHs(init)
             editable_init = Chem.EditableMol(init)
             target_atom_idx = next(
-                 (a.GetIdx() for a in init.GetAtoms() if a.GetAtomicNum() > 1), 0
-             )
+                (a.GetIdx() for a in init.GetAtoms() if a.GetAtomicNum() > 1), 0
+            )
 
             for neighbor in init.GetAtomWithIdx(target_atom_idx).GetNeighbors():
                 if neighbor.GetSymbol() == "H":  # remove an H to make room for polymer
@@ -230,12 +241,12 @@ def build_polymer(
             info.SetResidueNumber(1)
             info.SetChainId(chainID)
             [atom.SetMonomerInfo(info) for atom in init_gap.GetAtoms()]
-            polymer = Chem.ReplaceSubstructs(polymer, Chem.MolFromSmarts("[I]"), init_gap)[0]
+            polymer = Chem.ReplaceSubstructs(
+                polymer, Chem.MolFromSmarts("[I]"), init_gap
+            )[0]
             Chem.SanitizeMol(polymer)
         except Exception as e:
-            raise ValueError(
-                "Initiator must be a valid SMILES string"
-            ) from e
+            raise ValueError("Initiator must be a valid SMILES string") from e
     Chem.SanitizeMol(polymer)
     return polymer
 
@@ -525,9 +536,7 @@ def calculate_box_components(
         .m_as(unit.dimensionless)
         .round()
     )
-    water_to_add = int(
-        round((solvent_mass) / water_mass).m_as(unit.dimensionless)
-    )
+    water_to_add = int(round((solvent_mass) / water_mass).m_as(unit.dimensionless))
 
     # Neutralise the system by adding and removing salt
     solute_charge = sum([molecule.total_charge for molecule in topology.molecules])
@@ -648,9 +657,19 @@ def introduce_stereoisomers(stereo_monomer, instance, seq):
     modified_seq = "".join(seq_list)
     return modified_seq
 
-def _generate_chain_lengths(num_chains, length_target, PDI_target, clip_min=5, clip_max=1000, tolerance=0.1, verbose=False):
+
+def _generate_chain_lengths(
+    num_chains,
+    length_target,
+    PDI_target,
+    clip_min=5,
+    clip_max=1000,
+    tolerance=0.1,
+    verbose=False,
+):
     import numpy as np
     import logging
+
     if verbose:
         logging.basicConfig(level=logging.INFO)
 
@@ -674,15 +693,20 @@ def _generate_chain_lengths(num_chains, length_target, PDI_target, clip_min=5, c
 
         # Calculate PDI of the generated chain lengths
         M_n = np.mean(chain_lengths)  # Number-average molecular weight
-        M_w = np.sum(np.square(chain_lengths)) / np.sum(chain_lengths)  # Weight-average molecular weight
+        M_w = np.sum(np.square(chain_lengths)) / np.sum(
+            chain_lengths
+        )  # Weight-average molecular weight
         PDI_actual = M_w / M_n
 
         # Check if the PDI fits within the target range
         if PDI_min <= PDI_actual <= PDI_max:
             if verbose:
-                logging.info(f"PDI verification passed: PDI_actual = {PDI_actual:.3f}, within target range {PDI_min:.3f} to {PDI_max:.3f}.")
+                logging.info(
+                    f"PDI verification passed: PDI_actual = {PDI_actual:.3f}, within target range {PDI_min:.3f} to {PDI_max:.3f}."
+                )
             break
     return chain_lengths
+
 
 class polymer_system:
     try:
@@ -709,6 +733,7 @@ class polymer_system:
     from openff.units import unit
     from rdkit.Chem import AllChem
     import string
+
     def __init__(
         self,
         monomer_list,
@@ -717,7 +742,7 @@ class polymer_system:
         num_chains,
         stereoisomerism_input=None,
         terminals="hydrogen",
-        initiator='[H]',
+        initiator="[H]",
         perc_A_target=100,
         blockiness_target=[1.0, "A"],
         copolymer=False,
@@ -796,9 +821,10 @@ class polymer_system:
         min_length (float): The minimum length of the polymer chains.
 
         max_length (float): The maximum length of the polymer chains.
-    
+
         """
         from swiftpol.utils import _generate_chain_id
+
         self.length_target = length_target
         self.terminals = terminals
         perc_A_actual = []
@@ -855,7 +881,7 @@ class polymer_system:
                         lambda x, y: x + y,
                         np.random.choice(
                             ["AA", "BB"],
-                            size=(int(round(length_actual/2)),),
+                            size=(int(round(length_actual / 2)),),
                             p=[perc_A_target / 100, 1 - (perc_A_target / 100)],
                         ),
                     )
@@ -918,7 +944,7 @@ class polymer_system:
                             lambda x, y: x + y,
                             np.random.choice(
                                 ["AA", "BB"],
-                                size=(int(length_actual/2),),
+                                size=(int(length_actual / 2),),
                                 p=[perc_A_target / 100, 1 - (perc_A_target / 100)],
                             ),
                         )
@@ -1084,7 +1110,9 @@ class polymer_system:
         from warnings import warn
 
         if rough and random:
-            raise ValueError("Please select either rough or random conformer generation, not both.")
+            raise ValueError(
+                "Please select either rough or random conformer generation, not both."
+            )
 
         if rough:
             params = AllChem.EmbedParameters()
@@ -1100,19 +1128,24 @@ class polymer_system:
             for chain in self.chains:
                 chain.generate_unique_atom_names()
             warn(
-            "Rough coordinates have been generated. Any charges previously applied to the system.chains attribute"
-            "will need to be reapplied.",
-            UserWarning,
-            )   
+                "Rough coordinates have been generated. Any charges previously applied to the system.chains attribute"
+                "will need to be reapplied.",
+                UserWarning,
+            )
 
         elif random:
             import random as ran
+
             for mol in self.chain_rdkit:
                 num_atoms = mol.GetNumAtoms()
                 conf = Chem.Conformer(num_atoms)
                 for i in range(num_atoms):
                     # Generate random x, y, z coordinates
-                    x, y, z = ran.uniform(-10, 10), ran.uniform(-10, 10), ran.uniform(-10, 10)
+                    x, y, z = (
+                        ran.uniform(-10, 10),
+                        ran.uniform(-10, 10),
+                        ran.uniform(-10, 10),
+                    )
                     conf.SetAtomPosition(i, (x, y, z))
                 mol.RemoveAllConformers()  # Clear existing conformers from RDKit molecule
                 mol.AddConformer(conf, assignId=True)
@@ -1121,9 +1154,9 @@ class polymer_system:
             for chain in self.chains:
                 chain.generate_unique_atom_names()
             warn(
-            "Random coordinates have been generated. Any charges previously applied to the system.chains attribute "
-            "will need to be reapplied. Please ensure optimized conformer generation is performed prior to simulation (e.g. using Polyply).",
-            UserWarning,
+                "Random coordinates have been generated. Any charges previously applied to the system.chains attribute "
+                "will need to be reapplied. Please ensure optimized conformer generation is performed prior to simulation (e.g. using Polyply).",
+                UserWarning,
             )
 
         else:
@@ -1185,16 +1218,22 @@ class polymer_system:
             "B_block_length": [self.B_block_length],
             "A_block_length": [self.A_block_length],
             "mean_blockiness": [self.mean_blockiness],
-            "A_actual": [self.A_actual]
+            "A_actual": [self.A_actual],
         }
-        
+
         if hasattr(self, "charge_scheme") and self.charge_scheme is not None:
             all_data["charge_scheme"] = [self.charge_scheme]
-        
-        if hasattr(self, "residual_monomer_actual") and self.residual_monomer_actual is not None:
+
+        if (
+            hasattr(self, "residual_monomer_actual")
+            and self.residual_monomer_actual is not None
+        ):
             all_data["residual_monomer_actual"] = [self.residual_monomer_actual]
-        
-        if hasattr(self, "residual_oligomer_actual") and self.residual_oligomer_actual is not None:
+
+        if (
+            hasattr(self, "residual_oligomer_actual")
+            and self.residual_oligomer_actual is not None
+        ):
             all_data["residual_oligomer_actual"] = [self.residual_oligomer_actual]
 
         subset_data = {
@@ -1308,13 +1347,13 @@ class polymer_system:
             If partial charges are not assigned to the system, processing large systems may raise errors from OpenFF-Interchange.
         """
         from swiftpol.build import calculate_box_components
-        
+
         from openff.interchange import Interchange
-        from openff.interchange.components._packmol import UNIT_CUBE    
+        from openff.interchange.components._packmol import UNIT_CUBE
         from openff.toolkit import ForceField
         import warnings
 
-        self.generate_conformers(random = True)
+        self.generate_conformers(random=True)
         if self.charge_scheme:
             self.charge_system(self.charge_scheme)
         else:
@@ -1482,7 +1521,9 @@ class polymer_system:
                 sigma = np.sqrt(np.log(1.05))
                 mu = np.log(self.length_target * 0.1) - 0.5 * sigma**2
                 chain_lengths = np.random.lognormal(mu, sigma, size=1)
-                chain_lengths = np.round(chain_lengths).astype(int)[0]  # Extract scalar value
+                chain_lengths = np.round(chain_lengths).astype(int)[
+                    0
+                ]  # Extract scalar value
                 oligo_seq = reduce(
                     lambda x, y: x + y,
                     np.random.choice(
@@ -1614,7 +1655,7 @@ class polymer_system_from_PDI:
     )
     from openff.units import unit
     from rdkit.Chem import AllChem
-    
+
     def __init__(
         self,
         monomer_list,
@@ -1624,129 +1665,129 @@ class polymer_system_from_PDI:
         PDI_target,
         stereoisomerism_input=None,
         terminals="hydrogen",
-        initiator='[H]',
+        initiator="[H]",
         perc_A_target=100,
         blockiness_target=[1.0, "A"],
         copolymer=False,
         diblock=False,
         acceptance=10,
-        verbose=None
+        verbose=None,
     ):
         """
         Initialize the polymer system and build the polymer chains.
-        
+
         This class initializes a polymer system and generates polymer chains based on the specified parameters. It supports homopolymers, copolymers, and diblock copolymers, with options for stereoisomerism, terminal groups, and blockiness control. The class also allows for fine-tuning of the polydispersity index (PDI) and other polymer properties.
-        
+
         Parameters
         ----------
         monomer_list : list
             List of monomers to be used in the polymerization.
-        
+
         reaction : str
             The type of reaction to be used for polymerization.
-        
+
         length_target : float
             The target length of the polymer chains.
-        
+
         num_chains : int
             The number of polymer chains to be generated.
-        
+
         PDI_target : float
             The target polydispersity index (PDI) of the polymer chains. A PDI value of up to 3.0 is supported. Smaller systems may not achieve high PDI values.
-        
+
         stereoisomerism_input : tuple, optional
             A tuple containing:
                 - The monomer (str).
                 - The instance fraction (float, e.g., 0.5 for 50% stereoisomer).
                 - The SMILES string (str) of the stereoisomer to be introduced.
             Default is None.
-        
+
         terminals : str, optional
             The type of terminal groups to be used. Default is 'hydrogen', which adds a hydrogen atom.
 
         initiator : (str, optional)
             The initiator group/alternate terminal to be added to the polymer as a canonical SMILES string. Default is '[H]'.
-        
+
         perc_A_target : float, optional
             The target percentage of monomer A in the copolymer. Default is 100.
-        
+
         blockiness_target : float, optional
             The target blockiness of the copolymer, indicating the degree of clustering of monomers A and B. Default is 1.0, with reference to 'A' monomer linkages.
-        
+
         copolymer : bool, optional
             Flag to indicate if the system is a copolymer. Default is False.
-        
+
         diblock : bool, optional
             Flag to indicate if the system is a diblock copolymer. Default is False.
-        
+
         acceptance : float, optional
             The percentage deviation allowed for blockiness and A percentage from target values. Default is 10%.
-        
+
         verbose : bool, optional
             If True, enables logging messages for debugging and progress tracking. Default is False.
-        
+
         Attributes
         ----------
         length_target : float
             The target length of the polymer chains.
-        
+
         terminals : str
             The type of terminal groups used.
-        
+
         blockiness_target : float
             The target blockiness of the copolymer.
-        
+
         A_target : float
             The target percentage of monomer A in the copolymer.
-        
+
         chains : list
             List of polymer chains as OpenFF Molecule objects.
-        
+
         chain_rdkit : list
             List of polymer chains as RDKit molecule objects.
-        
+
         lengths : list
             List of lengths of the polymer chains.
-        
+
         perc_A_actual : list
             List of actual percentages of monomer A in the polymer chains.
-        
+
         B_block_length : float
             The average block length of monomer B in the copolymer.
-        
+
         A_block_length : float
             The average block length of monomer A in the copolymer.
-        
+
         blockiness_list : list
             List of blockiness values for the polymer chains.
-        
+
         mean_blockiness : float
             The mean blockiness of the polymer chains.
-        
+
         mol_weight_average : float
             The average molecular weight of the polymer chains.
-        
+
         PDI : float
             The polydispersity index of the polymer chains.
-        
+
         Mn : float
             The number-average molecular weight of the polymer chains.
-        
+
         Mw : float
             The weight-average molecular weight of the polymer chains.
-        
+
         num_chains : int
             The number of polymer chains generated.
-        
+
         length_average : float
             The average length of the polymer chains.
-        
+
         min_length : float
             The minimum length of the polymer chains.
-        
+
         max_length : float
             The maximum length of the polymer chains.
-        
+
         Notes
         -----
         - This class is under development and may change significantly in future versions of SwiftPol.
@@ -1755,6 +1796,7 @@ class polymer_system_from_PDI:
         from swiftpol.build import _generate_chain_lengths
         from swiftpol.utils import _generate_chain_id
         import logging
+
         if verbose:
             logging.basicConfig(level=logging.INFO)
         self.length_target = length_target
@@ -1793,19 +1835,23 @@ class polymer_system_from_PDI:
         # Generate chain lengths based on PDI_target
         if copolymer:
             # Generate a list of chain lengths
-            chain_lengths = _generate_chain_lengths(num_chains, 
-                                                    length_target, 
-                                                    PDI_target, 
-                                                    clip_min=2, 
-                                                    clip_max=length_target*5,
-                                                    verbose=verbose)
+            chain_lengths = _generate_chain_lengths(
+                num_chains,
+                length_target,
+                PDI_target,
+                clip_min=2,
+                clip_max=length_target * 5,
+                verbose=verbose,
+            )
             # Build chains based on generated lengths
             for n, length_actual in enumerate(chain_lengths):
                 loops_tracker = 0
                 while True:
-                    if loops_tracker>200:
+                    if loops_tracker > 200:
                         if verbose:
-                            logging.info(f"build attempts exceeded 200, disregarding chain")  
+                            logging.info(
+                                f"build attempts exceeded 200, disregarding chain"
+                            )
                         break
                     if diblock:
                         sequence = reduce(
@@ -1844,12 +1890,16 @@ class polymer_system_from_PDI:
                             chains_rdkit.append(pol)
                             chain = Molecule.from_rdkit(pol)
                             chains.append(chain)
-                            perc_A_actual.append((sequence.count("A") / len(sequence)) * 100)
-                            blockiness, bbl, abl = blockiness_gen(sequence, blockiness_target[1])
+                            perc_A_actual.append(
+                                (sequence.count("A") / len(sequence)) * 100
+                            )
+                            blockiness, bbl, abl = blockiness_gen(
+                                sequence, blockiness_target[1]
+                            )
                             blockiness_list.append(blockiness)
                             BBL.append(bbl)
                             ABL.append(abl)
-                             
+
                         else:
                             pol = build_polymer(
                                 sequence=sequence,
@@ -1864,19 +1914,22 @@ class polymer_system_from_PDI:
                             chains_rdkit.append(pol)
                             chain = Molecule.from_rdkit(pol)
                             chains.append(chain)
-                            perc_A_actual.append((sequence.count("A") / len(sequence)) * 100)                        
-                            blockiness, bbl, abl = blockiness_gen(sequence, blockiness_target[1])
+                            perc_A_actual.append(
+                                (sequence.count("A") / len(sequence)) * 100
+                            )
+                            blockiness, bbl, abl = blockiness_gen(
+                                sequence, blockiness_target[1]
+                            )
                             blockiness_list.append(blockiness)
                             BBL.append(bbl)
                             ABL.append(abl)
                         if verbose:
-                                logging.info(f"Built chain {id_new}")  
+                            logging.info(f"Built chain {id_new}")
 
-                        
                         break
                     else:
-                        loops_tracker+=1
-           
+                        loops_tracker += 1
+
             # Finalize statistics
             try:
                 self.B_block_length = mean(BBL)
@@ -1893,18 +1946,20 @@ class polymer_system_from_PDI:
                 )
         else:
             # Generate chain lengths based on PDI_target
-            chain_lengths = _generate_chain_lengths(num_chains, 
-                                                    length_target, 
-                                                    PDI_target, 
-                                                    clip_min=2, 
-                                                    clip_max=length_target*5,
-                                                    verbose=verbose)
-        
+            chain_lengths = _generate_chain_lengths(
+                num_chains,
+                length_target,
+                PDI_target,
+                clip_min=2,
+                clip_max=length_target * 5,
+                verbose=verbose,
+            )
+
             # Build chains based on generated lengths
             for n, length_actual in enumerate(chain_lengths):
                 # Generate sequence
-                sequence = 'A' * length_actual
-        
+                sequence = "A" * length_actual
+
                 # Handle stereoisomerism if specified
                 id_new = _generate_chain_id(n)
                 if stereoisomerism_input is not None:
@@ -1931,14 +1986,14 @@ class polymer_system_from_PDI:
                         chainID=id_new,
                     )
                 if verbose:
-                    logging.info(f"Built chain {id_new}")           
+                    logging.info(f"Built chain {id_new}")
                 # Store chain data
                 lengths.append(int(length_actual))
                 chains_rdkit.append(pol)
                 chain = Molecule.from_rdkit(pol)
                 chains.append(chain)
                 perc_A_actual.append((sequence.count("A") / len(sequence)) * 100)
-        
+
             # Set attributes for homopolymer
             self.A_target = perc_A_target
             self.B_block_length = None
@@ -1962,7 +2017,9 @@ class polymer_system_from_PDI:
         self.min_length = min(lengths)
         self.max_length = max(lengths)
         if verbose:
-            print(f'Built SwiftPol ensemble of size {self.num_chains} and PDI {self.PDI}')
+            print(
+                f"Built SwiftPol ensemble of size {self.num_chains} and PDI {self.PDI}"
+            )
 
     def __repr__(self):
 
@@ -1971,7 +2028,6 @@ class polymer_system_from_PDI:
             f"average chain length = {self.length_average}-mers, PDI = {self.PDI}"
         )
         return description
-
 
     def generate_conformers(self, rough=False, random=False):
         """
@@ -2014,7 +2070,9 @@ class polymer_system_from_PDI:
         from warnings import warn
 
         if rough and random:
-            raise ValueError("Please select either rough or random conformer generation, not both.")
+            raise ValueError(
+                "Please select either rough or random conformer generation, not both."
+            )
 
         if rough:
             params = AllChem.EmbedParameters()
@@ -2030,19 +2088,24 @@ class polymer_system_from_PDI:
             for chain in self.chains:
                 chain.generate_unique_atom_names()
             warn(
-            "Rough coordinates have been generated. Any charges previously applied to the system.chains attribute"
-            "will need to be reapplied.",
-            UserWarning,
-            )   
+                "Rough coordinates have been generated. Any charges previously applied to the system.chains attribute"
+                "will need to be reapplied.",
+                UserWarning,
+            )
 
         elif random:
             import random as ran
+
             for mol in self.chain_rdkit:
                 num_atoms = mol.GetNumAtoms()
                 conf = Chem.Conformer(num_atoms)
                 for i in range(num_atoms):
                     # Generate random x, y, z coordinates
-                    x, y, z = ran.uniform(-10, 10), ran.uniform(-10, 10), ran.uniform(-10, 10)
+                    x, y, z = (
+                        ran.uniform(-10, 10),
+                        ran.uniform(-10, 10),
+                        ran.uniform(-10, 10),
+                    )
                     conf.SetAtomPosition(i, (x, y, z))
                 mol.RemoveAllConformers()  # Clear existing conformers from RDKit molecule
                 mol.AddConformer(conf, assignId=True)
@@ -2051,9 +2114,9 @@ class polymer_system_from_PDI:
             for chain in self.chains:
                 chain.generate_unique_atom_names()
             warn(
-            "Random coordinates have been generated. Any charges previously applied to the system.chains attribute "
-            "will need to be reapplied. Please ensure optimized conformer generation is performed prior to simulation (e.g. using Polyply).",
-            UserWarning,
+                "Random coordinates have been generated. Any charges previously applied to the system.chains attribute "
+                "will need to be reapplied. Please ensure optimized conformer generation is performed prior to simulation (e.g. using Polyply).",
+                UserWarning,
             )
 
         else:
@@ -2095,7 +2158,7 @@ class polymer_system_from_PDI:
     def export_to_csv(self, filename, include_all_data=True):
         """
         Export the attributes of the polymer_system instance into a pandas DataFrame and save it as a CSV file.
-    
+
         Parameters
         ----------
         filename : str
@@ -2116,16 +2179,22 @@ class polymer_system_from_PDI:
             "B_block_length": [self.B_block_length],
             "A_block_length": [self.A_block_length],
             "mean_blockiness": [self.mean_blockiness],
-            "A_actual": [self.A_actual]
+            "A_actual": [self.A_actual],
         }
-        
+
         if hasattr(self, "charge_scheme") and self.charge_scheme is not None:
             all_data["charge_scheme"] = [self.charge_scheme]
-        
-        if hasattr(self, "residual_monomer_actual") and self.residual_monomer_actual is not None:
+
+        if (
+            hasattr(self, "residual_monomer_actual")
+            and self.residual_monomer_actual is not None
+        ):
             all_data["residual_monomer_actual"] = [self.residual_monomer_actual]
-        
-        if hasattr(self, "residual_oligomer_actual") and self.residual_oligomer_actual is not None:
+
+        if (
+            hasattr(self, "residual_oligomer_actual")
+            and self.residual_oligomer_actual is not None
+        ):
             all_data["residual_oligomer_actual"] = [self.residual_oligomer_actual]
 
         subset_data = {
@@ -2235,7 +2304,8 @@ class polymer_system_from_PDI:
         from openff.interchange import Interchange
         from openff.toolkit import ForceField
         import warnings
-        from openff.interchange.components._packmol import UNIT_CUBE  
+        from openff.interchange.components._packmol import UNIT_CUBE
+
         if self.charge_scheme:
             self.charge_system(self.charge_scheme)
         else:
@@ -2245,14 +2315,19 @@ class polymer_system_from_PDI:
             )
 
         box_vectors = (50 * unit.angstrom) * UNIT_CUBE
-        molecules, number_of_copies, residual_monomer_actual, residual_oligomer_actual = self.calculate_residuals(residual_monomer, residual_oligomer)
+        (
+            molecules,
+            number_of_copies,
+            residual_monomer_actual,
+            residual_oligomer_actual,
+        ) = self.calculate_residuals(residual_monomer, residual_oligomer)
         mol_pdb_files_dest = []
         for i in molecules:
             string_i = str(molecules.index(i)) + ".pdb"
             mol_pdb_files_dest.append(string_i)
             if i.has_unique_atom_names == False:
                 i.generate_unique_atom_names()
-            i.generate_conformers(n_conformers=1) # Conformers generated for residuals
+            i.generate_conformers(n_conformers=1)  # Conformers generated for residuals
             i.to_file(string_i, file_format="pdb")
         self.residual_monomer_actual = residual_monomer_actual
         self.residual_oligomer_actual = residual_oligomer_actual
@@ -2287,6 +2362,7 @@ class polymer_system_from_PDI:
             return_tuple += (pdb_file,)
         print(f"Polyply input files generated! Saved at {return_tuple}")
         return topology
+
     def calculate_residuals(
         self, residual_monomer=0, residual_oligomer=0, return_rdkit=False
     ):
@@ -2400,7 +2476,9 @@ class polymer_system_from_PDI:
                 sigma = np.sqrt(np.log(1.05))
                 mu = np.log(self.length_target * 0.1) - 0.5 * sigma**2
                 chain_lengths = np.random.lognormal(mu, sigma, size=1)
-                chain_lengths = np.round(chain_lengths).astype(int)[0]  # Extract scalar value
+                chain_lengths = np.round(chain_lengths).astype(int)[
+                    0
+                ]  # Extract scalar value
                 oligo_seq = reduce(
                     lambda x, y: x + y,
                     np.random.choice(
@@ -2415,7 +2493,7 @@ class polymer_system_from_PDI:
                     monomer_list=monomer_list,
                     reaction=AllChem.ReactionFromSmarts(self.reaction),
                     chain_num=len(self.chains) + 1 + i,
-                    terminal=self.terminals,                
+                    terminal=self.terminals,
                 )
                 oligomer = Molecule.from_rdkit(oligomer_rd)
                 oligomer.name = "oligo" + str(len(self.chains) + 1 + i)
@@ -2456,7 +2534,7 @@ class polymer_system_from_PDI:
                     monomer_list=monomer_list,
                     reaction=AllChem.ReactionFromSmarts(self.reaction),
                     chain_num=len(self.chains) + 1 + i,
-                    terminal=self.terminals,                    
+                    terminal=self.terminals,
                 )
                 oligomer = Molecule.from_rdkit(oligomer_rd)
                 oligomer.name = "oligo" + str(len(self.chains) + 1 + i)
@@ -2504,6 +2582,3 @@ class polymer_system_from_PDI:
                 residual_monomer_actual,
                 residual_oligomer_actual,
             )
-        
-
-
