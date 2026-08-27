@@ -109,7 +109,7 @@ jobs:
 
     - name: Generate coverage badge
       run: |
-        pip install genbadge
+        pip install genbadge[coverage]
         genbadge coverage -i coverage.xml
         mv coverage-badge.svg Repo/
 
