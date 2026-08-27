@@ -55,7 +55,7 @@ jobs:
         conda env create -f Dev_tools/swiftpol.yml
         conda activate swiftpol
         python -m pip install --upgrade pip
-        python -m pip install pytest flake8 pylint "genbadge[coverage,tests]"
+        python -m pip install pytest flake8 pylint genbadge[coverage]
 
     - name: Lint with flake8
       run: |
@@ -112,3 +112,10 @@ jobs:
         source ~/.bashrc
         conda activate swiftpol
         pytest --cov=swiftpol --cov-report=term
+
+    - name: Generate coverage badge
+      run: |
+        genbadge coverage -i coverage.xml
+        mv coverage-badge.svg docs/
+
+    
