@@ -70,8 +70,12 @@ jobs:
       shell: bash -l {0}
       run: |
         conda activate swiftpol
-        pylint swiftpol --exit-zero --max-line-length=127 --disable=all --enable=E,W0102,W0702,W0612,W0201,W1514
-        
+        pylint swiftpol --exit-zero --max-line-length=127 \
+          --disable=all \
+          --enable=E,W0102,W0702,W0612,W0201,W1514 \
+          --generated-members="rdkit.Chem.*,rdkit.Chem.AllChem.*" \
+          --ignored-modules=openff.units
+          
     - name: Build tests
       run: |
         source ~/.bashrc
