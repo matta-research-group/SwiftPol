@@ -128,9 +128,14 @@
 <div class="viewcode-block" id="build_polymer">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.build_polymer">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">build_polymer</span><span class="p">(</span>
-    <span class="n">sequence</span><span class="p">,</span> <span class="n">monomer_list</span><span class="p">,</span> <span class="n">reaction</span><span class="p">,</span> <span class="n">terminal</span><span class="o">=</span><span class="s2">"hydrogen"</span><span class="p">,</span> <span class="n">initiator</span><span class="o">=</span><span class="s1">'[H]'</span><span class="p">,</span> <span class="n">chain_num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">chainID</span><span class="o">=</span><span class="s2">"A"</span>
+    <span class="n">sequence</span><span class="p">,</span>
+    <span class="n">monomer_list</span><span class="p">,</span>
+    <span class="n">reaction</span><span class="p">,</span>
+    <span class="n">terminal</span><span class="o">=</span><span class="s2">"hydrogen"</span><span class="p">,</span>
+    <span class="n">initiator</span><span class="o">=</span><span class="s2">"[H]"</span><span class="p">,</span>
+    <span class="n">chain_num</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">chainID</span><span class="o">=</span><span class="s2">"A"</span><span class="p">,</span>
 <span class="p">):</span>
-
 <span class="w">    </span><span class="sd">"""</span>
 <span class="sd">    Constructs a polymer from a given sequence of monomers.</span>
 
@@ -235,7 +240,9 @@
         <span class="n">info</span><span class="o">.</span><span class="n">SetResidueNumber</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">info</span><span class="o">.</span><span class="n">SetChainId</span><span class="p">(</span><span class="n">chainID</span><span class="p">)</span>
         <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">hydrogen</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
-        <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s2">"[At]"</span><span class="p">),</span> <span class="n">hydrogen</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s2">"[At]"</span><span class="p">),</span> <span class="n">hydrogen</span><span class="p">)[</span>
+            <span class="mi">0</span>
+        <span class="p">]</span>
         <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
         <span class="n">Chem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">terminal</span> <span class="o">==</span> <span class="s2">"carboxyl"</span><span class="p">:</span>
@@ -245,7 +252,9 @@
         <span class="n">info</span><span class="o">.</span><span class="n">SetResidueNumber</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">info</span><span class="o">.</span><span class="n">SetChainId</span><span class="p">(</span><span class="n">chainID</span><span class="p">)</span>
         <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">carboxyl</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
-        <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s2">"[At]"</span><span class="p">),</span> <span class="n">carboxyl</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s2">"[At]"</span><span class="p">),</span> <span class="n">carboxyl</span><span class="p">)[</span>
+            <span class="mi">0</span>
+        <span class="p">]</span>
         <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
         <span class="n">Chem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">terminal</span> <span class="o">==</span> <span class="s2">"ester"</span><span class="p">:</span>
@@ -284,7 +293,9 @@
         <span class="n">info</span><span class="o">.</span><span class="n">SetResidueNumber</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">info</span><span class="o">.</span><span class="n">SetChainId</span><span class="p">(</span><span class="n">chainID</span><span class="p">)</span>
         <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">term_gap</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
-        <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s2">"[At]"</span><span class="p">),</span> <span class="n">term_gap</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s2">"[At]"</span><span class="p">),</span> <span class="n">term_gap</span><span class="p">)[</span>
+            <span class="mi">0</span>
+        <span class="p">]</span>
         <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">initiator</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
@@ -292,8 +303,8 @@
             <span class="n">init</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">AddHs</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
             <span class="n">editable_init</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">EditableMol</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
             <span class="n">target_atom_idx</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
-                 <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">init</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">0</span>
-             <span class="p">)</span>
+                <span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">GetIdx</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">init</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()</span> <span class="k">if</span> <span class="n">a</span><span class="o">.</span><span class="n">GetAtomicNum</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">0</span>
+            <span class="p">)</span>
 
             <span class="k">for</span> <span class="n">neighbor</span> <span class="ow">in</span> <span class="n">init</span><span class="o">.</span><span class="n">GetAtomWithIdx</span><span class="p">(</span><span class="n">target_atom_idx</span><span class="p">)</span><span class="o">.</span><span class="n">GetNeighbors</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">neighbor</span><span class="o">.</span><span class="n">GetSymbol</span><span class="p">()</span> <span class="o">==</span> <span class="s2">"H"</span><span class="p">:</span>  <span class="c1"># remove an H to make room for polymer</span>
@@ -307,12 +318,12 @@
             <span class="n">info</span><span class="o">.</span><span class="n">SetResidueNumber</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">info</span><span class="o">.</span><span class="n">SetChainId</span><span class="p">(</span><span class="n">chainID</span><span class="p">)</span>
             <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">SetMonomerInfo</span><span class="p">(</span><span class="n">info</span><span class="p">)</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">init_gap</span><span class="o">.</span><span class="n">GetAtoms</span><span class="p">()]</span>
-            <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span><span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s2">"[I]"</span><span class="p">),</span> <span class="n">init_gap</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">polymer</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">ReplaceSubstructs</span><span class="p">(</span>
+                <span class="n">polymer</span><span class="p">,</span> <span class="n">Chem</span><span class="o">.</span><span class="n">MolFromSmarts</span><span class="p">(</span><span class="s2">"[I]"</span><span class="p">),</span> <span class="n">init_gap</span>
+            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">"Initiator must be a valid SMILES string"</span>
-            <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Initiator must be a valid SMILES string"</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
     <span class="n">Chem</span><span class="o">.</span><span class="n">SanitizeMol</span><span class="p">(</span><span class="n">polymer</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">polymer</span></div>
 
@@ -614,9 +625,7 @@
         <span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">)</span>
         <span class="o">.</span><span class="n">round</span><span class="p">()</span>
     <span class="p">)</span>
-    <span class="n">water_to_add</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
-        <span class="nb">round</span><span class="p">((</span><span class="n">solvent_mass</span><span class="p">)</span> <span class="o">/</span> <span class="n">water_mass</span><span class="p">)</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">)</span>
-    <span class="p">)</span>
+    <span class="n">water_to_add</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">((</span><span class="n">solvent_mass</span><span class="p">)</span> <span class="o">/</span> <span class="n">water_mass</span><span class="p">)</span><span class="o">.</span><span class="n">m_as</span><span class="p">(</span><span class="n">unit</span><span class="o">.</span><span class="n">dimensionless</span><span class="p">))</span>
 
     <span class="c1"># Neutralise the system by adding and removing salt</span>
     <span class="n">solute_charge</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">molecule</span><span class="o">.</span><span class="n">total_charge</span> <span class="k">for</span> <span class="n">molecule</span> <span class="ow">in</span> <span class="n">topology</span><span class="o">.</span><span class="n">molecules</span><span class="p">])</span>
@@ -741,9 +750,19 @@
     <span class="k">return</span> <span class="n">modified_seq</span></div>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_generate_chain_lengths</span><span class="p">(</span><span class="n">num_chains</span><span class="p">,</span> <span class="n">length_target</span><span class="p">,</span> <span class="n">PDI_target</span><span class="p">,</span> <span class="n">clip_min</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">clip_max</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_generate_chain_lengths</span><span class="p">(</span>
+    <span class="n">num_chains</span><span class="p">,</span>
+    <span class="n">length_target</span><span class="p">,</span>
+    <span class="n">PDI_target</span><span class="p">,</span>
+    <span class="n">clip_min</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+    <span class="n">clip_max</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+    <span class="n">tolerance</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">):</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
     <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
@@ -767,15 +786,20 @@
 
         <span class="c1"># Calculate PDI of the generated chain lengths</span>
         <span class="n">M_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">chain_lengths</span><span class="p">)</span>  <span class="c1"># Number-average molecular weight</span>
-        <span class="n">M_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">chain_lengths</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">chain_lengths</span><span class="p">)</span>  <span class="c1"># Weight-average molecular weight</span>
+        <span class="n">M_w</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">chain_lengths</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span>
+            <span class="n">chain_lengths</span>
+        <span class="p">)</span>  <span class="c1"># Weight-average molecular weight</span>
         <span class="n">PDI_actual</span> <span class="o">=</span> <span class="n">M_w</span> <span class="o">/</span> <span class="n">M_n</span>
 
         <span class="c1"># Check if the PDI fits within the target range</span>
         <span class="k">if</span> <span class="n">PDI_min</span> <span class="o">&lt;=</span> <span class="n">PDI_actual</span> <span class="o">&lt;=</span> <span class="n">PDI_max</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"PDI verification passed: PDI_actual = </span><span class="si">{</span><span class="n">PDI_actual</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, within target range </span><span class="si">{</span><span class="n">PDI_min</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">PDI_max</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">."</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"PDI verification passed: PDI_actual = </span><span class="si">{</span><span class="n">PDI_actual</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">, within target range </span><span class="si">{</span><span class="n">PDI_min</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">PDI_max</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">."</span>
+                <span class="p">)</span>
             <span class="k">break</span>
     <span class="k">return</span> <span class="n">chain_lengths</span>
+
 
 <div class="viewcode-block" id="polymer_system">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system">[docs]</a>
@@ -804,6 +828,7 @@
     <span class="kn">from</span><span class="w"> </span><span class="nn">openff.units</span><span class="w"> </span><span class="kn">import</span> <span class="n">unit</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem</span><span class="w"> </span><span class="kn">import</span> <span class="n">AllChem</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">string</span>
+
 <div class="viewcode-block" id="polymer_system.__init__">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -814,7 +839,7 @@
         <span class="n">num_chains</span><span class="p">,</span>
         <span class="n">stereoisomerism_input</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">terminals</span><span class="o">=</span><span class="s2">"hydrogen"</span><span class="p">,</span>
-        <span class="n">initiator</span><span class="o">=</span><span class="s1">'[H]'</span><span class="p">,</span>
+        <span class="n">initiator</span><span class="o">=</span><span class="s2">"[H]"</span><span class="p">,</span>
         <span class="n">perc_A_target</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
         <span class="n">blockiness_target</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">"A"</span><span class="p">],</span>
         <span class="n">copolymer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -893,9 +918,10 @@
 <span class="sd">        min_length (float): The minimum length of the polymer chains.</span>
 
 <span class="sd">        max_length (float): The maximum length of the polymer chains.</span>
-<span class="sd">    </span>
+
 <span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_generate_chain_id</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">length_target</span> <span class="o">=</span> <span class="n">length_target</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">terminals</span> <span class="o">=</span> <span class="n">terminals</span>
         <span class="n">perc_A_actual</span> <span class="o">=</span> <span class="p">[]</span>
@@ -952,7 +978,7 @@
                         <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span>
                         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
                             <span class="p">[</span><span class="s2">"AA"</span><span class="p">,</span> <span class="s2">"BB"</span><span class="p">],</span>
-                            <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">length_actual</span><span class="o">/</span><span class="mi">2</span><span class="p">)),),</span>
+                            <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">length_actual</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)),),</span>
                             <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="n">perc_A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">perc_A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)],</span>
                         <span class="p">),</span>
                     <span class="p">)</span>
@@ -1015,7 +1041,7 @@
                             <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span>
                             <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
                                 <span class="p">[</span><span class="s2">"AA"</span><span class="p">,</span> <span class="s2">"BB"</span><span class="p">],</span>
-                                <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">length_actual</span><span class="o">/</span><span class="mi">2</span><span class="p">),),</span>
+                                <span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">length_actual</span> <span class="o">/</span> <span class="mi">2</span><span class="p">),),</span>
                                 <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="n">perc_A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">perc_A_target</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)],</span>
                             <span class="p">),</span>
                         <span class="p">)</span>
@@ -1184,7 +1210,9 @@
         <span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
 
         <span class="k">if</span> <span class="n">rough</span> <span class="ow">and</span> <span class="n">random</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Please select either rough or random conformer generation, not both."</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"Please select either rough or random conformer generation, not both."</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">rough</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">EmbedParameters</span><span class="p">()</span>
@@ -1200,19 +1228,24 @@
             <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
                 <span class="n">chain</span><span class="o">.</span><span class="n">generate_unique_atom_names</span><span class="p">()</span>
             <span class="n">warn</span><span class="p">(</span>
-            <span class="s2">"Rough coordinates have been generated. Any charges previously applied to the system.chains attribute"</span>
-            <span class="s2">"will need to be reapplied."</span><span class="p">,</span>
-            <span class="ne">UserWarning</span><span class="p">,</span>
-            <span class="p">)</span>   
+                <span class="s2">"Rough coordinates have been generated. Any charges previously applied to the system.chains attribute"</span>
+                <span class="s2">"will need to be reapplied."</span><span class="p">,</span>
+                <span class="ne">UserWarning</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="k">elif</span> <span class="n">random</span><span class="p">:</span>
             <span class="kn">import</span><span class="w"> </span><span class="nn">random</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ran</span>
+
             <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_rdkit</span><span class="p">:</span>
                 <span class="n">num_atoms</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span>
                 <span class="n">conf</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Conformer</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">):</span>
                     <span class="c1"># Generate random x, y, z coordinates</span>
-                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                        <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                        <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                    <span class="p">)</span>
                     <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
                 <span class="n">mol</span><span class="o">.</span><span class="n">RemoveAllConformers</span><span class="p">()</span>  <span class="c1"># Clear existing conformers from RDKit molecule</span>
                 <span class="n">mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">assignId</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -1221,9 +1254,9 @@
             <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
                 <span class="n">chain</span><span class="o">.</span><span class="n">generate_unique_atom_names</span><span class="p">()</span>
             <span class="n">warn</span><span class="p">(</span>
-            <span class="s2">"Random coordinates have been generated. Any charges previously applied to the system.chains attribute "</span>
-            <span class="s2">"will need to be reapplied. Please ensure optimized conformer generation is performed prior to simulation (e.g. using Polyply)."</span><span class="p">,</span>
-            <span class="ne">UserWarning</span><span class="p">,</span>
+                <span class="s2">"Random coordinates have been generated. Any charges previously applied to the system.chains attribute "</span>
+                <span class="s2">"will need to be reapplied. Please ensure optimized conformer generation is performed prior to simulation (e.g. using Polyply)."</span><span class="p">,</span>
+                <span class="ne">UserWarning</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
@@ -1291,16 +1324,22 @@
             <span class="s2">"B_block_length"</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">B_block_length</span><span class="p">],</span>
             <span class="s2">"A_block_length"</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">A_block_length</span><span class="p">],</span>
             <span class="s2">"mean_blockiness"</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mean_blockiness</span><span class="p">],</span>
-            <span class="s2">"A_actual"</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">A_actual</span><span class="p">]</span>
+            <span class="s2">"A_actual"</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">A_actual</span><span class="p">],</span>
         <span class="p">}</span>
-        
+
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"charge_scheme"</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge_scheme</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">all_data</span><span class="p">[</span><span class="s2">"charge_scheme"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_scheme</span><span class="p">]</span>
-        
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"residual_monomer_actual"</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">residual_monomer_actual</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"residual_monomer_actual"</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">residual_monomer_actual</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="p">):</span>
             <span class="n">all_data</span><span class="p">[</span><span class="s2">"residual_monomer_actual"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">residual_monomer_actual</span><span class="p">]</span>
-        
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"residual_oligomer_actual"</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">residual_oligomer_actual</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"residual_oligomer_actual"</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">residual_oligomer_actual</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="p">):</span>
             <span class="n">all_data</span><span class="p">[</span><span class="s2">"residual_oligomer_actual"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">residual_oligomer_actual</span><span class="p">]</span>
 
         <span class="n">subset_data</span> <span class="o">=</span> <span class="p">{</span>
@@ -1420,13 +1459,13 @@
 <span class="sd">            If partial charges are not assigned to the system, processing large systems may raise errors from OpenFF-Interchange.</span>
 <span class="sd">        """</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.build</span><span class="w"> </span><span class="kn">import</span> <span class="n">calculate_box_components</span>
-        
+
         <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange</span><span class="w"> </span><span class="kn">import</span> <span class="n">Interchange</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange.components._packmol</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNIT_CUBE</span>    
+        <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange.components._packmol</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNIT_CUBE</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">ForceField</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">generate_conformers</span><span class="p">(</span><span class="n">random</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generate_conformers</span><span class="p">(</span><span class="n">random</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge_scheme</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">charge_system</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_scheme</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -1597,7 +1636,9 @@
                 <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1.05</span><span class="p">))</span>
                 <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length_target</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span>
                 <span class="n">chain_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">lognormal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-                <span class="n">chain_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">chain_lengths</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Extract scalar value</span>
+                <span class="n">chain_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">chain_lengths</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)[</span>
+                    <span class="mi">0</span>
+                <span class="p">]</span>  <span class="c1"># Extract scalar value</span>
                 <span class="n">oligo_seq</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span>
                     <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span>
                     <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
@@ -1733,7 +1774,7 @@
     <span class="p">)</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">openff.units</span><span class="w"> </span><span class="kn">import</span> <span class="n">unit</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">rdkit.Chem</span><span class="w"> </span><span class="kn">import</span> <span class="n">AllChem</span>
-    
+
 <div class="viewcode-block" id="polymer_system_from_PDI.__init__">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system_from_PDI.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
@@ -1745,129 +1786,129 @@
         <span class="n">PDI_target</span><span class="p">,</span>
         <span class="n">stereoisomerism_input</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">terminals</span><span class="o">=</span><span class="s2">"hydrogen"</span><span class="p">,</span>
-        <span class="n">initiator</span><span class="o">=</span><span class="s1">'[H]'</span><span class="p">,</span>
+        <span class="n">initiator</span><span class="o">=</span><span class="s2">"[H]"</span><span class="p">,</span>
         <span class="n">perc_A_target</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
         <span class="n">blockiness_target</span><span class="o">=</span><span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="s2">"A"</span><span class="p">],</span>
         <span class="n">copolymer</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">diblock</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">acceptance</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-        <span class="n">verbose</span><span class="o">=</span><span class="kc">None</span>
+        <span class="n">verbose</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Initialize the polymer system and build the polymer chains.</span>
-<span class="sd">        </span>
+
 <span class="sd">        This class initializes a polymer system and generates polymer chains based on the specified parameters. It supports homopolymers, copolymers, and diblock copolymers, with options for stereoisomerism, terminal groups, and blockiness control. The class also allows for fine-tuning of the polydispersity index (PDI) and other polymer properties.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        monomer_list : list</span>
 <span class="sd">            List of monomers to be used in the polymerization.</span>
-<span class="sd">        </span>
+
 <span class="sd">        reaction : str</span>
 <span class="sd">            The type of reaction to be used for polymerization.</span>
-<span class="sd">        </span>
+
 <span class="sd">        length_target : float</span>
 <span class="sd">            The target length of the polymer chains.</span>
-<span class="sd">        </span>
+
 <span class="sd">        num_chains : int</span>
 <span class="sd">            The number of polymer chains to be generated.</span>
-<span class="sd">        </span>
+
 <span class="sd">        PDI_target : float</span>
 <span class="sd">            The target polydispersity index (PDI) of the polymer chains. A PDI value of up to 3.0 is supported. Smaller systems may not achieve high PDI values.</span>
-<span class="sd">        </span>
+
 <span class="sd">        stereoisomerism_input : tuple, optional</span>
 <span class="sd">            A tuple containing:</span>
 <span class="sd">                - The monomer (str).</span>
 <span class="sd">                - The instance fraction (float, e.g., 0.5 for 50% stereoisomer).</span>
 <span class="sd">                - The SMILES string (str) of the stereoisomer to be introduced.</span>
 <span class="sd">            Default is None.</span>
-<span class="sd">        </span>
+
 <span class="sd">        terminals : str, optional</span>
 <span class="sd">            The type of terminal groups to be used. Default is 'hydrogen', which adds a hydrogen atom.</span>
 
 <span class="sd">        initiator : (str, optional)</span>
 <span class="sd">            The initiator group/alternate terminal to be added to the polymer as a canonical SMILES string. Default is '[H]'.</span>
-<span class="sd">        </span>
+
 <span class="sd">        perc_A_target : float, optional</span>
 <span class="sd">            The target percentage of monomer A in the copolymer. Default is 100.</span>
-<span class="sd">        </span>
+
 <span class="sd">        blockiness_target : float, optional</span>
 <span class="sd">            The target blockiness of the copolymer, indicating the degree of clustering of monomers A and B. Default is 1.0, with reference to 'A' monomer linkages.</span>
-<span class="sd">        </span>
+
 <span class="sd">        copolymer : bool, optional</span>
 <span class="sd">            Flag to indicate if the system is a copolymer. Default is False.</span>
-<span class="sd">        </span>
+
 <span class="sd">        diblock : bool, optional</span>
 <span class="sd">            Flag to indicate if the system is a diblock copolymer. Default is False.</span>
-<span class="sd">        </span>
+
 <span class="sd">        acceptance : float, optional</span>
 <span class="sd">            The percentage deviation allowed for blockiness and A percentage from target values. Default is 10%.</span>
-<span class="sd">        </span>
+
 <span class="sd">        verbose : bool, optional</span>
 <span class="sd">            If True, enables logging messages for debugging and progress tracking. Default is False.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Attributes</span>
 <span class="sd">        ----------</span>
 <span class="sd">        length_target : float</span>
 <span class="sd">            The target length of the polymer chains.</span>
-<span class="sd">        </span>
+
 <span class="sd">        terminals : str</span>
 <span class="sd">            The type of terminal groups used.</span>
-<span class="sd">        </span>
+
 <span class="sd">        blockiness_target : float</span>
 <span class="sd">            The target blockiness of the copolymer.</span>
-<span class="sd">        </span>
+
 <span class="sd">        A_target : float</span>
 <span class="sd">            The target percentage of monomer A in the copolymer.</span>
-<span class="sd">        </span>
+
 <span class="sd">        chains : list</span>
 <span class="sd">            List of polymer chains as OpenFF Molecule objects.</span>
-<span class="sd">        </span>
+
 <span class="sd">        chain_rdkit : list</span>
 <span class="sd">            List of polymer chains as RDKit molecule objects.</span>
-<span class="sd">        </span>
+
 <span class="sd">        lengths : list</span>
 <span class="sd">            List of lengths of the polymer chains.</span>
-<span class="sd">        </span>
+
 <span class="sd">        perc_A_actual : list</span>
 <span class="sd">            List of actual percentages of monomer A in the polymer chains.</span>
-<span class="sd">        </span>
+
 <span class="sd">        B_block_length : float</span>
 <span class="sd">            The average block length of monomer B in the copolymer.</span>
-<span class="sd">        </span>
+
 <span class="sd">        A_block_length : float</span>
 <span class="sd">            The average block length of monomer A in the copolymer.</span>
-<span class="sd">        </span>
+
 <span class="sd">        blockiness_list : list</span>
 <span class="sd">            List of blockiness values for the polymer chains.</span>
-<span class="sd">        </span>
+
 <span class="sd">        mean_blockiness : float</span>
 <span class="sd">            The mean blockiness of the polymer chains.</span>
-<span class="sd">        </span>
+
 <span class="sd">        mol_weight_average : float</span>
 <span class="sd">            The average molecular weight of the polymer chains.</span>
-<span class="sd">        </span>
+
 <span class="sd">        PDI : float</span>
 <span class="sd">            The polydispersity index of the polymer chains.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Mn : float</span>
 <span class="sd">            The number-average molecular weight of the polymer chains.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Mw : float</span>
 <span class="sd">            The weight-average molecular weight of the polymer chains.</span>
-<span class="sd">        </span>
+
 <span class="sd">        num_chains : int</span>
 <span class="sd">            The number of polymer chains generated.</span>
-<span class="sd">        </span>
+
 <span class="sd">        length_average : float</span>
 <span class="sd">            The average length of the polymer chains.</span>
-<span class="sd">        </span>
+
 <span class="sd">        min_length : float</span>
 <span class="sd">            The minimum length of the polymer chains.</span>
-<span class="sd">        </span>
+
 <span class="sd">        max_length : float</span>
 <span class="sd">            The maximum length of the polymer chains.</span>
-<span class="sd">        </span>
+
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
 <span class="sd">        - This class is under development and may change significantly in future versions of SwiftPol.</span>
@@ -1876,6 +1917,7 @@
         <span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.build</span><span class="w"> </span><span class="kn">import</span> <span class="n">_generate_chain_lengths</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">swiftpol.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">_generate_chain_id</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">length_target</span> <span class="o">=</span> <span class="n">length_target</span>
@@ -1914,19 +1956,23 @@
         <span class="c1"># Generate chain lengths based on PDI_target</span>
         <span class="k">if</span> <span class="n">copolymer</span><span class="p">:</span>
             <span class="c1"># Generate a list of chain lengths</span>
-            <span class="n">chain_lengths</span> <span class="o">=</span> <span class="n">_generate_chain_lengths</span><span class="p">(</span><span class="n">num_chains</span><span class="p">,</span> 
-                                                    <span class="n">length_target</span><span class="p">,</span> 
-                                                    <span class="n">PDI_target</span><span class="p">,</span> 
-                                                    <span class="n">clip_min</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> 
-                                                    <span class="n">clip_max</span><span class="o">=</span><span class="n">length_target</span><span class="o">*</span><span class="mi">5</span><span class="p">,</span>
-                                                    <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+            <span class="n">chain_lengths</span> <span class="o">=</span> <span class="n">_generate_chain_lengths</span><span class="p">(</span>
+                <span class="n">num_chains</span><span class="p">,</span>
+                <span class="n">length_target</span><span class="p">,</span>
+                <span class="n">PDI_target</span><span class="p">,</span>
+                <span class="n">clip_min</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">clip_max</span><span class="o">=</span><span class="n">length_target</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="c1"># Build chains based on generated lengths</span>
             <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">length_actual</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chain_lengths</span><span class="p">):</span>
                 <span class="n">loops_tracker</span> <span class="o">=</span> <span class="mi">0</span>
                 <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">loops_tracker</span><span class="o">&gt;</span><span class="mi">200</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">loops_tracker</span> <span class="o">&gt;</span> <span class="mi">200</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"build attempts exceeded 200, disregarding chain"</span><span class="p">)</span>  
+                            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">"build attempts exceeded 200, disregarding chain"</span>
+                            <span class="p">)</span>
                         <span class="k">break</span>
                     <span class="k">if</span> <span class="n">diblock</span><span class="p">:</span>
                         <span class="n">sequence</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span>
@@ -1965,12 +2011,16 @@
                             <span class="n">chains_rdkit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
                             <span class="n">chain</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
                             <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
-                            <span class="n">perc_A_actual</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">"A"</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
-                            <span class="n">blockiness</span><span class="p">,</span> <span class="n">bbl</span><span class="p">,</span> <span class="n">abl</span> <span class="o">=</span> <span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">blockiness_target</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                            <span class="n">perc_A_actual</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                <span class="p">(</span><span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">"A"</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span>
+                            <span class="p">)</span>
+                            <span class="n">blockiness</span><span class="p">,</span> <span class="n">bbl</span><span class="p">,</span> <span class="n">abl</span> <span class="o">=</span> <span class="n">blockiness_gen</span><span class="p">(</span>
+                                <span class="n">sequence</span><span class="p">,</span> <span class="n">blockiness_target</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                            <span class="p">)</span>
                             <span class="n">blockiness_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blockiness</span><span class="p">)</span>
                             <span class="n">BBL</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bbl</span><span class="p">)</span>
                             <span class="n">ABL</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">abl</span><span class="p">)</span>
-                             
+
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">pol</span> <span class="o">=</span> <span class="n">build_polymer</span><span class="p">(</span>
                                 <span class="n">sequence</span><span class="o">=</span><span class="n">sequence</span><span class="p">,</span>
@@ -1985,19 +2035,22 @@
                             <span class="n">chains_rdkit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
                             <span class="n">chain</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
                             <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
-                            <span class="n">perc_A_actual</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">"A"</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>                        
-                            <span class="n">blockiness</span><span class="p">,</span> <span class="n">bbl</span><span class="p">,</span> <span class="n">abl</span> <span class="o">=</span> <span class="n">blockiness_gen</span><span class="p">(</span><span class="n">sequence</span><span class="p">,</span> <span class="n">blockiness_target</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                            <span class="n">perc_A_actual</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                <span class="p">(</span><span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">"A"</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span>
+                            <span class="p">)</span>
+                            <span class="n">blockiness</span><span class="p">,</span> <span class="n">bbl</span><span class="p">,</span> <span class="n">abl</span> <span class="o">=</span> <span class="n">blockiness_gen</span><span class="p">(</span>
+                                <span class="n">sequence</span><span class="p">,</span> <span class="n">blockiness_target</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                            <span class="p">)</span>
                             <span class="n">blockiness_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">blockiness</span><span class="p">)</span>
                             <span class="n">BBL</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bbl</span><span class="p">)</span>
                             <span class="n">ABL</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">abl</span><span class="p">)</span>
                         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Built chain </span><span class="si">{</span><span class="n">id_new</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>  
+                            <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Built chain </span><span class="si">{</span><span class="n">id_new</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
-                        
                         <span class="k">break</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">loops_tracker</span><span class="o">+=</span><span class="mi">1</span>
-           
+                        <span class="n">loops_tracker</span> <span class="o">+=</span> <span class="mi">1</span>
+
             <span class="c1"># Finalize statistics</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">B_block_length</span> <span class="o">=</span> <span class="n">mean</span><span class="p">(</span><span class="n">BBL</span><span class="p">)</span>
@@ -2014,18 +2067,20 @@
                 <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Generate chain lengths based on PDI_target</span>
-            <span class="n">chain_lengths</span> <span class="o">=</span> <span class="n">_generate_chain_lengths</span><span class="p">(</span><span class="n">num_chains</span><span class="p">,</span> 
-                                                    <span class="n">length_target</span><span class="p">,</span> 
-                                                    <span class="n">PDI_target</span><span class="p">,</span> 
-                                                    <span class="n">clip_min</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> 
-                                                    <span class="n">clip_max</span><span class="o">=</span><span class="n">length_target</span><span class="o">*</span><span class="mi">5</span><span class="p">,</span>
-                                                    <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
-        
+            <span class="n">chain_lengths</span> <span class="o">=</span> <span class="n">_generate_chain_lengths</span><span class="p">(</span>
+                <span class="n">num_chains</span><span class="p">,</span>
+                <span class="n">length_target</span><span class="p">,</span>
+                <span class="n">PDI_target</span><span class="p">,</span>
+                <span class="n">clip_min</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                <span class="n">clip_max</span><span class="o">=</span><span class="n">length_target</span> <span class="o">*</span> <span class="mi">5</span><span class="p">,</span>
+                <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">,</span>
+            <span class="p">)</span>
+
             <span class="c1"># Build chains based on generated lengths</span>
             <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">length_actual</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chain_lengths</span><span class="p">):</span>
                 <span class="c1"># Generate sequence</span>
-                <span class="n">sequence</span> <span class="o">=</span> <span class="s1">'A'</span> <span class="o">*</span> <span class="n">length_actual</span>
-        
+                <span class="n">sequence</span> <span class="o">=</span> <span class="s2">"A"</span> <span class="o">*</span> <span class="n">length_actual</span>
+
                 <span class="c1"># Handle stereoisomerism if specified</span>
                 <span class="n">id_new</span> <span class="o">=</span> <span class="n">_generate_chain_id</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">stereoisomerism_input</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -2052,14 +2107,14 @@
                         <span class="n">chainID</span><span class="o">=</span><span class="n">id_new</span><span class="p">,</span>
                     <span class="p">)</span>
                 <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Built chain </span><span class="si">{</span><span class="n">id_new</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>           
+                    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Built chain </span><span class="si">{</span><span class="n">id_new</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
                 <span class="c1"># Store chain data</span>
                 <span class="n">lengths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">length_actual</span><span class="p">))</span>
                 <span class="n">chains_rdkit</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
                 <span class="n">chain</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">pol</span><span class="p">)</span>
                 <span class="n">chains</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span>
                 <span class="n">perc_A_actual</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sequence</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">"A"</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">sequence</span><span class="p">))</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
-        
+
             <span class="c1"># Set attributes for homopolymer</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">A_target</span> <span class="o">=</span> <span class="n">perc_A_target</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">B_block_length</span> <span class="o">=</span> <span class="kc">None</span>
@@ -2083,7 +2138,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">min_length</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Built SwiftPol ensemble of size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_chains</span><span class="si">}</span><span class="s1"> and PDI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PDI</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span></div>
+            <span class="nb">print</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Built SwiftPol ensemble of size </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_chains</span><span class="si">}</span><span class="s2"> and PDI </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PDI</span><span class="si">}</span><span class="s2">"</span>
+            <span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -2093,7 +2150,6 @@
             <span class="sa">f</span><span class="s2">"average chain length = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">length_average</span><span class="si">}</span><span class="s2">-mers, PDI = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">PDI</span><span class="si">}</span><span class="s2">"</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">description</span>
-
 
 <div class="viewcode-block" id="polymer_system_from_PDI.generate_conformers">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system_from_PDI.generate_conformers">[docs]</a>
@@ -2138,7 +2194,9 @@
         <span class="kn">from</span><span class="w"> </span><span class="nn">warnings</span><span class="w"> </span><span class="kn">import</span> <span class="n">warn</span>
 
         <span class="k">if</span> <span class="n">rough</span> <span class="ow">and</span> <span class="n">random</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Please select either rough or random conformer generation, not both."</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">"Please select either rough or random conformer generation, not both."</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">rough</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">AllChem</span><span class="o">.</span><span class="n">EmbedParameters</span><span class="p">()</span>
@@ -2154,19 +2212,24 @@
             <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
                 <span class="n">chain</span><span class="o">.</span><span class="n">generate_unique_atom_names</span><span class="p">()</span>
             <span class="n">warn</span><span class="p">(</span>
-            <span class="s2">"Rough coordinates have been generated. Any charges previously applied to the system.chains attribute"</span>
-            <span class="s2">"will need to be reapplied."</span><span class="p">,</span>
-            <span class="ne">UserWarning</span><span class="p">,</span>
-            <span class="p">)</span>   
+                <span class="s2">"Rough coordinates have been generated. Any charges previously applied to the system.chains attribute"</span>
+                <span class="s2">"will need to be reapplied."</span><span class="p">,</span>
+                <span class="ne">UserWarning</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="k">elif</span> <span class="n">random</span><span class="p">:</span>
             <span class="kn">import</span><span class="w"> </span><span class="nn">random</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ran</span>
+
             <span class="k">for</span> <span class="n">mol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chain_rdkit</span><span class="p">:</span>
                 <span class="n">num_atoms</span> <span class="o">=</span> <span class="n">mol</span><span class="o">.</span><span class="n">GetNumAtoms</span><span class="p">()</span>
                 <span class="n">conf</span> <span class="o">=</span> <span class="n">Chem</span><span class="o">.</span><span class="n">Conformer</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_atoms</span><span class="p">):</span>
                     <span class="c1"># Generate random x, y, z coordinates</span>
-                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span> <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                        <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                        <span class="n">ran</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+                    <span class="p">)</span>
                     <span class="n">conf</span><span class="o">.</span><span class="n">SetAtomPosition</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
                 <span class="n">mol</span><span class="o">.</span><span class="n">RemoveAllConformers</span><span class="p">()</span>  <span class="c1"># Clear existing conformers from RDKit molecule</span>
                 <span class="n">mol</span><span class="o">.</span><span class="n">AddConformer</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">assignId</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -2175,9 +2238,9 @@
             <span class="k">for</span> <span class="n">chain</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">:</span>
                 <span class="n">chain</span><span class="o">.</span><span class="n">generate_unique_atom_names</span><span class="p">()</span>
             <span class="n">warn</span><span class="p">(</span>
-            <span class="s2">"Random coordinates have been generated. Any charges previously applied to the system.chains attribute "</span>
-            <span class="s2">"will need to be reapplied. Please ensure optimized conformer generation is performed prior to simulation (e.g. using Polyply)."</span><span class="p">,</span>
-            <span class="ne">UserWarning</span><span class="p">,</span>
+                <span class="s2">"Random coordinates have been generated. Any charges previously applied to the system.chains attribute "</span>
+                <span class="s2">"will need to be reapplied. Please ensure optimized conformer generation is performed prior to simulation (e.g. using Polyply)."</span><span class="p">,</span>
+                <span class="ne">UserWarning</span><span class="p">,</span>
             <span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
@@ -2225,7 +2288,7 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">export_to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">include_all_data</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Export the attributes of the polymer_system instance into a pandas DataFrame and save it as a CSV file.</span>
-<span class="sd">    </span>
+
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        filename : str</span>
@@ -2246,16 +2309,22 @@
             <span class="s2">"B_block_length"</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">B_block_length</span><span class="p">],</span>
             <span class="s2">"A_block_length"</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">A_block_length</span><span class="p">],</span>
             <span class="s2">"mean_blockiness"</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mean_blockiness</span><span class="p">],</span>
-            <span class="s2">"A_actual"</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">A_actual</span><span class="p">]</span>
+            <span class="s2">"A_actual"</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">A_actual</span><span class="p">],</span>
         <span class="p">}</span>
-        
+
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"charge_scheme"</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge_scheme</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">all_data</span><span class="p">[</span><span class="s2">"charge_scheme"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_scheme</span><span class="p">]</span>
-        
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"residual_monomer_actual"</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">residual_monomer_actual</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"residual_monomer_actual"</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">residual_monomer_actual</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="p">):</span>
             <span class="n">all_data</span><span class="p">[</span><span class="s2">"residual_monomer_actual"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">residual_monomer_actual</span><span class="p">]</span>
-        
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"residual_oligomer_actual"</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">residual_oligomer_actual</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">"residual_oligomer_actual"</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">residual_oligomer_actual</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="p">):</span>
             <span class="n">all_data</span><span class="p">[</span><span class="s2">"residual_oligomer_actual"</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">residual_oligomer_actual</span><span class="p">]</span>
 
         <span class="n">subset_data</span> <span class="o">=</span> <span class="p">{</span>
@@ -2371,7 +2440,8 @@
         <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange</span><span class="w"> </span><span class="kn">import</span> <span class="n">Interchange</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">openff.toolkit</span><span class="w"> </span><span class="kn">import</span> <span class="n">ForceField</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange.components._packmol</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNIT_CUBE</span>  
+        <span class="kn">from</span><span class="w"> </span><span class="nn">openff.interchange.components._packmol</span><span class="w"> </span><span class="kn">import</span> <span class="n">UNIT_CUBE</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">charge_scheme</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">charge_system</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">charge_scheme</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -2381,14 +2451,19 @@
             <span class="p">)</span>
 
         <span class="n">box_vectors</span> <span class="o">=</span> <span class="p">(</span><span class="mi">50</span> <span class="o">*</span> <span class="n">unit</span><span class="o">.</span><span class="n">angstrom</span><span class="p">)</span> <span class="o">*</span> <span class="n">UNIT_CUBE</span>
-        <span class="n">molecules</span><span class="p">,</span> <span class="n">number_of_copies</span><span class="p">,</span> <span class="n">residual_monomer_actual</span><span class="p">,</span> <span class="n">residual_oligomer_actual</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_residuals</span><span class="p">(</span><span class="n">residual_monomer</span><span class="p">,</span> <span class="n">residual_oligomer</span><span class="p">)</span>
+        <span class="p">(</span>
+            <span class="n">molecules</span><span class="p">,</span>
+            <span class="n">number_of_copies</span><span class="p">,</span>
+            <span class="n">residual_monomer_actual</span><span class="p">,</span>
+            <span class="n">residual_oligomer_actual</span><span class="p">,</span>
+        <span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">calculate_residuals</span><span class="p">(</span><span class="n">residual_monomer</span><span class="p">,</span> <span class="n">residual_oligomer</span><span class="p">)</span>
         <span class="n">mol_pdb_files_dest</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">molecules</span><span class="p">:</span>
             <span class="n">string_i</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">molecules</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="o">+</span> <span class="s2">".pdb"</span>
             <span class="n">mol_pdb_files_dest</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">string_i</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">i</span><span class="o">.</span><span class="n">has_unique_atom_names</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
                 <span class="n">i</span><span class="o">.</span><span class="n">generate_unique_atom_names</span><span class="p">()</span>
-            <span class="n">i</span><span class="o">.</span><span class="n">generate_conformers</span><span class="p">(</span><span class="n">n_conformers</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Conformers generated for residuals</span>
+            <span class="n">i</span><span class="o">.</span><span class="n">generate_conformers</span><span class="p">(</span><span class="n">n_conformers</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># Conformers generated for residuals</span>
             <span class="n">i</span><span class="o">.</span><span class="n">to_file</span><span class="p">(</span><span class="n">string_i</span><span class="p">,</span> <span class="n">file_format</span><span class="o">=</span><span class="s2">"pdb"</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">residual_monomer_actual</span> <span class="o">=</span> <span class="n">residual_monomer_actual</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">residual_oligomer_actual</span> <span class="o">=</span> <span class="n">residual_oligomer_actual</span>
@@ -2423,6 +2498,7 @@
             <span class="n">return_tuple</span> <span class="o">+=</span> <span class="p">(</span><span class="n">pdb_file</span><span class="p">,)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Polyply input files generated! Saved at </span><span class="si">{</span><span class="n">return_tuple</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">topology</span></div>
+
 
 <div class="viewcode-block" id="polymer_system_from_PDI.calculate_residuals">
 <a class="viewcode-back" href="../../api.html#swiftpol.build.polymer_system_from_PDI.calculate_residuals">[docs]</a>
@@ -2539,7 +2615,9 @@
                 <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">1.05</span><span class="p">))</span>
                 <span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">length_target</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span>
                 <span class="n">chain_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">lognormal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-                <span class="n">chain_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">chain_lengths</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># Extract scalar value</span>
+                <span class="n">chain_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">chain_lengths</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)[</span>
+                    <span class="mi">0</span>
+                <span class="p">]</span>  <span class="c1"># Extract scalar value</span>
                 <span class="n">oligo_seq</span> <span class="o">=</span> <span class="n">reduce</span><span class="p">(</span>
                     <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">,</span>
                     <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
@@ -2554,7 +2632,7 @@
                     <span class="n">monomer_list</span><span class="o">=</span><span class="n">monomer_list</span><span class="p">,</span>
                     <span class="n">reaction</span><span class="o">=</span><span class="n">AllChem</span><span class="o">.</span><span class="n">ReactionFromSmarts</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reaction</span><span class="p">),</span>
                     <span class="n">chain_num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span>
-                    <span class="n">terminal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">terminals</span><span class="p">,</span>                
+                    <span class="n">terminal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">terminals</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="n">oligomer</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">oligomer_rd</span><span class="p">)</span>
                 <span class="n">oligomer</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"oligo"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
@@ -2595,7 +2673,7 @@
                     <span class="n">monomer_list</span><span class="o">=</span><span class="n">monomer_list</span><span class="p">,</span>
                     <span class="n">reaction</span><span class="o">=</span><span class="n">AllChem</span><span class="o">.</span><span class="n">ReactionFromSmarts</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reaction</span><span class="p">),</span>
                     <span class="n">chain_num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">i</span><span class="p">,</span>
-                    <span class="n">terminal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">terminals</span><span class="p">,</span>                    
+                    <span class="n">terminal</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">terminals</span><span class="p">,</span>
                 <span class="p">)</span>
                 <span class="n">oligomer</span> <span class="o">=</span> <span class="n">Molecule</span><span class="o">.</span><span class="n">from_rdkit</span><span class="p">(</span><span class="n">oligomer_rd</span><span class="p">)</span>
                 <span class="n">oligomer</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">"oligo"</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">chains</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">i</span><span class="p">)</span>
@@ -2644,9 +2722,6 @@
                 <span class="n">residual_oligomer_actual</span><span class="p">,</span>
             <span class="p">)</span></div>
 </div>
-
-        
-
 
 </pre></div>
 
