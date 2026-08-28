@@ -111,6 +111,6 @@ jobs:
       run: |
         pip install genbadge[coverage]
         genbadge coverage -i coverage.xml
-        mv coverage-badge.svg Repo/
+        mv /home/runner/work/SwiftPol/SwiftPol/coverage-badge.svg Repo/
 
     
